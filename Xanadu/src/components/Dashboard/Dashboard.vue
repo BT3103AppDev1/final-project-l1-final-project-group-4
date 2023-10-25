@@ -52,7 +52,7 @@ export default {
         activity.id = docs.id;
         activities.push(activity);
         // console.log(docs.data());
-        console.log(activity);
+        //console.log(activity);
       });
       return activities;
       // console.log(activities);
@@ -88,9 +88,9 @@ export default {
     //   console.log(doc);
     // });
     // console.log(this.activityData);
-    console.log(
-      "activityData and activityChartData has loaded in Dashboard.vue."
-    );
+    // console.log(
+    //   "activityData and activityChartData has loaded in Dashboard.vue."
+    // );
   },
 };
 </script>

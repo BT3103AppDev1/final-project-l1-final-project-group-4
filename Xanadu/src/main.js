@@ -29,6 +29,10 @@ import Toolbar from "primevue/toolbar";
 import RadioButton from "primevue/radiobutton";
 import Dialog from "primevue/dialog";
 import Textarea from "primevue/textarea";
+import FocusTrap from "primevue/focustrap";
+import Password from "primevue/password";
+import Divider from "primevue/divider";
+import Menubar from 'primevue/menubar';
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
 
@@ -55,5 +59,9 @@ app.component("Calendar", Calendar);
 app.component("Button", Button);
 app.component("InputText", InputText);
 app.component("Toast", Toast);
+app.directive("focustrap", FocusTrap);
+app.component("Password", Password);
+app.component("Divider", Divider);
+app.component("Menubar", Menubar);
 
 createApp(App).use(router).use(VueChartkick).mount("#app");
