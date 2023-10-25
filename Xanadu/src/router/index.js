@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/DashboardView.vue";
 import Forum from "../views/ForumView.vue";
 import Marketplace from "../views/MarketplaceView.vue";
-
+import EditProduct from '../views/EditProduct.vue'
 import Register from "../views/RegisterView.vue";
 
 import AddProduct from "../views/AddProduct.vue";
@@ -38,7 +38,7 @@ const router = createRouter({
       component: Register,
     },
     {
-      path: "/AddProduct",
+      path: "/marketplace/AddProduct",
       name: "AddProduct",
       component: AddProduct,
     },
