@@ -2,17 +2,13 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/DashboardView.vue";
 import Forum from "../views/ForumView.vue";
 import Marketplace from "../views/MarketplaceView.vue";
-import EditProduct from '../views/EditProduct.vue'
-import Register from "../views/RegisterView.vue";
-
-import AddProduct from "../views/AddProduct.vue";
-import ProductView from "../views/ProductView.vue";
-
-import AddThread from "../views/AddThread.vue";
-import AddReply from "../views/AddReply.vue";
-import ThreadReply from "../views/ThreadReplyView.vue";
-
-import Cart from "../views/CartView.vue"; // Import the Cart component here
+import AddProduct from '../views/AddProduct.vue';
+import ProductView from '../views/ProductView.vue';
+import Cart from '../views/CartView.vue';
+import EditProduct from '../views/EditProduct.vue';
+import Register from "../views/RegisterView.vue"; // Added this import
+import AddThread from "../views/AddThread.vue"; // Added this import
+import AddReply from "../views/AddReply.vue"; // Added this import
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,7 +34,7 @@ const router = createRouter({
       component: Register,
     },
     {
-      path: "/marketplace/AddProduct",
+      path: "/AddProduct",
       name: "AddProduct",
       component: AddProduct,
     },
@@ -48,14 +44,9 @@ const router = createRouter({
       component: ProductView,
     },
     {
-      path:'/marketplace/product/:id/edit',
-      name: 'EditProduct',
-      component: EditProduct
-    },
-    {
-      path: '/cart', // Add the cart route here
-      name: 'Cart',
-      component: Cart
+      path: "/cart",
+      name: "Cart",
+      component: Cart,
     },
     { 
       path: "/AddThread", 
@@ -73,6 +64,11 @@ const router = createRouter({
       name: "AddReply",
       component: AddReply,
     },
+    {
+      path:'/marketplace/product/:id/edit',
+      name: 'EditProduct',
+      component: EditProduct
+    }
   ],
 });
 
