@@ -64,4 +64,7 @@ app.component("Password", Password);
 app.component("Divider", Divider);
 app.component("Menubar", Menubar);
 
-createApp(App).use(router).use(VueChartkick).mount("#app");
+// createApp(App).use(router).use(VueChartkick).mount("#app");
+app.use(router);
+app.use(VueChartkick);
+app.mount("#app");
