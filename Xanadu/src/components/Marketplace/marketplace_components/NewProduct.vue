@@ -19,7 +19,8 @@ export default {
             ShortDesc:"",
             Shipping:"",
             Dimensions:"",
-            Desc:""
+            Desc:"",
+            Cost: ""
         }
     },
     methods : {
@@ -56,7 +57,8 @@ export default {
                 shipping: this.Shipping,
                 dimensions: this.Dimensions,
                 desc: this.Desc,
-                pictures: this.img1
+                pictures: this.img1,
+                cost: this.Cost
             })
             const docSnap = await getDoc(doc(db,this.username,this.Title))
             console.log(docSnap.data())
@@ -83,6 +85,7 @@ export default {
     <div class="titleAndDesc">
         <input v-model="Title" type="text" id="Title" name="Title" placeholder="Title">
         <input v-model="ShortDesc" type="text" id="ShortDesc" name="ShortDesc" placeholder="Short Description">
+        <input v-model.number="Cost" type="number" id="Cost" name="Cost" placeholder="Cost">
     </div>
 </div>
 <div class="lowerhalf">
@@ -240,7 +243,7 @@ input::placeholder {
     color: #CDD7CF;
 }
 
-input[name="ShortDesc"]::placeholder, input[name="ShortDesc"] {
+input[name="ShortDesc"]::placeholder, input[name="ShortDesc"],input[name="Cost"]::placeholder, input[name="Cost"]{
     
     /* bodyLG */
     font-family: Montserrat;
@@ -266,6 +269,16 @@ input[name="ShortDesc"] {
     display: flex;
     width: 650px;
     height: 60px;
+    flex-direction: row;
+    justify-content: center;
+    border: 1px solid #CBCBCB;
+}
+
+input[name="Cost"] {
+    margin: 10px 0px 0px 0px;
+    display: flex;
+    width: 200px;
+    height: 40px;
     flex-direction: row;
     justify-content: center;
     border: 1px solid #CBCBCB;

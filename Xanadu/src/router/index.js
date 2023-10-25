@@ -14,6 +14,13 @@ import AddReply from "../views/AddReply.vue";
 import ThreadReply from "../views/ThreadReplyView.vue";
 
 import Cart from "../views/CartView.vue"; // Import the Cart component here
+import AddProduct from '../views/AddProduct.vue';
+import ProductView from '../views/ProductView.vue';
+import Cart from '../views/CartView.vue';
+import EditProduct from '../views/EditProduct.vue';
+import Register from "../views/RegisterView.vue"; // Added this import
+import AddThread from "../views/AddThread.vue"; // Added this import
+import AddReply from "../views/AddReply.vue"; // Added this import
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,7 +56,7 @@ const router = createRouter({
       component: ProductView,
     },
     {
-      path: "/cart", // Add the cart route here
+      path: "/cart",
       name: "Cart",
       component: Cart,
     },
@@ -73,6 +80,11 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: Login,
+    },
+    {
+      path:'/marketplace/product/:id/edit',
+      name: 'EditProduct',
+      component: EditProduct
     }
   ],
 });
