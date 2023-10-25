@@ -32,6 +32,7 @@ import Textarea from "primevue/textarea";
 import FocusTrap from "primevue/focustrap";
 import Password from "primevue/password";
 import Divider from "primevue/divider";
+import Menubar from 'primevue/menubar';
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
 
@@ -61,6 +62,7 @@ app.component("Toast", Toast);
 app.directive("focustrap", FocusTrap);
 app.component("Password", Password);
 app.component("Divider", Divider);
+app.component("Menubar", Menubar);
 
 app.use(router);
 app.use(VueChartkick);

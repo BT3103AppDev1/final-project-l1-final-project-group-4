@@ -27,10 +27,10 @@ export default {
   },
   watch: {
     activityData(data) {
-      console.log(
-        "activityData has been passed from Dashboard.vue to EcoFriendlyActivities.vue. This is activityData:"
-      );
-      console.log(data);
+      // console.log(
+      //   "activityData has been passed from Dashboard.vue to EcoFriendlyActivities.vue. This is activityData:"
+      // );
+      // console.log(data);
     },
   },
   methods: {
