@@ -4,6 +4,7 @@ import Forum from "../views/ForumView.vue";
 import Marketplace from "../views/MarketplaceView.vue";
 
 import Register from "../views/RegisterView.vue";
+import Login from "../views/LoginView.vue";
 
 import AddProduct from "../views/AddProduct.vue";
 import ProductView from "../views/ProductView.vue";
@@ -68,6 +69,11 @@ const router = createRouter({
       name: "AddReply",
       component: AddReply,
     },
+    {
+      path: "/login",
+      name: "login",
+      component: Login,
+    }
   ],
 });
 
