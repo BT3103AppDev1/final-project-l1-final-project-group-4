@@ -56,6 +56,4 @@ app.component("Button", Button);
 app.component("InputText", InputText);
 app.component("Toast", Toast);
 
-app.use(router);
-app.use(VueChartkick);
-app.mount("#app");
+createApp(App).use(router).use(VueChartkick).mount("#app");

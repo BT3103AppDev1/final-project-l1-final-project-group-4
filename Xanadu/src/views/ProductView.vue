@@ -9,6 +9,10 @@
           <input v-model="quantity" type="number" id="quantity" min="1">
         </div>
         <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
+        <div class="edit-product-btn">
+          <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink>
+        </div>
+        
       </div>
     </div>
   </template>
@@ -40,7 +44,7 @@
           vm.product = {
             id: productDoc.id,
             title: productData.title,
-            description: productData.description,
+            description: productData.desc,
             picture: productData.pictures
           };
         });
@@ -63,6 +67,9 @@
   
         await addDoc(cartRef, productToAdd);
         alert("Added to cart!");
+      },
+      EditProduct(product) {
+        console.log("Edit Product: ", product)
       }
     }
   }
@@ -130,6 +137,7 @@
   }
   
   .cart-btn {
+    margin: 10px;
     background-color: #748C70;
     color: white;
     border: none;
@@ -138,6 +146,23 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+  }
+
+  .edit-product-btn a {
+    background-color: #748C70;
+    color: white;
+    border: none;
+    padding: 12px 24px; /* Increased padding */
+    font-size: 18px; /* Increased font size */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Montserrat;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 140%;
+    text-decoration: none;
+
   }
   
   .cart-btn:hover {

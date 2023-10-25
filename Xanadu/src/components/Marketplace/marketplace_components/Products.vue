@@ -1,29 +1,49 @@
 <template>
-    <div class="products">
-      <img class="productimage" src="@/assets/products page.png">
-      <div class="add-product-btn">
-        <RouterLink to="AddProduct">Add Product</RouterLink>
-      </div>
-  
-      <div class="productlist">
-        <div v-for="product in products" :key="product.title" class="productcard">
-          <RouterLink :to="'/product/' + product.id">
-            <div class="product-card">
-              <div class="product-image-container">
-                <img :src="product.picture" alt="Product Image" class="product-card-image">
-              </div>
-              <div class="product-details">
-                <p class="product-title">{{ product.title }}</p>
-                <p class="product-description">{{ product.Desc || 'No description' }}</p>
-              </div>
+  <div class="products">
+    <img class="productimage" src="@/assets/products page.png">
+    
+    <div class="add-product-btn">
+      <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
+    </div>
+    
+    <!-- PrimeVue Carousel -->
+    <div class="card">
+      <Carousel :value="products" :numVisible="3" :numScroll="3" :responsiveOptions="responsiveOptions">
+        <template #item="slotProps">
+          <div class="border-1 surface-border border-round m-2 text-center py-5 px-3">
+            <div class="mb-3">
+              <img :src="slotProps.data.picture" :alt="slotProps.data.title" class="w-6 shadow-2" />
             </div>
-          </RouterLink>
-        </div>
+            <div>
+              <h4 class="mb-1">{{ slotProps.data.title }}</h4>
+              <p class="product-description">{{ slotProps.data.description || 'No description' }}</p>
+              <!-- You can add more info as needed here -->
+            </div>
+          </div>
+        </template>
+      </Carousel>
+    </div>
+    
+    <!-- Your Existing Code for Product List -->
+    <div class="productlist">
+      <div v-for="product in products" :key="product.title" class="productcard">
+        <RouterLink :to="'/marketplace/product/' + product.id">
+          <div class="product-card">
+            <div class="product-image-container">
+              <img :src="product.picture" alt="Product Image" class="product-card-image">
+            </div>
+            <div class="product-details">
+              <p class="product-title">{{ product.title }}</p>
+              <p class="product-description">{{ product.description || 'No description' }}</p>
+            </div>
+          </div>
+        </RouterLink>
       </div>
     </div>
-  </template>
-  
-  <style>
+  </div>
+</template>
+
+<style>
   .productlist {
     display: flex;
     flex-wrap: wrap;
@@ -112,34 +132,54 @@
     justify-content: center;
   }
   </style>
-  
-  <script>
-  import firebaseApp from "@/firebase.js";
-  import { getFirestore, getDocs, collection } from "firebase/firestore";
-  
-  const db = getFirestore(firebaseApp);
-  
-  export default {
-    data() {
-      return {
-        username: "testuser",
-        products: [],
-      };
-    },
-    async mounted() {
-      const fbproducts = [];
-      const alldocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.username, 'Products'));
-      
-      alldocs.forEach((doc) => {
-        fbproducts.push({
-          id: doc.id,
-          title: doc.data().title,
-          description: doc.data().Desc,
-          picture: doc.data().pictures,
-        });
+
+<script>
+import firebaseApp from "@/firebase.js";
+import { getFirestore, getDocs, collection } from "firebase/firestore";
+import Carousel from 'primevue/carousel'; // Imported Carousel component
+
+const db = getFirestore(firebaseApp);
+
+export default {
+  components: {
+    Carousel // Register the Carousel component
+  },
+  data() {
+    return {
+      username: "testuser",
+      products: [],
+      responsiveOptions: [ // Responsive options for the Carousel
+        {
+          breakpoint: '1199px',
+          numVisible: 1,
+          numScroll: 1
+        },
+        {
+          breakpoint: '991px',
+          numVisible: 2,
+          numScroll: 1
+        },
+        {
+          breakpoint: '767px',
+          numVisible: 1,
+          numScroll: 1
+        }
+      ],
+    };
+  },
+  async mounted() {
+    const fbproducts = [];
+    const alldocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.username, 'Products'));
+    
+    alldocs.forEach((doc) => {
+      fbproducts.push({
+        id: doc.id,
+        title: doc.data().title,
+        description: doc.data().desc,
+        picture: doc.data().pictures,
       });
-      this.products = fbproducts;
-    },
-  };
-  </script>
-  
+    });
+    this.products = fbproducts;
+  },
+};
+</script>

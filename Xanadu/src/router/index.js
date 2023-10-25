@@ -48,9 +48,14 @@ const router = createRouter({
       component: ProductView,
     },
     {
-      path: "/cart", // Add the cart route here
-      name: "Cart",
-      component: Cart,
+      path:'/marketplace/product/:id/edit',
+      name: 'EditProduct',
+      component: EditProduct
+    },
+    {
+      path: '/cart', // Add the cart route here
+      name: 'Cart',
+      component: Cart
     },
     { 
       path: "/AddThread", 
