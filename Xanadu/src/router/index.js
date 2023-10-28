@@ -39,15 +39,15 @@ const router = createRouter({
       component: Register,
     },
     {
-      path: "/AddProduct",
+      path: "/marketplace/AddProduct",
       name: "AddProduct",
       component: AddProduct,
     },
     {
-      path: "/product/:id",
-      name: "ProductView",
-      component: ProductView,
-    },
+      path: '/marketplace/product/:id',
+      component: ProductView,  // Assuming the component name for this view is 'ProductView'
+      props: true
+    },    
     {
       path: "/cart",
       name: "Cart",
