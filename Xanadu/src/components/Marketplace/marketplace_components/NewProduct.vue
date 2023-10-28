@@ -1,27 +1,35 @@
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore} from "firebase/firestore";
-import { setDoc, getDocs, doc, deleteDoc, getDoc} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+import { setDoc, getDocs, doc, deleteDoc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
 
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
+const auth = getAuth(firebaseApp);
 
 export default {
     data() {
         return {
-            showfile : false,
-            img1 : null,
+            showfile: false,
+            img1: null,
             imageData: false,
-            username: "testuser",
-            Title:"",
-            ShortDesc:"",
-            Shipping:"",
-            Dimensions:"",
-            Desc:"",
+            username: null,  // 2. Set to null by default
+            Title: "",
+            ShortDesc: "",
+            Shipping: "",
+            Dimensions: "",
+            Desc: "",
             Cost: ""
         }
+    },
+    mounted() {  // 3. Check the authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.username = user.displayName || user.email || 'anonymous';  // Assign the username, adjust this based on your user structure
+            }
+        });
     },
     methods : {
         triggerInput() {
@@ -49,21 +57,28 @@ export default {
                 }      
                 );
             },
-        async AddProduct() {
-            alert("Adding new product: "+ this.Title)
-            await setDoc(doc(db,'Eco-Entrepreneur',this.username,'Products',this.Title),{
-                title: this.Title,
-                shortdesc: this.ShortDesc,
-                shipping: this.Shipping,
-                dimensions: this.Dimensions,
-                desc: this.Desc,
-                pictures: this.img1,
-                cost: this.Cost
-            })
-            const docSnap = await getDoc(doc(db,this.username,this.Title))
-            console.log(docSnap.data())
-            this.$router.push('/Marketplace')
-        }
+            async AddProduct() {
+                alert("Adding new product: " + this.Title);
+                
+                // Setting the product inside the 'Products' collection
+                const productDocRef = doc(db, 'Products', this.Title);
+                await setDoc(productDocRef, {
+                    title: this.Title,
+                    shortdesc: this.ShortDesc,
+                    shipping: this.Shipping,
+                    dimensions: this.Dimensions,
+                    desc: this.Desc,
+                    pictures: this.img1,
+                    cost: this.Cost,
+                    username: this.username 
+                });
+                
+                // Retrieve the newly added product from the correct location
+                const docSnap = await getDoc(productDocRef);
+                console.log(docSnap.data());
+
+                this.$router.push('/Marketplace');
+            }
     }
 }
 

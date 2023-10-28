@@ -1,84 +1,115 @@
 <template>
-    <div class="product-view">
-      <div class="product-content">
-        <img :src="product.picture" alt="Product Image" class="product-view-image">
-        <h2 class="product-title">{{ product.title }}</h2>
-        <p class="product-description">{{ productDescription }}</p>
-        <div class="quantity-input">
-          <label for="quantity">Quantity:</label>
-          <input v-model="quantity" type="number" id="quantity" min="1">
-        </div>
-        <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
-        <div class="edit-product-btn">
-          <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink>
-        </div>
-        
+  <div class="product-view">
+    <div class="product-content">
+      <img :src="product.picture" alt="Product Image" class="product-view-image">
+      <h2 class="product-title">{{ product.title }}</h2>
+      <p class="product-description">{{ productDescription }}</p>
+      <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
+      <div class="quantity-input">
+        <label for="quantity">Quantity:</label>
+        <input v-model="quantity" type="number" id="quantity" min="1">
+      </div>
+      <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
+      <div class="edit-product-btn">
+        <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import { getFirestore, doc, getDoc, collection, addDoc } from "firebase/firestore";
-  
-  const db = getFirestore();
-  
-  export default {
-    props: {
-      id: String
-    },
-    data() {
-      return {
-        product: {},
-        quantity: 1 // Default quantity is set to 1
-      };
-    },
-    computed: {
-      productDescription() {
-        return this.product.description || "No description";
-      }
-    },
-    beforeRouteEnter(to, from, next) {
-      const productRef = doc(db, 'Eco-Entrepreneur', 'testuser', 'Products', to.params.id);
-  
-      getDoc(productRef).then((productDoc) => {
+  </div>
+</template>
+
+<script>
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
+const db = getFirestore();
+const auth = getAuth();
+
+export default {
+  props: {
+    id: String
+  },
+  data() {
+    return {
+      product: {},
+      quantity: 1
+    };
+  },
+  computed: {
+    productDescription() {
+      return this.product.description || "No description";
+    }
+  },
+  beforeRouteEnter(to, from, next) {
+    const productRef = doc(db, 'Products', to.params.id);
+    getDoc(productRef).then((productDoc) => {
+      if (productDoc.exists) {
         const productData = productDoc.data();
-  
         next(vm => {
           vm.product = {
             id: productDoc.id,
             title: productData.title,
             description: productData.desc,
-            picture: productData.pictures
+            picture: productData.pictures,
+            cost: productData.cost
           };
         });
-      });
-    },
-    methods: {
-      async addToCart(product, quantity) {
-        console.log("Product to add:", product, "Quantity:", quantity);
-  
-        const cartRef = collection(db, 'Eco-Entrepreneur', 'testuser', 'Cart');
-  
+      } else {
+        console.error("Product not found!");
+        next(false);
+      }
+    }).catch((error) => {
+      console.error("Error fetching product:", error);
+      next(false);
+    });
+  },
+  methods: {
+    async addToCart(product, quantityToAdd) {
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        alert("You must be logged in to add items to the cart.");
+        return;
+      }
+
+      const cartRef = collection(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart');
+      
+      // Check if the product is already in the cart
+      const productInCart = (await getDocs(cartRef)).docs.find(doc => doc.data().title === product.title);
+
+      if (productInCart) {
+        // Update the quantity of the existing product in the cart
+        const updatedQuantity = productInCart.data().quantity + quantityToAdd;
+        await updateDoc(doc(cartRef, productInCart.id), { quantity: updatedQuantity });
+        alert("Updated quantity in cart!");
+      } else {
+        // Add the product as a new entry to the cart
         const productToAdd = {
           title: product.title || "No title",
           picture: product.picture,
           description: this.productDescription,
-          quantity // Include the quantity
+          quantity: quantityToAdd,
+          cost: product.cost
         };
-  
-        console.log("Processed product to add:", productToAdd);
-  
+
         await addDoc(cartRef, productToAdd);
         alert("Added to cart!");
-      },
-      EditProduct(product) {
-        console.log("Edit Product: ", product)
       }
+    },
+    EditProduct(product) {
+      console.log("Edit Product: ", product);
     }
   }
-  </script>
+}
+</script>
+
   
   <style>
+  .product-cost {
+  font-size: 22px; /* Adjust the font size as needed */
+  font-weight: bold;
+  color: #748C70; /* Match the color with your theme */
+  margin-bottom: 20px; /* Some space below the cost for separation */
+  }
   .product-view {
     display: flex;
     justify-content: center;

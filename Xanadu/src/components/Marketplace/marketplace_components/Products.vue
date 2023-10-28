@@ -1,16 +1,12 @@
 <template>
   <div class="products">
     <img class="productimage" src="@/assets/products page.png">
-
     <div class="add-product-btn">
       <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
     </div>
-
-    <!-- Search bar input -->
     <div class="search-bar">
       <input v-model="searchTerm" type="text" placeholder="Search for products...">
     </div>
-
     <div class="productlist">
       <div v-for="product in filteredProducts" :key="product.title" class="productcard">
         <RouterLink :to="'/marketplace/product/' + product.id">
@@ -21,6 +17,7 @@
             <div class="product-details">
               <p class="product-title">{{ product.title }}</p>
               <p class="product-description">{{ product.description || 'No description' }}</p>
+              <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
             </div>
           </div>
         </RouterLink>
@@ -29,7 +26,52 @@
   </div>
 </template>
 
+<script>
+import { getFirestore, getDocs, collection } from "firebase/firestore";
+
+const db = getFirestore();
+
+export default {
+  data() {
+    return {
+      products: [],
+      searchTerm: '',
+    };
+  },
+  computed: {
+    filteredProducts() {
+      if (!this.searchTerm) return this.products;
+      const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
+      return this.products.filter(product => 
+        product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+        (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
+      );
+    }
+  },
+  async mounted() {
+    const fbproducts = [];
+    const alldocs = await getDocs(collection(db, 'Products'));
+    alldocs.forEach((doc) => {
+      fbproducts.push({
+        id: doc.id,
+        title: doc.data().title,
+        description: doc.data().desc,
+        picture: doc.data().pictures,
+        cost: doc.data().cost  // Fetch the cost from Firestore
+      });
+    });
+    this.products = fbproducts;
+  },
+};
+</script>
+
+
 <style>
+.product-cost {
+  font-size: 20px;
+  font-weight: bold;
+  color: #748C70; /* You can choose your preferred color */
+}
 .productlist {
   display: flex;
   flex-wrap: wrap;
@@ -132,46 +174,3 @@
 }
 
 </style>
-
-<script>
-import firebaseApp from "@/firebase.js";
-import { getFirestore, getDocs, collection } from "firebase/firestore";
-
-const db = getFirestore(firebaseApp);
-
-export default {
-  data() {
-    return {
-      username: "testuser",
-      products: [],
-      searchTerm: '',
-    };
-  },
-  computed: {
-    filteredProducts() { // Step 1.2: Add a computed property to filter the products
-      if (!this.searchTerm) return this.products;
-
-      const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-
-      return this.products.filter(product => 
-        product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
-        (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
-      );
-    }
-  },
-  async mounted() {
-    const fbproducts = [];
-    const alldocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.username, 'Products'));
-    
-    alldocs.forEach((doc) => {
-      fbproducts.push({
-        id: doc.id,
-        title: doc.data().title,
-        description: doc.data().desc,
-        picture: doc.data().pictures,
-      });
-    });
-    this.products = fbproducts;
-  },
-};
-</script>
