@@ -1,4 +1,5 @@
 <template>
+  <Toast></Toast>
   <div class="product-view">
     <div class="product-content">
       <img :src="product.picture" alt="Product Image" class="product-view-image">
@@ -75,9 +76,19 @@ export default {
 
     // need to add function to delete from user collection as well
     async deleteProduct(productTitle) {
-      alert("Deleting " + productTitle);
+      this.$toast.add({
+                    severity: "info",
+                    summary: "Deleting Product",
+                    life: 6000,
+                });
       await deleteDoc(doc(db, 'Products', productTitle));
+      this.$toast.add({
+                    severity: "success",
+                    summary: "Deleted Product",
+                    life: 6000,
+                });
       this.$router.push('/Marketplace');
+      
     },
 
     async addToCart(product, quantityToAdd) {
