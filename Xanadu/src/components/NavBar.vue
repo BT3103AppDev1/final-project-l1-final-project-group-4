@@ -20,15 +20,31 @@
         <div class="profile-dropdown">
           <Button icon="pi pi-user" class="profile-pic"></Button>
           <div class="dropdown-content">
-            <a @click="$router.push('/register')" class="dropdown-item">Register</a>
-            <a @click="$router.push('/login')" class="dropdown-item">Login</a>
-            <a @click="signOut" class="dropdown-item">Logout</a>
+            <a v-if="!isLoggedIn" @click="$router.push('/register')" class="dropdown-item">Register</a>
+            <a v-if="!isLoggedIn" @click="$router.push('/login')" class="dropdown-item">Login</a>
+            <a v-if="isLoggedIn" @click="signOut" class="dropdown-item">Logout</a>
           </div>
         </div>
       </template>
     </Menubar>
   </div>
 </template>
+
+<script setup>
+//brian - testing for conditional rendering of authentication buttons (register/login/logout)
+import firebaseApp from "../firebase.js"
+import {ref, watchEffect} from 'vue'
+const isLoggedIn = ref(true)
+
+const auth = getAuth();
+onAuthStateChanged(auth, function(user)  {
+      if (user) {
+        isLoggedIn.value = true // if we have a user
+      } else {
+        isLoggedIn.value = false // if we do not
+      }
+  })
+</script>
 
 <script>
 import { RouterLink } from "vue-router";
@@ -41,7 +57,6 @@ export default {
 
   data() {
     return {
-      user: false,
 
       items: [
         { label: "Dashboard", route: "/dashboard" },
