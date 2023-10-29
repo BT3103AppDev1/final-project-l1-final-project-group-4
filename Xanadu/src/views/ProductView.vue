@@ -9,16 +9,25 @@
         <label for="quantity">Quantity:</label>
         <input v-model="quantity" type="number" id="quantity" min="1">
       </div>
-      <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
-      <div class="edit-product-btn">
-        <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink>
+      <!-- Add v-if for user-type = Green Ranger -->
+      <div class="buttons">
+        <div class="add-cart-btn">
+          <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
+        </div>
+        <div class="edit-product-btn">
+          <!-- Add v-if for user-type = Eco-Entrepreneur -->
+          <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink> 
+        </div>
+        <div class = "delete-button">
+          <Button class="del-product-btn" icon="pi pi-times" severity="danger" rounded aria-label="Cancel" @click = "deleteProduct(product.title)"/>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const db = getFirestore();
@@ -63,6 +72,14 @@ export default {
     });
   },
   methods: {
+
+    // need to add function to delete from user collection as well
+    async deleteProduct(productTitle) {
+      alert("Deleting " + productTitle);
+      await deleteDoc(doc(db, 'Products', productTitle));
+      this.$router.push('/Marketplace');
+    },
+
     async addToCart(product, quantityToAdd) {
       const currentUser = auth.currentUser;
 
@@ -114,6 +131,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     padding: 20px;
     height: 100vh; /* Take up full viewport height */
     background-color: #f4f4f4; /* Light gray background */
@@ -198,9 +216,21 @@ export default {
     text-decoration: none;
 
   }
+
+  .del-product-btn {
+    margin: 10px;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+  }
+
   
-  .cart-btn:hover {
+  .cart-btn:hover, .edit-product-btn a:hover {
     background-color: #657B61; /* Darken the button color on hover */
   }
+
   </style>
   

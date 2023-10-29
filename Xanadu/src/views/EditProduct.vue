@@ -465,8 +465,11 @@ input[name="Cost"] {
 </style>
 <script>
   import { getFirestore, doc, getDoc, collection, addDoc } from "firebase/firestore";
+  import { getAuth } from "firebase/auth";
   
   const db = getFirestore();
+  const auth = getAuth();
+
 export default {
     data() {
       return {
@@ -479,24 +482,31 @@ export default {
       }
     },
     beforeRouteEnter(to, from, next) {
-      const productRef = doc(db, 'Eco-Entrepreneur', 'testuser', 'Products', to.params.id);
+        const currentUser = auth.currentUser;
+
+        if (!currentUser) {
+        alert("You are not logged in.");
+        return;
+        }
+
+        const productRef = doc(db, 'Eco-Entrepreneur', currentUser.uid, 'Products', to.params.id);
   
-      getDoc(productRef).then((productDoc) => {
-        const productData = productDoc.data();
+        getDoc(productRef).then((productDoc) => {
+            const productData = productDoc.data();
   
-        next(vm => {
-          vm.product = {
-            id: productDoc.id,
-            title: productData.title,
-            description: productData.desc,
-            picture: productData.pictures,
-            shipping: productData.shipping,
-            dimensions: productData.dimensions,
-            shortdesc: productData.shortdesc,
-            cost: productData.cost
-          };
+            next(vm => {
+                    vm.product = {
+                        id: productDoc.id,
+                        title: productData.title,
+                        description: productData.desc,
+                        picture: productData.pictures,
+                        shipping: productData.shipping,
+                        dimensions: productData.dimensions,
+                        shortdesc: productData.shortdesc,
+                        cost: productData.cost
+                    };
+                });
         });
-      });
     },
     methods: {
         Update() {

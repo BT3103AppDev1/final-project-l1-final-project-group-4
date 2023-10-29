@@ -58,7 +58,12 @@ export default {
                 );
             },
             async AddProduct() {
-                alert("Adding new product: " + this.Title);
+
+                this.$toast.add({
+                    severity: "info",
+                    summary: "Adding New Product",
+                    life: 3000,
+                });
                 
                 // Setting the product inside the 'Products' collection
                 const productDocRef = doc(db, 'Products', this.Title);
@@ -76,6 +81,12 @@ export default {
                 // Retrieve the newly added product from the correct location
                 const docSnap = await getDoc(productDocRef);
                 console.log(docSnap.data());
+
+                this.$toast.add({
+                    severity: "success",
+                    summary: "Added New Product",
+                    life: 3000,
+                });
 
                 this.$router.push('/Marketplace');
             }
