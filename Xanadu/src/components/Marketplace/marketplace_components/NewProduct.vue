@@ -120,7 +120,6 @@ export default {
             <input type="file" 
             ref = "uploadPictures"
             @change="uploadPictures"
-            v-show="showfile"
             accept="image/*" >   
 
         </div>
