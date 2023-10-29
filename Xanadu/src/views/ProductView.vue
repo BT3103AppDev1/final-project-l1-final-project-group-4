@@ -23,6 +23,9 @@
   const db = getFirestore();
   
   export default {
+    props: {
+      id: String
+    },
     data() {
       return {
         product: {},
