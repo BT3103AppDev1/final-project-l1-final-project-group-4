@@ -20,6 +20,8 @@ import Graphs from "./dashboard_components/Graphs.vue";
 import firebaseApp from "@/firebase.js";
 import { getFirestore } from "firebase/firestore";
 import { doc, getDocs, collection } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 const db = getFirestore(firebaseApp);
 
 export default {
@@ -28,8 +30,35 @@ export default {
     MilestoneProgress,
     Graphs,
   },
+  async mounted() {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.userId = user.uid;
+      }
+    });
+
+    this.activityChartData = await this.getActivityChartData();
+    // console.log(this.activityChartData);
+    // let activityData =
+    this.activityData = await this.getActivityData();
+    // For debugging
+    // this.activityData.forEach((doc) => {
+    //   console.log(doc);
+    // });
+    // console.log(this.activityData);
+    // console.log(
+    //   "activityData and activityChartData has loaded in Dashboard.vue."
+    // );
+  },
+  watch: {
+    userId(userId) {
+      console.log(userId);
+    },
+  },
   data() {
     return {
+      userId: "",
       activityChartData: null,
       activityData: null,
       refreshComp: 0,
@@ -77,20 +106,6 @@ export default {
       // console.log(activityChartData);
       return activityChartData;
     },
-  },
-  async mounted() {
-    this.activityChartData = await this.getActivityChartData();
-    // console.log(this.activityChartData);
-    // let activityData =
-    this.activityData = await this.getActivityData();
-    // For debugging
-    // this.activityData.forEach((doc) => {
-    //   console.log(doc);
-    // });
-    // console.log(this.activityData);
-    // console.log(
-    //   "activityData and activityChartData has loaded in Dashboard.vue."
-    // );
   },
 };
 </script>
