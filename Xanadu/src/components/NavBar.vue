@@ -1,57 +1,118 @@
 <template>
   <div>
-    <div class="shipping">
-      <p>Free shipping for all orders!</p>
-    </div>
-    <div class="navbar">
-      <img class="logo" src="../assets/xanadu.png" />
-      <ul>
-        <li>
-          <RouterLink to="/dashboard">Dashboard</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="marketplace">Marketplace</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="forum">Forum</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="cart">Cart</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="register">Register</RouterLink>
-        </li>
-      </ul>
-    </div>
+    <div class="shipping-note">Free shipping for all orders!</div>
+    <Menubar :model="items" style="align-items: center;">
+      <template #start>
+        <img alt="logo" src="../assets/xanadu.png" height="50" class="mr-2"/>
+      </template>
+
+      <template #item="{ label, item, props, root, hasSubmenu }">
+        <div>
+          <RouterLink v-if="item.route" v-slot="routerProps" :to="item.route">
+            <span v-bind="props.icon" />
+            <span v-bind="props.label">{{ label }}</span>
+          </RouterLink>
+        </div>
+      </template>
+
+      <template #end>
+        <Button icon="pi pi-shopping-cart" @click="$router.push('/cart')" class="cart-button"></Button>
+        <div class="profile-dropdown">
+          <Button icon="pi pi-user" class="profile-pic"></Button>
+          <div class="dropdown-content">
+            <a v-if="!isLoggedIn" @click="$router.push('/register')" class="dropdown-item">Register</a>
+            <a v-if="!isLoggedIn" @click="$router.push('/login')" class="dropdown-item">Login</a>
+            <a v-if="isLoggedIn" @click="signOut" class="dropdown-item">Logout</a>
+          </div>
+        </div>
+      </template>
+    </Menubar>
   </div>
 </template>
 
+<script setup>
+//brian - testing for conditional rendering of authentication buttons (register/login/logout)
+import firebaseApp from "../firebase.js"
+import {ref, watchEffect} from 'vue'
+const isLoggedIn = ref(true)
+
+const auth = getAuth();
+onAuthStateChanged(auth, function(user)  {
+      if (user) {
+        isLoggedIn.value = true // if we have a user
+      } else {
+        isLoggedIn.value = false // if we do not
+      }
+  })
+</script>
+
 <script>
 import { RouterLink } from "vue-router";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default {
   components: {
     RouterLink,
   },
+
+  data() {
+    return {
+
+      items: [
+        { label: "Dashboard", route: "/dashboard" },
+        { label: "Marketplace", route: "/marketplace" },
+        { label: "Forum", route: "/forum" }
+      ]
+    }
+  },
+
+  methods: {
+    signOut() {
+      const auth = getAuth();
+      auth.signOut()
+        .then(() => {
+          console.log("Sign Out completed");
+          this.$router.push("/");
+        }).catch((error) => console.log(error));
+    },
+  },
 };
 </script>
 
 <style>
-.navbar a.router-link-exact-active {
-  color: #5a6d57;
-}
-
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
 .navbar {
-  display: inline-flex;
-  justify-content: center;
+  display: flex;
+  justify-content: space-between; /* Distribute space equally between elements */
+}
+
+.p-menubar-root-list {
   align-items: center;
+  flex-grow: 1; /* Allow the menu items to take available space */
+  display: flex;
+  justify-content: center; /* Ensure items within this container are centralized */
+}
+
+.shipping-note {
+  font-family: Montserrat;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.8px;
+  color: var(--White, #fff);
+  background-color: #738678;
+  padding: 5px 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.cart-button, .profile-pic {
+  background-color: #738678;
+  border-color: #738678;
+}
+
+.p-menubar-root-list {
+  align-items: center;
+  width: 500px;
 }
 
 li a {
@@ -60,8 +121,6 @@ li a {
   text-align: center;
   padding: 16px;
   text-decoration: none;
-  align-items: center;
-  justify-content: center;
 }
 
 li {
@@ -70,27 +129,48 @@ li {
   justify-content: center;
 }
 
-.logo {
-  display: block;
-  width: 180px;
-  padding: 0px 440px 0px 70px;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
 }
 
-.shipping {
-  text-align: center;
-  background-color: #738678;
-  width: 100%;
-  height: 100%;
-  font-family: Montserrat;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  letter-spacing: 0.8px;
-  color: var(--White, #fff);
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000;
 }
+
+.profile-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-item {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+.cart-button {
+  margin-right: 10px;
+}
+
+.profile-pic {
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
 </style>

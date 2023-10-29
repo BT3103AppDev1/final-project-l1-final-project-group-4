@@ -1,26 +1,37 @@
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore} from "firebase/firestore";
-import { setDoc, getDocs, doc, deleteDoc, getDoc} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+import { setDoc, getDocs, doc, deleteDoc, getDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
 
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
 
+
+
 export default {
     data() {
         return {
-            showfile : false,
-            img1 : null,
+            showfile: false,
+            img1: null,
             imageData: false,
-            username: "testuser",
-            Title:"",
-            ShortDesc:"",
-            Shipping:"",
-            Dimensions:"",
-            Desc:""
+            user: null,  // 2. Set to null by default
+            Title: "",
+            ShortDesc: "",
+            Shipping: "",
+            Dimensions: "",
+            Desc: "",
+            Cost: "",
         }
+    },
+    mounted() {
+        const auth = getAuth(firebaseApp);  // 3. Check the authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.user = user
+            }
+        });
     },
     methods : {
         triggerInput() {
@@ -48,26 +59,60 @@ export default {
                 }      
                 );
             },
-        async AddProduct() {
-            alert("Adding new product: "+ this.Title)
-            await setDoc(doc(db,'Eco-Entrepreneur',this.username,'Products',this.Title),{
-                title: this.Title,
-                shortdesc: this.ShortDesc,
-                shipping: this.Shipping,
-                dimensions: this.Dimensions,
-                desc: this.Desc,
-                pictures: this.img1
-            })
-            const docSnap = await getDoc(doc(db,this.username,this.Title))
-            console.log(docSnap.data())
-            this.$router.push('/Marketplace')
-        }
+            async AddProduct() {
+
+                this.$toast.add({
+                    severity: "info",
+                    summary: "Adding New Product",
+                    life: 3000,
+                });
+                
+                
+                // Setting the product inside the 'Products' collection
+                const productDocRef = doc(db, 'Products', this.Title);
+                await setDoc(productDocRef, {
+                    title: this.Title,
+                    shortdesc: this.ShortDesc,
+                    shipping: this.Shipping,
+                    dimensions: this.Dimensions,
+                    desc: this.Desc,
+                    pictures: this.img1,
+                    cost: this.Cost,
+                    username: this.user.uid
+                });
+
+
+                const indivProductDocRef = doc(db, 'Eco-Entrepreneur', this.user.uid, 'Products', this.Title);
+
+                await setDoc(indivProductDocRef, {
+                    title: this.Title,
+                    shortdesc: this.ShortDesc,
+                    shipping: this.Shipping,
+                    dimensions: this.Dimensions,
+                    desc: this.Desc,
+                    pictures: this.img1,
+                    cost: this.Cost,
+                });
+                
+                // Retrieve the newly added product from the correct location
+                const docSnap = await getDoc(productDocRef);
+                console.log(docSnap.data());
+
+                this.$toast.add({
+                    severity: "success",
+                    summary: "Added New Product",
+                    life: 3000,
+                });
+
+                this.$router.push('/Marketplace');
+            }
     }
 }
 
 </script>
 
 <template>
+    <Toast></Toast>
 <div class="upperhalf">
     <div class="AddImages" :style ="{'background-image' : 'url('+img1+')'}">
         <div class="UploadImages">
@@ -83,6 +128,7 @@ export default {
     <div class="titleAndDesc">
         <input v-model="Title" type="text" id="Title" name="Title" placeholder="Title">
         <input v-model="ShortDesc" type="text" id="ShortDesc" name="ShortDesc" placeholder="Short Description">
+        <input v-model.number="Cost" type="number" id="Cost" name="Cost" placeholder="Cost">
     </div>
 </div>
 <div class="lowerhalf">
@@ -240,7 +286,7 @@ input::placeholder {
     color: #CDD7CF;
 }
 
-input[name="ShortDesc"]::placeholder, input[name="ShortDesc"] {
+input[name="ShortDesc"]::placeholder, input[name="ShortDesc"],input[name="Cost"]::placeholder, input[name="Cost"]{
     
     /* bodyLG */
     font-family: Montserrat;
@@ -266,6 +312,16 @@ input[name="ShortDesc"] {
     display: flex;
     width: 650px;
     height: 60px;
+    flex-direction: row;
+    justify-content: center;
+    border: 1px solid #CBCBCB;
+}
+
+input[name="Cost"] {
+    margin: 10px 0px 0px 0px;
+    display: flex;
+    width: 200px;
+    height: 40px;
     flex-direction: row;
     justify-content: center;
     border: 1px solid #CBCBCB;
