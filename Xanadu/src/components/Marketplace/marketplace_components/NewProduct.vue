@@ -1,7 +1,7 @@
 <script>
 import firebaseApp from "@/firebase.js";
 import { getFirestore } from "firebase/firestore";
-import { setDoc, getDocs, doc, deleteDoc, getDoc } from "firebase/firestore";
+import { setDoc, getDocs, doc, deleteDoc, getDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
 import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
 
@@ -65,6 +65,7 @@ export default {
                     life: 3000,
                 });
                 
+                const user = auth.currentUser;
                 // Setting the product inside the 'Products' collection
                 const productDocRef = doc(db, 'Products', this.Title);
                 await setDoc(productDocRef, {
@@ -76,6 +77,22 @@ export default {
                     pictures: this.img1,
                     cost: this.Cost,
                     username: this.username 
+                });
+
+                const docRef = doc(db, 'Users', user.uid);
+                const userDoc= await getDoc(docRef);
+                const userType = userDoc.data().userType;
+
+                const indivProductDocRef = doc(db, userType, user.uid, 'Products', this.Title);
+
+                await setDoc(indivProductDocRef, {
+                    title: this.Title,
+                    shortdesc: this.ShortDesc,
+                    shipping: this.Shipping,
+                    dimensions: this.Dimensions,
+                    desc: this.Desc,
+                    pictures: this.img1,
+                    cost: this.Cost,
                 });
                 
                 // Retrieve the newly added product from the correct location
