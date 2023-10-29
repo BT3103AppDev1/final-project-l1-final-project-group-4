@@ -7,7 +7,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import requi
 
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
-const auth = getAuth(firebaseApp);
+
+
 
 export default {
     data() {
@@ -15,19 +16,20 @@ export default {
             showfile: false,
             img1: null,
             imageData: false,
-            username: null,  // 2. Set to null by default
+            user: null,  // 2. Set to null by default
             Title: "",
             ShortDesc: "",
             Shipping: "",
             Dimensions: "",
             Desc: "",
-            Cost: ""
+            Cost: "",
         }
     },
-    mounted() {  // 3. Check the authentication state
+    mounted() {
+        const auth = getAuth(firebaseApp);  // 3. Check the authentication state
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                this.username = user.displayName || user.email || 'anonymous';  // Assign the username, adjust this based on your user structure
+                this.user = user
             }
         });
     },
@@ -65,7 +67,7 @@ export default {
                     life: 3000,
                 });
                 
-                const user = auth.currentUser;
+                
                 // Setting the product inside the 'Products' collection
                 const productDocRef = doc(db, 'Products', this.Title);
                 await setDoc(productDocRef, {
@@ -76,14 +78,11 @@ export default {
                     desc: this.Desc,
                     pictures: this.img1,
                     cost: this.Cost,
-                    username: this.username 
+                    username: this.user.uid
                 });
 
-                const docRef = doc(db, 'Users', user.uid);
-                const userDoc= await getDoc(docRef);
-                const userType = userDoc.data().userType;
 
-                const indivProductDocRef = doc(db, userType, user.uid, 'Products', this.Title);
+                const indivProductDocRef = doc(db, 'Eco-Entrepreneur', this.user.uid, 'Products', this.Title);
 
                 await setDoc(indivProductDocRef, {
                     title: this.Title,

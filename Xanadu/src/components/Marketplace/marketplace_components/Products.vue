@@ -76,9 +76,22 @@ export default {
     this.products = fbproducts;
     const userDoc = await getDoc(this.userDocRef);
     const userType = userDoc.data().userType;
-    if (userType == "Eco-Entrepreneur") {
+    if (this.user && userType == "Eco-Entrepreneur") {
       this.seller = true;
-    }
+      console.log("a seller");
+      const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'))
+      const sellerproducts = []
+      sellerdocs.forEach((doc) => {
+      sellerproducts.push({
+        id: doc.id,
+        title: doc.data().title,
+        description: doc.data().desc,
+        picture: doc.data().pictures,
+        cost: doc.data().cost  // Fetch the cost from Firestore
+      });
+      });
+      this.products = sellerproducts;
+      }
   },
 
 
