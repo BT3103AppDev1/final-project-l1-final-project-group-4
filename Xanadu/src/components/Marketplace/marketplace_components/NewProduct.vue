@@ -96,6 +96,7 @@ export default {
 </script>
 
 <template>
+    <Toast></Toast>
 <div class="upperhalf">
     <div class="AddImages" :style ="{'background-image' : 'url('+img1+')'}">
         <div class="UploadImages">
