@@ -9,9 +9,11 @@
         <label for="quantity">Quantity:</label>
         <input v-model="quantity" type="number" id="quantity" min="1">
       </div>
+      <!-- Add v-if for user-type = Green Ranger -->
       <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
       <div class="edit-product-btn">
-        <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink>
+        <!-- Add v-if for user-type = Eco-Entrepreneur -->
+        <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink> 
       </div>
     </div>
   </div>
