@@ -361,6 +361,8 @@ import {
   getDocs,
   collection,
 } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 const db = getFirestore(firebaseApp);
 
 export default {
@@ -374,6 +376,7 @@ export default {
       selectedActivities: null,
       filters: {},
       submitted: false,
+      userId: "",
     };
   },
   props: {
@@ -388,8 +391,10 @@ export default {
     this.initFilters();
   },
   mounted() {
-    // console.log(this.activityData);
-    // ProductService.getProducts().then((data) => (this.products = data));
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      this.userId = auth.currentUser.uid;
+    });
   },
   methods: {
     formatCurrency(value) {
@@ -429,8 +434,12 @@ export default {
       date = `${day}/${month}/${year}`;
       let sustainabilityPoints = (this.activity.amount / 10).toFixed(3);
       try {
+        console.log(this.userId);
         const docRef = await addDoc(
-          collection(db, "Green Rangers/TestingAcct/Eco-Friendly Activities"),
+          collection(
+            db,
+            "Green Rangers/" + this.userId + "/Eco-Friendly Activities"
+          ),
           {
             name: this.activity.name,
             activityType: this.activity.activityType,
@@ -475,7 +484,7 @@ export default {
       var data = this.activity;
       const activityDoc = await doc(
         db,
-        "Green Rangers/TestingAcct/Eco-Friendly Activities/" + data.id
+        "Green Rangers/" + this.userId + "/Eco-Friendly Activities/" + data.id
       );
       var date = data.date;
       if (typeof data.date === "string") {
@@ -523,7 +532,9 @@ export default {
       await deleteDoc(
         doc(
           db,
-          "Green Rangers/TestingAcct/Eco-Friendly Activities/" +
+          "Green Rangers/" +
+            this.userId +
+            "/Eco-Friendly Activities/" +
             this.activity.id
         )
       );
@@ -552,7 +563,10 @@ export default {
         await deleteDoc(
           doc(
             db,
-            "Green Rangers/TestingAcct/Eco-Friendly Activities/" + activity.id
+            "Green Rangers/" +
+              this.userId +
+              "/Eco-Friendly Activities/" +
+              activity.id
           )
         );
       });
