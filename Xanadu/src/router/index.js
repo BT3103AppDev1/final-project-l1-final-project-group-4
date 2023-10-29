@@ -2,11 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/DashboardView.vue";
 import Forum from "../views/ForumView.vue";
 import Marketplace from "../views/MarketplaceView.vue";
-
+import Confirmation from '@/views/Confirmation.vue';
 import Login from "../views/LoginView.vue";
-
 import ThreadReply from "../views/ThreadReplyView.vue";
-
 import Cart from "../views/CartView.vue"; // Import the Cart component here
 import AddProduct from '../views/AddProduct.vue';
 import ProductView from '../views/ProductView.vue';
@@ -52,6 +50,11 @@ const router = createRouter({
       path: "/cart",
       name: "Cart",
       component: Cart,
+    },
+    {
+      path: '/confirmation',
+      name: 'Confirmation',
+      component: Confirmation
     },
     { 
       path: "/AddThread", 

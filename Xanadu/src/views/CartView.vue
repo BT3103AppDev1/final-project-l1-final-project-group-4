@@ -84,8 +84,12 @@ export default {
       });
     },
     checkout() {
-      alert("Checkout button clicked!");
+      this.$router.push({
+        path: '/confirmation',
+        query: { total: this.total.toFixed(2) } // Passing total as a query parameter
+      });
     }
+
   },
   computed: {
     total() {
