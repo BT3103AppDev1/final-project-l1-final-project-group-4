@@ -1,7 +1,7 @@
 <template>
-  <div class="products">
+  <div v-if="user" class="products">
     <img class="productimage" src="@/assets/products page.png">
-    <div class="add-product-btn">
+    <div  v-if= "seller" class="add-product-btn">
       <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
     </div>
     <div class="search-bar">
@@ -27,7 +27,9 @@
 </template>
 
 <script>
-import { getFirestore, getDocs, collection } from "firebase/firestore";
+import firebaseApp from "@/firebase.js";
+import { setDoc, getDocs, doc, deleteDoc, getDoc, collection, getFirestore } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
 
 const db = getFirestore();
 
@@ -36,6 +38,9 @@ export default {
     return {
       products: [],
       searchTerm: '',
+      user: false,
+      userDocRef: false,
+      seller: false
     };
   },
   computed: {
@@ -46,9 +51,17 @@ export default {
         product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
         (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
       );
-    }
+    },
+
   },
   async mounted() {
+    const auth = getAuth(firebaseApp);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.user = user;
+        this.userDocRef = doc(db, 'Users', this.user.uid);
+      }
+    })
     const fbproducts = [];
     const alldocs = await getDocs(collection(db, 'Products'));
     alldocs.forEach((doc) => {
@@ -61,6 +74,24 @@ export default {
       });
     });
     this.products = fbproducts;
+    const userDoc = await getDoc(this.userDocRef);
+    const userType = userDoc.data().userType;
+    if (this.user && userType == "Eco-Entrepreneur") {
+      this.seller = true;
+      console.log("a seller");
+      const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'))
+      const sellerproducts = []
+      sellerdocs.forEach((doc) => {
+      sellerproducts.push({
+        id: doc.id,
+        title: doc.data().title,
+        description: doc.data().desc,
+        picture: doc.data().pictures,
+        cost: doc.data().cost  // Fetch the cost from Firestore
+      });
+      });
+      this.products = sellerproducts;
+      }
   },
 
 
