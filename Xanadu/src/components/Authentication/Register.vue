@@ -137,6 +137,13 @@ export default {
                     });
                 }
 
+                setDoc(doc(db, "Users", userCredential.user.uid), {
+                    userType: this.userType,
+                    firstName: this.firstName,
+                    lastName: this.lastName,
+                    email: this.email,
+                });
+
                 const user = userCredential.user;
                 //console.log(user);
                 console.log("Registration completed.");
