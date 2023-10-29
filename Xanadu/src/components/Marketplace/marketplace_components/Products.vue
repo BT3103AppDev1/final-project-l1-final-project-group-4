@@ -62,6 +62,8 @@ export default {
     });
     this.products = fbproducts;
   },
+
+
 };
 </script>
 
