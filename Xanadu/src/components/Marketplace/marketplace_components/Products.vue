@@ -1,145 +1,209 @@
 <template>
-    <div class="products">
-      <img class="productimage" src="@/assets/products page.png">
-      <div class="add-product-btn">
-        <RouterLink to="AddProduct">Add Product</RouterLink>
-      </div>
-  
-      <div class="productlist">
-        <div v-for="product in products" :key="product.title" class="productcard">
-          <RouterLink :to="'/product/' + product.id">
-            <div class="product-card">
-              <div class="product-image-container">
-                <img :src="product.picture" alt="Product Image" class="product-card-image">
-              </div>
-              <div class="product-details">
-                <p class="product-title">{{ product.title }}</p>
-                <p class="product-description">{{ product.Desc || 'No description' }}</p>
-              </div>
+  <div v-if="user" class="products">
+    <img class="productimage" src="@/assets/products page.png">
+    <div  v-if= "seller" class="add-product-btn">
+      <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
+    </div>
+    <div class="search-bar">
+      <input v-model="searchTerm" type="text" placeholder="Search for products...">
+    </div>
+    <div class="productlist">
+      <div v-for="product in filteredProducts" :key="product.title" class="productcard">
+        <RouterLink :to="'/marketplace/product/' + product.id">
+          <div class="product-card">
+            <div class="product-image-container">
+              <img :src="product.picture" alt="Product Image" class="product-card-image">
             </div>
-          </RouterLink>
-        </div>
+            <div class="product-details">
+              <p class="product-title">{{ product.title }}</p>
+              <p class="product-description">{{ product.description || 'No description' }}</p>
+              <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
+            </div>
+          </div>
+        </RouterLink>
       </div>
     </div>
-  </template>
-  
-  <style>
-  .productlist {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 20px; /* Provides even spacing between the cards. Can replace margin-right and margin-bottom. */
-  }
-  
-  .productcard {
-    flex: 0 0 calc(33.33% - 20px);
-    box-sizing: border-box;
-    padding: 5px;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  
-  .productcard:hover {
-    transform: translateY(-5px); /* Lift card slightly on hover for a nice effect */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Increase shadow depth on hover */
-  }
-  
-  .product-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    border: 2px solid #748C70;
-    text-align: center;
-    border-radius: 10px;
-  }
-  
-  .product-image-container {
-    width: 200px; /* Set a fixed width for the square container */
-    height: 200px; /* Set a fixed height for the square container */
-    overflow: hidden; /* Hide any overflow */
-  }
-  
-  .product-card-image {
-    width: 100%;
-    height: 100%; /* Make the image fill the square container */
-    object-fit: cover; /* Ensures image retains aspect ratio but fills space */
-    border-radius: 10px; /* Rounded edges for the image */
-  }
-  
-  .product-details {
-    width: 100%;
-  }
-  
-  .product-title {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #333; /* Darker text for readability */
-  }
-  
-  .product-description {
-    font-size: 16px;
-    margin: 10px 0; /* Add some spacing above and below the description */
-    line-height: 1.5;
-    color: #555; /* Darker text for readability */
-  }
-  
-  .products {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .productimage {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  
-  .add-product-btn a {
-    background-color: #748C70;
-    color: white;
-    width: 250px;
-    padding: 16px;
-    text-align: center;
-    margin-bottom: 20px;
-    font-family: Montserrat;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 140%;
-    text-transform: capitalize;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  </style>
-  
-  <script>
-  import firebaseApp from "@/firebase.js";
-  import { getFirestore, getDocs, collection } from "firebase/firestore";
-  
-  const db = getFirestore(firebaseApp);
-  
-  export default {
-    data() {
-      return {
-        username: "testuser",
-        products: [],
-      };
+  </div>
+</template>
+
+<script>
+import firebaseApp from "@/firebase.js";
+import { setDoc, getDocs, doc, deleteDoc, getDoc, collection, getFirestore } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
+
+const db = getFirestore();
+
+export default {
+  data() {
+    return {
+      products: [],
+      searchTerm: '',
+      user: false,
+      userDocRef: false,
+      seller: false
+    };
+  },
+  computed: {
+    filteredProducts() {
+      if (!this.searchTerm) return this.products;
+      const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
+      return this.products.filter(product => 
+        product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+        (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
+      );
     },
-    async mounted() {
-      const fbproducts = [];
-      const alldocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.username, 'Products'));
-      
-      alldocs.forEach((doc) => {
-        fbproducts.push({
-          id: doc.id,
-          title: doc.data().title,
-          description: doc.data().Desc,
-          picture: doc.data().pictures,
-        });
+
+  },
+  async mounted() {
+    const auth = getAuth(firebaseApp);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.user = user;
+        this.userDocRef = doc(db, 'Users', this.user.uid);
+      }
+    })
+    const fbproducts = [];
+    const alldocs = await getDocs(collection(db, 'Products'));
+    alldocs.forEach((doc) => {
+      fbproducts.push({
+        id: doc.id,
+        title: doc.data().title,
+        description: doc.data().desc,
+        picture: doc.data().pictures,
+        cost: doc.data().cost  // Fetch the cost from Firestore
       });
-      this.products = fbproducts;
-    },
-  };
-  </script>
-  
+    });
+    this.products = fbproducts;
+    const userDoc = await getDoc(this.userDocRef);
+    const userType = userDoc.data().userType;
+    if (this.user && userType == "Eco-Entrepreneur") {
+      this.seller = true;
+      console.log("a seller");
+      const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'))
+      const sellerproducts = []
+      sellerdocs.forEach((doc) => {
+      sellerproducts.push({
+        id: doc.id,
+        title: doc.data().title,
+        description: doc.data().desc,
+        picture: doc.data().pictures,
+        cost: doc.data().cost  // Fetch the cost from Firestore
+      });
+      });
+      this.products = sellerproducts;
+      }
+  },
+
+
+};
+</script>
+
+
+<style>
+.product-cost {
+  font-size: 20px;
+  font-weight: bold;
+  color: #748C70; /* You can choose your preferred color */
+}
+.productlist {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 20px; /* Provides even spacing between the cards. Can replace margin-right and margin-bottom. */
+}
+
+.productcard {
+  flex: 0 0 calc(33.33% - 20px);
+  box-sizing: border-box;
+  padding: 5px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.productcard:hover {
+  transform: translateY(-5px); /* Lift card slightly on hover for a nice effect */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Increase shadow depth on hover */
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: 2px solid #748C70;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.product-image-container {
+  width: 200px; /* Set a fixed width for the square container */
+  height: 200px; /* Set a fixed height for the square container */
+  overflow: hidden; /* Hide any overflow */
+}
+
+.product-card-image {
+  width: 100%;
+  height: 100%; /* Make the image fill the square container */
+  object-fit: cover; /* Ensures image retains aspect ratio but fills space */
+  border-radius: 10px; /* Rounded edges for the image */
+}
+
+.product-details {
+  width: 100%;
+}
+
+.product-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333; /* Darker text for readability */
+}
+
+.product-description {
+  font-size: 16px;
+  margin: 10px 0; /* Add some spacing above and below the description */
+  line-height: 1.5;
+  color: #555; /* Darker text for readability */
+}
+
+.products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.productimage {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.add-product-btn a {
+  background-color: #748C70;
+  color: white;
+  width: 250px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: Montserrat;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 140%;
+  text-transform: capitalize;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-bar {
+  margin: 20px 0;
+  width: 80%;
+  max-width: 400px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #748C70;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+</style>
