@@ -1,7 +1,11 @@
 <template>
   <div>
     <Toast></Toast>
-    <Graphs :activityChartData="activityChartData" :key="refreshComp" />
+    <Graphs
+      :activityChartData="activityChartData"
+      :purchasesData="purchasesData"
+      :key="refreshComp"
+    />
     <MilestoneProgress />
     <EcoFriendlyActivities
       :activityData="activityData"
@@ -46,6 +50,7 @@ export default {
       // console.log(this.activityChartData);
       // let activityData =
       this.activityData = await this.getActivityData(this.userId);
+
       // For debugging
       // this.activityData.forEach((doc) => {
       //   console.log(doc);
@@ -54,6 +59,24 @@ export default {
       console.log(
         "activityData and activityChartData has loaded in Dashboard.vue."
       );
+      this.purchases = await this.getPurchasesData();
+    },
+    purchases(purchases) {
+      console.log(purchases);
+      this.productCategories = Object.keys(purchases);
+      // console.log(this.productCategories);
+      this.productCategorySpending = Object.values(purchases);
+      // console.log(this.productCategorySpending);
+      this.purchasesData = {
+        labels: this.productCategories,
+        datasets: [
+          {
+            data: this.productCategorySpending,
+            backgroundColor: ["#738678", "#E4D5A3", "#5F192C"],
+            hoverBackgroundColor: ["#838678", "#E4D5C3", "#6F192C"],
+          },
+        ],
+      };
     },
   },
   data() {
@@ -62,6 +85,11 @@ export default {
       activityChartData: null,
       activityData: null,
       refreshComp: 0,
+      chartOptions: null,
+      purchases: {},
+      productCategories: [],
+      productCategorySpending: [],
+      purchasesData: null,
     };
   },
   methods: {
@@ -111,6 +139,39 @@ export default {
       });
       // console.log(activityChartData);
       return activityChartData;
+    },
+
+    async getPurchasesData() {
+      var purchases = {};
+      const db = getFirestore();
+      const usersRef = collection(db, "Green Rangers");
+      const customerRef = doc(usersRef, this.userId);
+      const pastOrdersRef = collection(customerRef, "Past Orders");
+
+      const querySnapshot = await getDocs(pastOrdersRef);
+
+      const promises = querySnapshot.docs.map(async (orderDoc) => {
+        const productsRef = collection(orderDoc.ref, "products");
+        const productQuerySnapshot = await getDocs(productsRef);
+
+        productQuerySnapshot.forEach((productDoc) => {
+          const data = productDoc.data();
+          const category = data.category;
+          const cost = data.cost;
+          const quantity = data.quantity;
+
+          if (purchases.hasOwnProperty(category)) {
+            purchases[category] += cost * quantity;
+          } else {
+            purchases[category] = cost * quantity;
+          }
+          // console.log(purchases);
+        });
+      });
+
+      await Promise.all(promises);
+
+      return purchases;
     },
   },
 };

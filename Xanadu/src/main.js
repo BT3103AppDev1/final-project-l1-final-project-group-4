@@ -32,7 +32,8 @@ import Textarea from "primevue/textarea";
 import FocusTrap from "primevue/focustrap";
 import Password from "primevue/password";
 import Divider from "primevue/divider";
-import Menubar from 'primevue/menubar';
+import Menubar from "primevue/menubar";
+import Chart from "primevue/chart";
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
 
@@ -42,6 +43,7 @@ app.use(PrimeVue);
 app.use(ToastService);
 app.use(DialogService);
 
+app.component("Chart", Chart);
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);

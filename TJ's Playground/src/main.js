@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import Vue, { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router/index.js";
 import PrimeVue from "primevue/config";
@@ -24,6 +24,13 @@ import Toolbar from "primevue/toolbar";
 import RadioButton from "primevue/radiobutton";
 import Dialog from "primevue/dialog";
 import Textarea from "primevue/textarea";
+import Chart from "primevue/chart";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+
+Vue.use(BootstrapVue);
+// app.use(IconsPlugin);
 
 const app = createApp(App);
 
@@ -31,6 +38,7 @@ app.use(PrimeVue);
 app.use(ToastService);
 app.use(DialogService);
 
+app.component("Chart", Chart);
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);
