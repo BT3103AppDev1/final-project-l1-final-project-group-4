@@ -4,6 +4,9 @@
     <Graphs
       :activityChartData="activityChartData"
       :purchasesData="purchasesData"
+      :threadsStarted="threadsStarted"
+      :noOfComments="noOfComments"
+      :highestSpendingProductCategory="highestSpendingProductCategory"
       :key="refreshComp"
     />
     <MilestoneProgress />
@@ -34,6 +37,23 @@ export default {
     MilestoneProgress,
     Graphs,
   },
+  data() {
+    return {
+      userId: "",
+      activityChartData: null,
+      activityData: null,
+      refreshComp: 0,
+      chartOptions: null,
+      purchases: {},
+      productCategories: [],
+      productCategorySpending: [],
+      purchasesData: null,
+      totalSpending: 0, // this would be used for progress bar
+      threadsStarted: 0,
+      noOfComments: 0,
+      highestSpendingProductCategory: "",
+    };
+  },
   async mounted() {
     const auth = getAuth();
     // console.log(auth.currentUser.uid);
@@ -45,7 +65,7 @@ export default {
   },
   watch: {
     async userId(userId) {
-      console.log(this.userId);
+      // console.log(this.userId);
       this.activityChartData = await this.getActivityChartData(this.userId);
       // console.log(this.activityChartData);
       // let activityData =
@@ -60,9 +80,13 @@ export default {
         "activityData and activityChartData has loaded in Dashboard.vue."
       );
       this.purchases = await this.getPurchasesData();
+      const forum = await this.getThreadsData();
+      this.threadsStarted = forum[0];
+      this.noOfComments = forum[1];
+      // console.log(forum);
     },
     purchases(purchases) {
-      console.log(purchases);
+      // console.log(purchases);
       this.productCategories = Object.keys(purchases);
       // console.log(this.productCategories);
       this.productCategorySpending = Object.values(purchases);
@@ -77,21 +101,24 @@ export default {
           },
         ],
       };
+      var i = 0;
+      var index = 0;
+      var highestSpending = 0;
+
+      while (i < this.productCategorySpending.length) {
+        const spending = this.productCategorySpending[i];
+        this.totalSpending += spending;
+        if (spending > highestSpending) {
+          index = i;
+          highestSpending = spending;
+        }
+        i++;
+      }
+      this.highestSpendingProductCategory = this.productCategories[index];
+      // console.log(this.highestSpendingProductCategory);
     },
   },
-  data() {
-    return {
-      userId: "",
-      activityChartData: null,
-      activityData: null,
-      refreshComp: 0,
-      chartOptions: null,
-      purchases: {},
-      productCategories: [],
-      productCategorySpending: [],
-      purchasesData: null,
-    };
-  },
+
   methods: {
     async refresh() {
       console.log("refreshed!");
@@ -172,6 +199,30 @@ export default {
       await Promise.all(promises);
 
       return purchases;
+    },
+    async getThreadsData() {
+      var threads = {};
+      const db = getFirestore();
+      const usersRef = collection(db, "Green Rangers");
+      const customerRef = doc(usersRef, this.userId);
+      const pastOrdersRef = collection(customerRef, "Threads");
+
+      const querySnapshot = await getDocs(pastOrdersRef);
+      var threadsStarted = 0;
+      var noOfComments = 0;
+      const promises = querySnapshot.docs.map(async (orderDoc) => {
+        threadsStarted += 1;
+        const repliesRef = collection(orderDoc.ref, "Replies");
+        const replyQuerySnapshot = await getDocs(repliesRef);
+
+        replyQuerySnapshot.forEach((reply) => {
+          noOfComments += 1;
+        });
+      });
+
+      await Promise.all(promises);
+
+      return [threadsStarted, noOfComments];
     },
   },
 };

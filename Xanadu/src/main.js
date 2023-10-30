@@ -34,6 +34,7 @@ import Password from "primevue/password";
 import Divider from "primevue/divider";
 import Menubar from "primevue/menubar";
 import Chart from "primevue/chart";
+import Card from "primevue/card";
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
 
@@ -43,6 +44,7 @@ app.use(PrimeVue);
 app.use(ToastService);
 app.use(DialogService);
 
+app.component("Card", Card);
 app.component("Chart", Chart);
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
