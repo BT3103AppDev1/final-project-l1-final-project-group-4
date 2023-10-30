@@ -60,8 +60,6 @@ const router = createRouter({
         component: AddReply
     },
 
-    }
-
   ],
 });
 

@@ -7,7 +7,7 @@ import VueChartkick from "vue-chartkick";
 import "chartkick/chart.js";
 // import Vue from "vue";
 import PrimeVue from "primevue/config";
-import "primevue/resources/themes/arya-green/theme.css";
+import "primevue/resources/themes/saga-green/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import InputText from "primevue/inputtext";
