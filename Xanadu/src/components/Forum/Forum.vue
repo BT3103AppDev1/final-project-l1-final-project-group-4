@@ -1,11 +1,11 @@
 <template>
   <div>
     <div>
-        <Toast ref="toast" position="top-right" />
+      <Toast ref="toast" position="top-right" />
     </div>
     <div class="container">
       <div class="search-box">
-        <input type="text" id="search-bar" v-model="searchTerm" placeholder="Search" @input="searchThreads">
+        <input type="text" id="search-bar" v-model="searchTerm" placeholder="Search">
       </div>
       <br>
       <br>
@@ -23,11 +23,11 @@
       </Dialog>
 
       <!-- Looping through threads -->
-      <div v-for="thread in threads" :key="thread.id" class="forum-thread">
+      <div v-for="thread in filteredThreads" :key="thread.id" class="forum-thread">
         <div class="user-info">
           <!-- You can add user details here if they are associated with the thread -->
           <div class="profile-picture"></div>
-          <div class="username">Username Here</div>
+          <div class="username">{{ thread.firstName }} {{ thread.lastName }}</div>
         </div>
         <div class="thread-details">
           <div class="title-date">
@@ -44,11 +44,12 @@
             {{ thread.content }}
           </div>
         </div>
-        <div class="delete-action">
-          <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteThread(thread.id)"
-            style="margin: 5px" />
+        <div class="delete-action" v-if="thread.userId === loggedInUserId">
+          <Button icon="pi pi-trash" outlined rounded severity="danger"
+            @click="confirmDeleteThread(thread.userGroup, thread.userId, thread.id)" style="margin: 5px" />
         </div>
-          <div class="replies-container">
+
+        <div class="replies-container">
           <div class="reply-count">
             <span class="count">{{ thread.repliesCount }} replies</span>
           </div>
@@ -67,9 +68,12 @@ import {
   deleteDoc,
   doc,
   collection,
-  query,
+  getDocs,
   where
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
+
 export default {
   components: {
     'Toast': Toast
@@ -81,21 +85,48 @@ export default {
       toast: ref(null),
       threads: [],
       searchTerm: "",
-      deleteThreadDialog: false,  // For the visibility of the confirmation dialog
-      threadIdToDelete: null
+      deleteThreadDialog: false,
+      currentGroupToDelete: null,
+      currentUserIdToDelete: null,
+      threadIdToDelete: null,
+      loggedInUserId: null,
+      userGroups: ['Green Rangers', 'Eco-Entrepreneur']
     };
   },
+
   created() {
     this.db = getFirestore();
     this.searchThreads();
+    const auth = getAuth();
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.loggedInUserId = user.uid;
+      } else {
+        this.loggedInUserId = null;
+      }
+    });
   },
+
+  computed: {
+    filteredThreads() {
+      if (!this.searchTerm) return this.threads;
+
+      return this.threads.filter(thread => {
+        return thread.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          thread.content.toLowerCase().includes(this.searchTerm.toLowerCase());
+      });
+    }
+  },
+
   methods: {
-    confirmDeleteThread(threadId) {
-      this.threadIdToDelete = threadId; // Store the ID temporarily
-      this.deleteThreadDialog = true;   // Show the confirmation dialog
+    confirmDeleteThread(group, userId, threadId) {
+      this.deleteThreadDialog = true;
+      this.currentGroupToDelete = group;
+      this.currentUserIdToDelete = userId;
+      this.threadIdToDelete = threadId;
     },
 
-    // This method will be called when the user confirms the deletion
     async confirmDelete() {
       if (this.threadIdToDelete) {
         try {
@@ -105,8 +136,8 @@ export default {
             life: 3000,
           });
 
-          await deleteDoc(doc(this.db, 'threads', this.threadIdToDelete));
-          console.log("Thread successfully deleted!");
+          // Using the references to delete the specific thread
+          await deleteDoc(doc(this.db, this.currentGroupToDelete, this.currentUserIdToDelete, 'threads', this.threadIdToDelete));
 
           this.$refs.toast.add({
             severity: "success",
@@ -114,8 +145,10 @@ export default {
             life: 3000,
           });
 
-          this.threadIdToDelete = null;  // Reset the temporary ID
-          this.searchThreads();  // Refresh the threads list after deletion
+          this.threadIdToDelete = null;
+          this.currentUserIdToDelete = null;
+          this.currentGroupToDelete = null;
+          this.searchThreads();
         } catch (error) {
           console.error("Error deleting thread: ", error);
           this.$refs.toast.add({
@@ -126,42 +159,60 @@ export default {
           });
         }
       }
-      this.deleteThreadDialog = false; // Close the confirmation dialog
+      this.deleteThreadDialog = false;
     },
-    searchThreads() {
-      if (!this.searchTerm) {
-        onSnapshot(collection(this.db, 'threads'), snapshot => {
-          this.fetchRepliesCount(snapshot.docs);
-        });
-      } else {
-        onSnapshot(query(collection(this.db, 'threads'), where('title', '==', this.searchTerm)), snapshot => {
-          this.fetchRepliesCount(snapshot.docs);
-        });
+
+    async searchThreads() {
+      this.threads = [];
+
+      for (const group of this.userGroups) {
+        // Get all users under the group
+        const userCollectionRef = collection(this.db, group);
+        const usersSnapshot = await getDocs(userCollectionRef);
+
+        for (const userDoc of usersSnapshot.docs) {
+          // Fetch threads for each user under the group
+          const threadsCollectionRef = collection(this.db, group, userDoc.id, 'threads');
+          const threadsSnapshot = await getDocs(threadsCollectionRef);
+
+          this.fetchRepliesCount(threadsSnapshot.docs, group, userDoc);
+        }
       }
+      this.threads.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
     },
-    fetchRepliesCount(docs) {
+
+    fetchRepliesCount(docs, group, userDoc) {
       const threadsData = [];
       let threadsCount = docs.length;
 
       docs.forEach(doc => {
-        const threadData = { id: doc.id, ...doc.data(), repliesCount: 0 };
-        onSnapshot(collection(this.db, 'threads', doc.id, 'replies'), replySnapshot => {
+        const threadData = {
+          id: doc.id,
+          ...doc.data(),
+          repliesCount: 0,
+          userGroup: group,
+          userId: userDoc.id,
+          firstName: userDoc.data().firstName, // Added this line
+          lastName: userDoc.data().lastName     // Added this line
+        };
+
+        // Fetch reply count for each thread
+        onSnapshot(collection(this.db, group, userDoc.id, 'threads', doc.id, 'replies'), replySnapshot => {
           threadData.repliesCount = replySnapshot.docs.length;
           threadsData.push(threadData);
 
           threadsCount -= 1;
           if (threadsCount === 0) {
-            this.threads = threadsData;
+            this.threads = [...this.threads, ...threadsData];
           }
         });
       });
-    },
+    }
   }
 }
 </script>
-  
-  
-  
+
+
 <style scoped>
 /* global */
 
@@ -294,10 +345,10 @@ h1 {
 }
 
 .delete-action {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
 }
 
 /* Style for the delete button */
@@ -579,4 +630,5 @@ forum-info {
 .add-thread-button a:hover {
   background-color: darkgreen;
   /* Change the background color on hover */
-}</style>
+}
+</style>

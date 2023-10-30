@@ -1,5 +1,7 @@
 <template>
     <div>
+        <br>
+        
         <router-link to="/Forum" class="back-button"> &lt;Back to Forum</router-link>
 
 
