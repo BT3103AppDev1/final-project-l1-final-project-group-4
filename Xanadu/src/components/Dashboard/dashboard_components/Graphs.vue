@@ -1,16 +1,21 @@
 <template>
   <div>
     <h1>Dashboard</h1>
-    <div>
+    <div style="display: inline-block; width: 30%">
       <h4>Money Spent by Product Category</h4>
       <MarketplacePieChartVue :purchasesData="purchasesData" />
     </div>
-    <HighestSpendingProductCategoryCard
-      :highestSpendingProductCategory="highestSpendingProductCategory"
+    <div style="width: 40%; display: inline-block">
+      <HighestSpendingProductCategoryCard
+        :highestSpendingProductCategory="highestSpendingProductCategory"
+      />
+      <ThreadsStartedCard :threadsStarted="threadsStarted" />
+      <NoOfCommentsCard :noOfComments="noOfComments" />
+    </div>
+    <ActivityChart
+      :activityChartData="activityChartData"
+      style="display: inline-block; width: 30%"
     />
-    <ThreadsStartedCard :threadsStarted="threadsStarted" />
-    <NoOfCommentsCard :noOfComments="noOfComments" />
-    <ActivityChart :activityChartData="activityChartData" />
   </div>
 </template>
 
