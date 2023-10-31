@@ -23,6 +23,7 @@
             <a v-if="!isLoggedIn" @click="$router.push('/register')" class="dropdown-item">Register</a>
             <a v-if="!isLoggedIn" @click="$router.push('/login')" class="dropdown-item">Login</a>
             <a v-if="isLoggedIn" @click="signOut" class="dropdown-item">Logout</a>
+            <a v-if="isLoggedIn"  @click="$router.push('/orders')" class="dropdown-item">Orders</a>
           </div>
         </div>
       </template>

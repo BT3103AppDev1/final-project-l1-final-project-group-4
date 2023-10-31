@@ -12,6 +12,7 @@ import EditProduct from '../views/EditProduct.vue';
 import Register from "../views/RegisterView.vue"; // Added this import
 import AddThread from "../views/AddThread.vue"; // Added this import
 import AddReply from "../views/AddReply.vue"; // Added this import
+import Orders from "../views/Orders.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -81,7 +82,13 @@ const router = createRouter({
       path:'/marketplace/product/:id/edit',
       name: 'EditProduct',
       component: EditProduct
+    },
+    {
+      path: '/orders',
+      name: 'Orders',
+      component: Orders
     }
+
   ],
 });
 

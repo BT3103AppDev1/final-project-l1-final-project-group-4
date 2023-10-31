@@ -1,8 +1,9 @@
 <template>
     <div class="upperhalf">
-        <div class="AddImages" :style ="{'background-image' : 'url('+product.picture+')'}">
+        <div class="AddImages" :style ="{'background-image' : 'url('+
+        imgdisplay+')'}">
             <div class="UploadImages">
-                <button @click ="triggerInput" id="UploadPictures">Upload Pictures</button>
+                <button @click ="triggerInput" id="UploadPictures">Update Picture</button>
                 <input type="file" 
                 ref = "uploadPictures"
                 @change="uploadPictures"
@@ -12,7 +13,7 @@
             </div>
         </div>
         <div class="titleAndDesc">
-            <input v-model="Title" type="text" id="Title" name="Title" :placeholder="product.title">
+            <p id="Title" name="Title" v-text= "product.title"></p>
             <input v-model="ShortDesc" type="text" id="ShortDesc" name="ShortDesc" :placeholder="product.shortdesc">
             <input v-model.number="Cost" type="number" id="Cost" name="Cost" :placeholder="product.cost">
         </div>
@@ -40,6 +41,162 @@
         </div>
     </div>
     </template>
+
+<script>
+import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
+  import { getFirestore, doc, getDoc, collection, addDoc, updateDoc } from "firebase/firestore";
+  import { getAuth, onAuthStateChanged } from "firebase/auth";
+  import firebaseApp from "@/firebase.js";
+  
+  const storage = getStorage(firebaseApp);
+  const db = getFirestore();
+  const auth = getAuth();
+
+export default {
+    data() {
+      return {
+        product: {},
+        Title: "",
+        ShortDesc: "",
+        Shipping: "",
+        Dimensions: "",
+        Desc: "",
+        Cost: "",
+        showfile : false,
+        img1: null,
+        user: null
+      };
+    },
+    mounted() {
+        const auth = getAuth(firebaseApp);  // 3. Check the authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.user = user;
+            }
+        });
+    },
+    computed: {
+      productDescription() {
+        return this.product.description || "No description";
+      },
+      imgdisplay() {
+        return this.img1 || this.product.picture;
+      }
+    },
+    beforeRouteEnter(to, from, next) {
+    const productRef = doc(db, 'Products', to.params.id);
+    getDoc(productRef).then((productDoc) => {
+      if (productDoc.exists) {
+        const productData = productDoc.data();
+        next(vm => {
+          vm.product = {
+            id: productDoc.id,
+            title: productData.title,
+            description: productData.desc,
+            picture: productData.pictures,
+            cost: productData.cost,
+            dimensions: productData.dimensions,
+            shipping: productData.shipping,
+            shortdesc: productData.shortdesc
+          };
+        });
+      } else {
+        console.error("Product not found!");
+        next(false);
+      }
+    }).catch((error) => {
+      console.error("Error fetching product:", error);
+      next(false);
+    });},
+    methods: {
+        async Update() {
+            console.log('Updating product: '+ this.product.title)
+            const productRef = doc(db, 'Products', this.product.title)
+            const indivUserProductRef = doc(db, 'Eco-Entrepreneur', this.user.uid, 'Products',this.product.title)
+            if (this.ShortDesc) {
+                await updateDoc(productRef, {
+                    shortdesc: this.ShortDesc
+                });
+                await updateDoc(indivUserProductRef, {
+                    shortdesc: this.ShortDesc
+                });
+            }
+            if (this.Shipping) {
+                await updateDoc(productRef, {
+                    shipping: this.Shipping
+                });
+                await updateDoc(indivUserProductRef, {
+                    shipping: this.Shipping
+                });
+            }
+            if (this.Dimensions) {
+                await updateDoc(productRef, {
+                    dimensions: this.Dimensions
+                });
+                await updateDoc(indivUserProductRef, {
+                    dimensions: this.Dimensions
+                });
+            }
+            if (this.Desc) {
+                await updateDoc(productRef, {
+                    desc: this.Desc
+                });
+                await updateDoc(indivUserProductRef, {
+                    desc: this.Desc
+                });
+            }
+            if (this.Cost) {
+                await updateDoc(productRef, {
+                    cost: this.Cost
+                });
+                await updateDoc(indivUserProductRef, {
+                    cost: this.Cost
+                });
+            }
+            if (this.img1) {
+                await updateDoc(productRef, {
+                    pictures: this.img1
+                })
+                await updateDoc(indivUserProductRef, {
+                    pictures: this.img1
+                })
+            }
+            this.$router.push('/marketplace')
+
+
+        },
+        triggerInput() {
+            this.$refs.uploadPictures.click()
+        },
+        uploadPictures(event) {
+            this.uploadValue=0;
+            this.img1=null;
+            this.imageData = event.target.files[0];
+            this.onUpload()
+
+        },
+        onUpload(){
+            this.img1=null;
+            const childref = ref(storage, `${this.imageData.name}`)
+            const storageRef=uploadBytesResumable(childref,this.imageData);
+            storageRef.on(
+                `state_changed`,
+                snapshot=>{
+                    this.uploadValue = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+                }, 
+                error=>{console.log(error.message)},
+                ()=>{this.uploadValue=100;
+                    getDownloadURL(storageRef.snapshot.ref).then((url)=>{
+                    this.img1 =url;
+                    console.log(this.img1)
+                    });
+                }      
+            );
+        },
+    }
+}
+
+</script>
 
 <style>
 
@@ -156,7 +313,7 @@ input[name="shipping"]::placeholder,input[name="shipping"], input[name="dimensio
     margin: 150px 108px 11px 108px;
 }
 
-input[name="Title"]::placeholder, input[name="Title"] {
+#Title {
 
     /* H3 */
     font-family: Montserrat;
@@ -463,56 +620,3 @@ input[name="Cost"] {
 
 }
 </style>
-<script>
-  import { getFirestore, doc, getDoc, collection, addDoc } from "firebase/firestore";
-  import { getAuth } from "firebase/auth";
-  
-  const db = getFirestore();
-  const auth = getAuth();
-
-export default {
-    data() {
-      return {
-        product: {},
-      };
-    },
-    computed: {
-      productDescription() {
-        return this.product.description || "No description";
-      }
-    },
-    beforeRouteEnter(to, from, next) {
-        const currentUser = auth.currentUser;
-
-        if (!currentUser) {
-        alert("You are not logged in.");
-        return;
-        }
-
-        const productRef = doc(db, 'Eco-Entrepreneur', currentUser.uid, 'Products', to.params.id);
-  
-        getDoc(productRef).then((productDoc) => {
-            const productData = productDoc.data();
-  
-            next(vm => {
-                    vm.product = {
-                        id: productDoc.id,
-                        title: productData.title,
-                        description: productData.desc,
-                        picture: productData.pictures,
-                        shipping: productData.shipping,
-                        dimensions: productData.dimensions,
-                        shortdesc: productData.shortdesc,
-                        cost: productData.cost
-                    };
-                });
-        });
-    },
-    methods: {
-        Update() {
-            console.log('Updating product: '+ product.title)
-        }
-    }
-}
-
-</script>
