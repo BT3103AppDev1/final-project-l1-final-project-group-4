@@ -63,20 +63,16 @@ const router = createRouter({
       component: AddThread 
     },
     {
-      path: "/:userType/:userId/thread/:threadId",
+      path: "/thread/:threadId",
       name: "ThreadReply",
       component: () => import("../views/ThreadReplyView.vue"),
-      props: true  // to pass the parameters as props to the component
+      props: true, // to pass the threadId as a prop to the component
     },
-    
     {
-      path: "/thread/:threadId/addreply/:userType/:userId",
+      path: "/thread/:id/addreply",
       name: "AddReply",
       component: AddReply,
-      props: true
     },
-    
-    
     {
       path: "/login",
       name: "login",
