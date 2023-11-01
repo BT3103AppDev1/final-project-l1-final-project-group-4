@@ -1,21 +1,21 @@
 <template>
   <div>
-    <h1>Dashboard</h1>
-    <div style="display: inline-block; width: 30%">
-      <h4>Money Spent by Product Category</h4>
-      <MarketplacePieChartVue :purchasesData="purchasesData" />
+    <div>
+      <h1>Dashboard</h1>
+      <div style="display: inline-block; width: 30%">
+        <h4>Money Spent by Product Category</h4>
+        <MarketplacePieChartVue :purchasesData="purchasesData" />
+      </div>
+      <div style="width: 40%; display: inline-block">
+        <HighestSpendingProductCategoryCard
+          :highestSpendingProductCategory="highestSpendingProductCategory"
+        />
+        <ThreadsStartedCard :threadsStarted="threadsStarted" />
+        <NoOfCommentsCard :noOfComments="noOfComments" />
+      </div>
+      <h4>Eco-Friendly Activities Points</h4>
+      <ActivityChart :activityChartData="activityChartData" />
     </div>
-    <div style="width: 40%; display: inline-block">
-      <HighestSpendingProductCategoryCard
-        :highestSpendingProductCategory="highestSpendingProductCategory"
-      />
-      <ThreadsStartedCard :threadsStarted="threadsStarted" />
-      <NoOfCommentsCard :noOfComments="noOfComments" />
-    </div>
-    <ActivityChart
-      :activityChartData="activityChartData"
-      style="display: inline-block; width: 30%"
-    />
   </div>
 </template>
 

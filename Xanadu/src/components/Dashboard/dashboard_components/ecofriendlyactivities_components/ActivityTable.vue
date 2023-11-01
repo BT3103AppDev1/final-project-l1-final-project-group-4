@@ -74,7 +74,8 @@
         ></Column>
         <Column field="amount" header="Amount" sortable style="min-width: 8rem">
           <template #body="slotProps">
-            {{ formatCurrency(slotProps.data.amount) }}
+            <!-- {{ formatCurrency(slotProps.data.amount) }} -->
+            {{ formatAmount(slotProps.data) }}
           </template>
         </Column>
         <Column
@@ -147,7 +148,7 @@
               id="activityType1"
               name="activityType"
               value="Water Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
             />
             <label for="activityType1">Water Conservation</label>
           </div>
@@ -156,7 +157,7 @@
               id="activityType2"
               name="activityType"
               value="Energy Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
             />
             <label for="activityType2">Energy Conservation</label>
           </div>
@@ -165,7 +166,7 @@
               id="activityType3"
               name="activityType"
               value="Waste Reduction"
-              v-model="activity.activityType"
+              v-model="activityType"
             />
             <label for="activityType3">Waste Reduction</label>
           </div>
@@ -175,12 +176,32 @@
       <div class="formgrid grid">
         <div class="field col">
           <label for="amount">Amount</label>
+          <br />
           <InputNumber
             id="amount"
             v-model="activity.amount"
             :minFractionDigits="0"
             :maxFractionDigits="2"
+            style="width: 85%"
           />
+          <h4
+            v-show="activityTypeWaterConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; L
+          </h4>
+          <h4
+            v-show="activityTypeWasteReduction"
+            style="display: inline; color: black"
+          >
+            &nbsp; Kg
+          </h4>
+          <h4
+            v-show="activityTypeEnergyConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; KwH
+          </h4>
         </div>
         <div class="field col">
           <label for="Date Picker">Date</label>
@@ -236,7 +257,7 @@
               id="activityType1"
               name="activityType"
               value="Water Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
             />
             <label for="activityType1">Water Conservation</label>
           </div>
@@ -245,7 +266,7 @@
               id="activityType2"
               name="activityType"
               value="Energy Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
             />
             <label for="activityType2">Energy Conservation</label>
           </div>
@@ -254,7 +275,7 @@
               id="activityType3"
               name="activityType"
               value="Waste Reduction"
-              v-model="activity.activityType"
+              v-model="activityType"
             />
             <label for="activityType3">Waste Reduction</label>
           </div>
@@ -264,12 +285,32 @@
       <div class="formgrid grid">
         <div class="field col">
           <label for="amount">Amount</label>
+          <br />
           <InputNumber
             id="amount"
             v-model="activity.amount"
             :minFractionDigits="0"
             :maxFractionDigits="2"
+            style="width: 85%"
           />
+          <h4
+            v-show="activityTypeWaterConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; L
+          </h4>
+          <h4
+            v-show="activityTypeWasteReduction"
+            style="display: inline; color: black"
+          >
+            &nbsp; Kg
+          </h4>
+          <h4
+            v-show="activityTypeEnergyConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; KwH
+          </h4>
         </div>
         <div class="field col">
           <label for="Date Picker">Date</label>
@@ -377,6 +418,10 @@ export default {
       filters: {},
       submitted: false,
       userId: "",
+      activityType: "",
+      activityTypeWaterConservation: false,
+      activityTypeEnergyConservation: false,
+      activityTypeWasteReduction: false,
     };
   },
   props: {
@@ -385,6 +430,30 @@ export default {
   watch: {
     activityData(data) {
       console.log(data);
+    },
+    activityType(type) {
+      console.log(type);
+      this.activity.activityType = type;
+      if (type == "Water Conservation") {
+        this.activityTypeWaterConservation = true;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = false;
+      }
+      if (type == "Energy Conservation") {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = true;
+        this.activityTypeWasteReduction = false;
+      }
+      if (type == "Waste Reduction") {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = true;
+      }
+    },
+    activityDialog(value) {
+      if (value == false) {
+        this.activityType = "";
+      }
     },
   },
   created() {
@@ -397,12 +466,16 @@ export default {
     });
   },
   methods: {
-    formatCurrency(value) {
-      if (value)
-        return value.toLocaleString("en-US", {
-          style: "currency",
-          currency: "USD",
-        });
+    formatAmount(data) {
+      if (data.activityType == "Waste Reduction") {
+        return String(data.amount) + " Kg";
+      }
+      if (data.activityType == "Water Conservation") {
+        return String(data.amount) + " L";
+      }
+      if (data.activityType == "Energy Conservation") {
+        return String(data.amount) + " KwH";
+      }
       return;
     },
     openNew() {
@@ -470,7 +543,10 @@ export default {
       this.activity = {};
     },
     editActivity(activity) {
+      this.activityType = activity.activityType;
+      console.log(activity.activityType);
       this.activity = { ...activity };
+      // this.activityType = activity.activityType;
       this.editActivityDialog = true;
     },
     async updateActivity() {

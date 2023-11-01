@@ -164,8 +164,28 @@ export default {
           );
         }
       });
+
+      console.log(activityChartData);
       // console.log(activityChartData);
-      return activityChartData;
+      var chartData = {};
+      var labels = Object.keys(activityChartData);
+      var data = Object.values(activityChartData);
+      var colors = ["#738678", "#C86368", "#E4D5A3"];
+      // // console.log(data); // --> this is ok
+      var datasets = [
+        {
+          backgroundColor: colors,
+          data: data,
+        },
+      ];
+
+      chartData = {
+        labels: labels,
+        datasets: datasets,
+      };
+      console.log(chartData);
+
+      return chartData;
     },
 
     async getPurchasesData() {
