@@ -1,5 +1,6 @@
 <template>
     <div class="adding">
+        <h2 class="reply-title">Add Thread</h2>
         <form @submit.prevent="addThread">
             <div class="title">
             <input v-model="threadTitle" placeholder="Thread Title" type="text" required />
@@ -24,7 +25,8 @@ export default {
             threadTitle: '',
             threadContent: '',
             db: null,  // Added this property to cache the Firestore instance
-            userType: null  // To store whether the user is a Green Ranger or Eco-Entrepreneur
+            userType: null, // To store whether the user is a Green Ranger or Eco-Entrepreneur
+            userID: null
         };
     },
     async created() {
@@ -55,7 +57,9 @@ export default {
                 const thread = {
                     title: this.threadTitle,
                     content: this.threadContent,
-                    timestamp: new Date()
+                    timestamp: new Date(),
+                    userType: this.userType, 
+                    userID: getAuth().currentUser.uid
                 };
 
                 if (!this.userType) {
@@ -76,21 +80,65 @@ export default {
 
 
 <style scoped>
-
-.adding{
-    margin-top: 50px;
+.adding {
+    background-color: #738678; /* Xanadu color */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 50px auto; /* Updated from margin-top */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the child elements */
 }
 
-.adding .description{
-    width: 100%;
-    min-height: 100px;
-    padding: 10px;
-    margin-block: 10px;
-}
-
-.adding .title{
-    width: 100%;
+.adding .title, .adding .description {
+    width: 95%; /* Reduce width for some padding effect */
     padding: 8px;
-    margin-block: 10px;
+    border: 2px solid #5a605c;
+    border-radius: 7px;
+    font-size: 16px;
+    color: #333;
+    background-color: #e8e9e7;
+    transition: border-color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.adding .description {
+    height: 100px; /* Specific height for the description textarea */
+}
+
+.adding .title input, .adding .description textarea {
+    width: 100%; /* Full width within the container */
+    border: none; /* Remove individual border as it's set on the container */
+    outline: none; /* Remove focus outline */
+    background-color: transparent; /* Transparent background */
+    font-size: 16px; /* Font size */
+    color: #333; /* Text color */
+}
+
+h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    color: #738678; /* Xanadu color */
+    background-color: white;
+    border: 2px solid #738678;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: center;
+}
+
+button:hover {
+    background-color: #e8e9e7;
+    color: #454f4b;
 }
 </style>

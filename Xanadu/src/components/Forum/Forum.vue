@@ -32,7 +32,8 @@
         <div class="thread-details">
           <div class="title-date">
             <div class="thread-title">
-              <router-link :to="{ name: 'ThreadReply', params: { threadId: thread.id } }">
+              <router-link
+                :to="{ name: 'ThreadReply', params: { threadId: thread.id, userId: thread.userId, userType: thread.userType } }">
                 <b>{{ thread.title }}</b>
               </router-link>
             </div>

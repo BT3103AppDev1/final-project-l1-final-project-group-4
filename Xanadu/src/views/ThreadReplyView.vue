@@ -1,7 +1,7 @@
 <template>
     <div>
         <br>
-        
+
         <router-link to="/Forum" class="back-button"> &lt;Back to Forum</router-link>
 
 
@@ -23,8 +23,11 @@
             </template>
         </Dialog>
         <div class="add-reply-button">
-            <router-link :to="`/thread/${threadId}/addreply`">Add Reply</router-link>
+            <router-link
+                :to="{ name: 'AddReply', params: { threadId: threadId, userType: thread.userType, userId: thread.userId } }">Add
+                Reply</router-link>
         </div>
+
         <br>
 
         <div class="reply-count">{{ replies.length }} Replies</div>
@@ -34,7 +37,7 @@
             <div class="user-info">
                 <!-- You can add user details here if they are associated with the reply -->
                 <div class="profile-picture"></div>
-                <div class="username">Username Here</div>
+                <div class="username">{{ reply.firstName }} {{ reply.lastName }}</div> <!-- Modified line -->
             </div>
             <div class="reply-details">
                 <div class="title-date">
@@ -46,10 +49,13 @@
                     {{ reply.content }}
                 </div>
             </div>
-            <div class="action-container">
-                <Button icon="pi pi-trash" outlined rounded severity="danger" @click="promptDeleteReply(reply.id)"
-                    style="margin: 5px" />
+            <div class="action-container" v-if="check === reply.replyuserId">
+                <!-- Conditionally display the delete button if the logged-in user's ID matches the userID of the reply -->
+                <Button  icon="pi pi-trash" outlined rounded severity="danger"
+                    @click="promptDeleteReply(reply.id)" style="margin: 5px" />
             </div>
+            
+            
         </div>
     </div>
 </template>
@@ -57,12 +63,13 @@
 <script>
 import { getFirestore, doc, getDoc, collection, onSnapshot, query, orderBy, deleteDoc } from 'firebase/firestore';
 import firebase from '@/firebase.js';
+import { getAuth } from 'firebase/auth';
 import Toast from 'primevue/toast';   // Import the Toast component
 import Dialog from 'primevue/dialog'; // Import the Dialog component
 import Button from 'primevue/button'; // Import the Button component for the dialog
 
 export default {
-    props: ['threadId'],
+    props: ['threadId', 'userId', 'userType'],
     components: {
         Toast,
         Dialog,
@@ -74,26 +81,29 @@ export default {
             replies: [],
             toast: null,   // Create a reference for the Toast
             deleteReplyDialog: false,  // For the visibility of the confirmation dialog
-            replyIdToDelete: null      // To temporarily store the reply ID for deletion
+            replyIdToDelete: null,      // To temporarily store the reply ID for deletion
+            check: null
         };
     },
     async created() {
         const db = getFirestore(firebase);
 
-        // Log the threadId to ensure it's correct
-        console.log("Thread ID:", this.threadId);
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        this.check = getAuth().currentUser.uid;
+        console.log('Logged-in user ID:', this.check);
 
-        // Fetch the thread data
-        const threadRef = doc(db, 'threads', this.threadId);
+        // Fetch the thread data based on userType, userId, and threadId
+        const threadRef = doc(db, this.userType, this.userId, 'threads', this.threadId);
         const threadDoc = await getDoc(threadRef);
-        
+
         if (threadDoc.exists()) {
             this.thread = { id: threadDoc.id, ...threadDoc.data() };
         }
 
-        // Fetch the replies for the thread
-        const repliesQuery = query(collection(db, 'threads', this.threadId, 'replies'), orderBy('timestamp', 'desc'));
-        
+        // Fetch the replies for the thread based on the hierarchy
+        const repliesQuery = query(collection(db, this.userType, this.userId, 'threads', this.threadId, 'replies'), orderBy('timestamp', 'desc'));
+
         onSnapshot(repliesQuery, (snapshot) => {
             this.replies = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -103,8 +113,12 @@ export default {
             // Log the fetched replies to see them
             console.log("Fetched replies:", this.replies);
         });
+
+        setTimeout(() => {
+      console.log("Direct test:", this.replies[0] ? this.replies[0].firstName : 'No userID');
+   }, 3000); 
     },
-    
+
 
     methods: {
         promptDeleteReply(replyId) {
@@ -116,7 +130,8 @@ export default {
 
             if (this.replyIdToDelete) {
                 try {
-                    const replyRef = doc(db, 'threads', this.threadId, 'replies', this.replyIdToDelete);
+                    const replyRef = doc(db, this.userType, this.userId, 'threads', this.threadId, 'replies', this.replyIdToDelete);
+
 
                     this.$refs.toast.add({
                         severity: "error",
@@ -134,10 +149,6 @@ export default {
                         life: 3000,
                     });
 
-                    // Remove the deleted reply from the `replies` array
-                    this.replies = this.replies.filter(reply => reply.id !== this.replyIdToDelete);
-
-                    this.replyIdToDelete = null;  // Reset the temporary ID
                 } catch (error) {
                     console.error("Error deleting reply: ", error);
 
@@ -147,11 +158,14 @@ export default {
                         detail: error.message,
                         life: 5000,
                     });
+                } finally {
+                    this.replyIdToDelete = null;  // Reset the temporary ID
+                    this.deleteReplyDialog = false; // Close the confirmation dialog
                 }
             }
-            this.deleteReplyDialog = false; // Close the confirmation dialog
         }
     }
+
 }
 </script>
 
