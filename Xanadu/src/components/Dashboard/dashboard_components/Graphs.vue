@@ -2,20 +2,22 @@
   <div>
     <div>
       <h1>Dashboard</h1>
-      <div style="display: inline-block; width: 35%">
+
+      <div class="pieChart">
         <h4>Money Spent by Product Category</h4>
         <MarketplacePieChartVue :purchasesData="purchasesData" />
       </div>
-      <div style="width: 30%; display: inline-block">
+      <div class="cards">
         <TopSpendingProductCategoryCard
           :highestSpendingProductCategory="highestSpendingProductCategory"
         />
         <ForumThreadsStartedCard :threadsStarted="threadsStarted" />
-
         <NoOfCommentsCard :noOfComments="noOfComments" />
       </div>
-      <h4>Eco-Friendly Activities Points</h4>
-      <ActivityChart :activityChartData="activityChartData" />
+      <div class="activityChart">
+        <h4>Eco-Friendly Activities Points</h4>
+        <ActivityChart :activityChartData="activityChartData" />
+      </div>
     </div>
   </div>
 </template>
@@ -58,3 +60,29 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.pieChart {
+  width: 23%;
+  height: 100%;
+  flex-shrink: 0;
+  float: left;
+  margin-right: 19%;
+}
+
+.cards {
+  margin-top: 4rem;
+  width: 20%;
+  height: 100%;
+  flex-shrink: 0;
+  float: left;
+  margin-right: 2%;
+}
+
+.activityChart {
+  width: 33%;
+  height: 100%;
+  flex-shrink: 0;
+  float: left;
+}
+</style>

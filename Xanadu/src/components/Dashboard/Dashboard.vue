@@ -1,15 +1,19 @@
 <template>
   <div>
     <Toast></Toast>
-    <Graphs
-      :activityChartData="activityChartData"
-      :purchasesData="purchasesData"
-      :threadsStarted="threadsStarted"
-      :noOfComments="noOfComments"
-      :highestSpendingProductCategory="highestSpendingProductCategory"
-      :key="refreshComp"
-    />
+    <div class="dashboardElements">
+      <Graphs
+        :activityChartData="activityChartData"
+        :purchasesData="purchasesData"
+        :threadsStarted="threadsStarted"
+        :noOfComments="noOfComments"
+        :highestSpendingProductCategory="highestSpendingProductCategory"
+        :key="refreshComp"
+      />
+    </div>
+
     <MilestoneProgress />
+
     <EcoFriendlyActivities
       :activityData="activityData"
       @added="refresh"
@@ -247,3 +251,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.dashboardElements {
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+</style>

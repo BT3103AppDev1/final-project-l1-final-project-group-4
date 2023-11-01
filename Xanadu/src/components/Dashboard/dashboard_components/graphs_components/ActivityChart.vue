@@ -4,7 +4,7 @@
       type="bar"
       :data="activityChartData"
       :options="chartOptions"
-      class="h-30rem"
+      class="columnChart"
     />
   </div>
 </template>
@@ -78,3 +78,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.columnChart {
+  width: 100%;
+  height: 20rem;
+}
+</style>
