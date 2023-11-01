@@ -2,26 +2,6 @@
   <div>
     <Toast> </Toast>
     <div class="card">
-      <Toolbar class="mb-4">
-        <template #start>
-          <Button
-            label="Add Eco-Friendly Activity"
-            icon="pi pi-plus"
-            severity="success"
-            class="mr-2"
-            @click="openNew"
-            style="margin-right: 10px"
-          />
-          <Button
-            label="Delete"
-            icon="pi pi-trash"
-            severity="danger"
-            @click="confirmDeleteSelected"
-            :disabled="!selectedActivities || !selectedActivities.length"
-          />
-        </template>
-      </Toolbar>
-
       <DataTable
         ref="dt"
         :value="activityData"
@@ -108,6 +88,25 @@
           </template>
         </Column>
       </DataTable>
+      <Toolbar class="mb-4">
+        <template #start>
+          <Button
+            label="Add Activity"
+            icon="pi pi-plus"
+            severity="success"
+            class="mr-2"
+            @click="openNew"
+            style="margin-right: 10px; background-color: #404e3e"
+          />
+          <Button
+            label="Delete"
+            icon="pi pi-trash"
+            severity="danger"
+            @click="confirmDeleteSelected"
+            :disabled="!selectedActivities || !selectedActivities.length"
+          />
+        </template>
+      </Toolbar>
     </div>
 
     <Dialog

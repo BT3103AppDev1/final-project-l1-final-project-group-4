@@ -2,15 +2,16 @@
   <div>
     <div>
       <h1>Dashboard</h1>
-      <div style="display: inline-block; width: 30%">
+      <div style="display: inline-block; width: 35%">
         <h4>Money Spent by Product Category</h4>
         <MarketplacePieChartVue :purchasesData="purchasesData" />
       </div>
-      <div style="width: 40%; display: inline-block">
-        <HighestSpendingProductCategoryCard
+      <div style="width: 30%; display: inline-block">
+        <TopSpendingProductCategoryCard
           :highestSpendingProductCategory="highestSpendingProductCategory"
         />
-        <ThreadsStartedCard :threadsStarted="threadsStarted" />
+        <ForumThreadsStartedCard :threadsStarted="threadsStarted" />
+
         <NoOfCommentsCard :noOfComments="noOfComments" />
       </div>
       <h4>Eco-Friendly Activities Points</h4>
@@ -21,17 +22,17 @@
 
 <script>
 import MarketplacePieChartVue from "./graphs_components/MarketplacePieChart.vue";
-import HighestSpendingProductCategoryCard from "./graphs_components/HighestSpendingProductCategoryCard.vue";
-import ThreadsStartedCard from "./graphs_components/ThreadsStartedCard.vue";
-import NoOfCommentsCard from "./graphs_components/NoOfCommentsCard.vue";
+import TopSpendingProductCategoryCard from "./graphs_components/TopSpendingProductCategoryCard.vue";
+import ForumThreadsStartedCard from "./graphs_components/ForumThreadsStartedCard.vue";
+import NoOfCommentsCard from "./graphs_components/ForumCommentsCard.vue";
 import ActivityChart from "./graphs_components/ActivityChart.vue";
 
 export default {
   components: {
     ActivityChart,
     MarketplacePieChartVue,
-    HighestSpendingProductCategoryCard,
-    ThreadsStartedCard,
+    TopSpendingProductCategoryCard,
+    ForumThreadsStartedCard,
     NoOfCommentsCard,
   },
   props: {
