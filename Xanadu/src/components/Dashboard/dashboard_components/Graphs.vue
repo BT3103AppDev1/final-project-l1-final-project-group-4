@@ -67,7 +67,7 @@ export default {
   height: 100%;
   flex-shrink: 0;
   float: left;
-  margin-right: 19%;
+  margin-right: 18.5%;
 }
 
 .cards {

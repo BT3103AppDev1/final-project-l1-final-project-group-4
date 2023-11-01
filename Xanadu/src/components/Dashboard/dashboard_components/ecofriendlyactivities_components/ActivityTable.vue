@@ -18,7 +18,7 @@
           <div
             class="flex flex-wrap gap-2 align-items-center justify-content-between"
           >
-            <h4 class="m-0">Manage Activities</h4>
+            <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1>
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText
@@ -38,23 +38,31 @@
           field="name"
           header="Name"
           sortable
-          style="min-width: 12rem"
+          style="min-width: 12rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
         <Column
           field="activityDescription"
           header="Activity Description"
           sortable
-          style="min-width: 12rem"
+          style="min-width: 12rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
         <Column
           field="sustainabilityPoints"
           header="Points"
           sortable
-          style="min-width: 16rem"
+          style="min-width: 8rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
-        <Column field="amount" header="Amount" sortable style="min-width: 8rem">
+        <Column
+          field="amount"
+          header="Amount"
+          sortable
+          style="min-width: 8rem; text-align: center"
+          headerClass="column-text-right"
+        >
           <template #body="slotProps">
-            <!-- {{ formatCurrency(slotProps.data.amount) }} -->
             {{ formatAmount(slotProps.data) }}
           </template>
         </Column>
@@ -62,25 +70,30 @@
           field="activityType"
           header="ActivityType"
           sortable
-          style="min-width: 10rem"
+          style="min-width: 10rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
-        <Column field="date" header="Date" style="min-width: 10rem" sortable>
+        <Column
+          field="date"
+          header="Date"
+          style="min-width: 10rem; text-align: center"
+          sortable
+          headerClass="column-text-right"
+        >
         </Column>
 
-        <Column :exportable="false" style="min-width: 8rem">
+        <Column :exportable="false" style="min-width: 4rem; text-align: center">
           <template #body="slotProps">
             <Button
               icon="pi pi-pencil"
               outlined
-              rounded
               class="mr-2"
               @click="editActivity(slotProps.data)"
               style="margin: 5px"
             />
             <Button
-              icon="pi pi-trash"
+              icon="pi pi-times"
               outlined
-              rounded
               severity="danger"
               @click="confirmDeleteActivity(slotProps.data)"
               style="margin: 5px"
@@ -664,3 +677,23 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.ecoFriendlyActivityHeader {
+  color: var(--neutral-gray-404040, #404040);
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.75rem; /* 39.063% */
+  letter-spacing: 0.1rem;
+}
+</style>
+
+<style lang="scss">
+.column-text-right {
+  .p-column-header-content {
+    text-align: center; // or center
+    display: block !important;
+  }
+}
+</style>
