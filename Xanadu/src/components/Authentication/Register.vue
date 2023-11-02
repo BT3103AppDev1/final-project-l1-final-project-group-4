@@ -29,6 +29,29 @@
                 </div>
 
                 <div class="field">
+                    <p class="upload-pic-label">Upload profile picture</p>
+                    <div class="UploadImages">
+                        <button @click ="triggerInput" id="UploadPictures">Upload Pictures</button>
+                        <input type="file" 
+                        ref = "uploadPictures"
+                        @change="uploadPictures"
+                        accept="image/*" >   
+                    </div>
+                </div>
+
+                <div class="field">
+                    <span class="p-float-label">
+                        <InputText
+                            id="inputUsername"
+                            v-model="username"
+                            type="text"
+                            required
+                        />
+                        <label for="inputUsername">Username</label>
+                    </span>
+                </div>
+
+                <div class="field">
                     <span class="p-input-icon-right p-float-label">
                         <i class="pi pi-envelope" />
                         <InputText
@@ -101,20 +124,55 @@
 import firebaseApp from "../../firebase.js"
 import { getFirestore } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
 import {getAuth, createUserWithEmailAndPassword} from "firebase/auth";
+
+const storage = getStorage();
 
 export default {
     data() {
         return {
             firstName: "",
             lastName: "",
+            username: "",
             email: "",
             password: "",
             userType: "",
+            img1: null,
+            imageData: false,
         };
     },
 
     methods: {
+        triggerInput() {
+            this.$refs.uploadPictures.click()
+        },
+
+        uploadPictures(event) {
+            this.uploadValue=0;
+            this.img1=null;
+            this.imageData = event.target.files[0];
+            this.onUpload()
+
+        },
+
+        onUpload(){
+            this.img1=null;
+            const childref = ref(storage, `${this.imageData.name}`)
+            const storageRef=uploadBytesResumable(childref,this.imageData);
+
+            storageRef.on(`state_changed`, snapshot=>{
+                this.uploadValue = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+            }, error=>{console.log(error.message)}, ()=>{
+                this.uploadValue=100;
+                getDownloadURL(storageRef.snapshot.ref).then((url)=>{
+                    this.img1 =url;
+                    console.log(this.img1)
+                    console.log(typeof this.img1)
+                });
+            });
+        },
+
         register() {
             if (this.userType==""){
                 alert("Please select an Account Type you would like to register as!")
@@ -124,19 +182,27 @@ export default {
             const auth = getAuth();
             const db = getFirestore();
 
+            if (this.img1 == null) {
+                this.img1 = "https://firebasestorage.googleapis.com/v0/b/xanadu-40991.appspot.com/o/profile.png?alt=media&token=d9062579-1a8f-48dc-902e-85625f45ab4d"
+            }
+
             createUserWithEmailAndPassword(auth, this.email, this.password)
                 .then((userCredential) => {
                 if (this.userType == "Eco-Entrepreneur") {
                     setDoc(doc(db, "Eco-Entrepreneur", userCredential.user.uid), {
                     firstName: this.firstName,
                     lastName: this.lastName,
+                    username: this.username,
                     email: this.email,
+                    profilePicture: this.img1,
                     });
                 } else if (this.userType == "Green Ranger"){
                     setDoc(doc(db, "Green Rangers", userCredential.user.uid), {
                     firstName: this.firstName,
                     lastName: this.lastName,
+                    username: this.username,
                     email: this.email,
+                    profilePicture: this.img1,
                     });
                 }
 
@@ -144,7 +210,9 @@ export default {
                     userType: this.userType,
                     firstName: this.firstName,
                     lastName: this.lastName,
+                    username: this.username,
                     email: this.email,
+                    profilePicture: this.img1,
                 });
 
                 const user = userCredential.user;
@@ -186,6 +254,8 @@ export default {
 <style scoped>
 /* import specific font */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+
+
 
 .CreateAccountTitle{
     font-size: 32px; 
@@ -269,5 +339,10 @@ li{
 .switchTo_login:hover{
     background-color: rgba(226, 226, 226, 0.79);
     outline: rgb(201, 201, 201) 0.5px solid;
+}
+
+.upload-pic-label{
+    margin-top: 0;
+    padding-left: 10px;
 }
 </style>    
