@@ -1,26 +1,51 @@
 <template>
-  <Toast></Toast>
   <div class="product-view">
     <div class="product-content">
-      <img :src="product.picture" alt="Product Image" class="product-view-image">
-      <h2 class="product-title">{{ product.title }}</h2>
-      <p class="product-description">{{ productDescription }}</p>
-      <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
-      <div class="quantity-input">
-        <label for="quantity">Quantity:</label>
-        <input v-model="quantity" type="number" id="quantity" min="1">
+      <div class="product-left">
+        <img :src="product.picture" alt="Product Image" class="product-view-image">
       </div>
-      <!-- Add v-if for user-type = Green Ranger -->
-      <div class="buttons">
-        <div class="add-cart-btn">
-          <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
+      <div class="product-right">
+        <h2 class="product-title">{{ product.title }}</h2>
+        <div class="product-details">
+          <div class="detail-section">
+            <h3>Description:</h3>
+            <p class="product-description">{{ productDescription }}</p>
+          </div>
+          <div class="detail-section">
+            <h3>Short Description:</h3>
+            <p>{{ product.shortdesc }}</p>
+          </div>
+          <div class="detail-section">
+            <h3>Shipping:</h3>
+            <p>{{ product.shipping }}</p>
+          </div>
+          <div class="detail-section">
+            <h3>Dimensions:</h3>
+            <p>{{ product.dimensions }}</p>
+          </div>
+          <div class="detail-section">
+            <h3>Price:</h3>
+            <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
+          </div>
+          <div class="detail-section">
+            <h3>Seller:</h3>
+            <p>{{ product.seller }}</p>
+          </div>
         </div>
-        <div class="edit-product-btn">
-          <!-- Add v-if for user-type = Eco-Entrepreneur -->
-          <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink> 
-        </div>
-        <div class = "delete-button">
-          <Button class="del-product-btn" icon="pi pi-times" severity="danger" rounded aria-label="Cancel" @click = "deleteProduct(product.title)"/>
+        <div class="actions-section">
+          <div v-if="userType !== 'Eco-Entrepreneur'" class="quantity-input">
+            <label for="quantity">Quantity:</label>
+            <input v-model="quantity" type="number" id="quantity" min="1">
+          </div>
+          <div class="buttons">
+            <div v-if="userType === 'Green Ranger'" class="add-cart-btn">
+              <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
+            </div>
+            <div v-if="userType === 'Eco-Entrepreneur'" class="product-buttons">
+              <RouterLink :to="'/marketplace/product/' + product.id + '/edit'" class="edit-btn">Edit Product</RouterLink>
+              <Button class="del-product-btn" icon="pi pi-times" severity="danger" rounded aria-label="Cancel" @click="deleteProduct(product.title)"/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -41,14 +66,35 @@ export default {
   data() {
     return {
       product: {},
-      quantity: 1
+      quantity: 1,
+      userType: null
     };
+  },
+  async created() {
+      const user = auth.currentUser;
+
+      if (user) {
+          const ecoEntrepreneurDocRef = doc(db, "Eco-Entrepreneur", user.uid);
+          const ecoEntrepreneurDocSnap = await getDoc(ecoEntrepreneurDocRef);
+
+          if (ecoEntrepreneurDocSnap.exists()) {
+              this.userType = "Eco-Entrepreneur";
+          } else {
+              const greenRangersDocRef = doc(db, "Green Rangers", user.uid);
+              const greenRangersDocSnap = await getDoc(greenRangersDocRef);
+
+              if (greenRangersDocSnap.exists()) {
+                  this.userType = "Green Ranger";
+              }
+          }
+      }
   },
   computed: {
     productDescription() {
       return this.product.description || "No description";
     }
   },
+  
   beforeRouteEnter(to, from, next) {
     const productRef = doc(db, 'Products', to.params.id);
     getDoc(productRef).then((productDoc) => {
@@ -58,9 +104,13 @@ export default {
           vm.product = {
             id: productDoc.id,
             title: productData.title,
+            shortdesc: productData.shortdesc,
+            shipping: productData.shipping,
+            dimensions: productData.dimensions,
             description: productData.desc,
             picture: productData.pictures,
-            cost: productData.cost
+            cost: productData.cost,
+            seller: productData.username
           };
         });
       } else {
@@ -131,117 +181,132 @@ export default {
 </script>
 
   
-  <style>
-  .product-cost {
-  font-size: 22px; /* Adjust the font size as needed */
+<style>
+.product-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 50px 20px;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+}
+
+.product-content {
+  background: #fff;
+  padding: 25px;
+  max-width: 1200px;
+  border-radius: 15px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.product-left,
+.product-right {
+  flex: 1 1 300px;
+}
+
+.product-view-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.product-title {
+  font-size: 28px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+h3 {
+  color: #4a7c59;
+  margin-top: 20px;
+}
+
+.product-description,
+.detail-section p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.cart-btn,
+.edit-product-btn a,
+.edit-btn,
+.del-product-btn {
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   font-weight: bold;
-  color: #748C70; /* Match the color with your theme */
-  margin-bottom: 20px; /* Some space below the cost for separation */
-  }
-  .product-view {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    padding: 20px;
-    height: 100vh; /* Take up full viewport height */
-    background-color: #f4f4f4; /* Light gray background */
-  }
-  
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.cart-btn:hover,
+.edit-product-btn a:hover,
+.edit-btn:hover,
+.del-product-btn:hover {
+  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.quantity-input input {
+  font-family: inherit;
+}
+
+.detail-section {
+  border-top: 1px solid #eaeaea;
+  padding-top: 15px;
+}
+
+.product-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.edit-btn {
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #45a049;
+}
+
+.del-product-btn {
+  background-color: #f44336;
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.del-product-btn:hover {
+  background-color: #da190b;
+}
+
+@media (max-width: 768px) {
   .product-content {
-    background: #fff;
-    padding: 20px;
-    max-width: 600px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  .product-view-image {
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    object-fit: cover;
-    margin-bottom: 20px;
-    border-radius: 10px; /* Rounded edges for the image */
-  }
-  
-  .product-title {
-    font-size: 24px; /* Increased title font size */
-    margin-bottom: 10px;
-    color: #333; /* Darker text for readability */
-  }
-  
-  .product-description {
-    font-size: 18px; /* Increased description font size */
-    margin: 20px 0; /* Add some spacing above and below the description */
-    line-height: 1.5;
-    color: #555; /* Darker text for readability */
-  }
-  
-  .quantity-input {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .quantity-input label {
-    margin-right: 10px;
-    font-size: 18px;
-  }
-  
-  .quantity-input input {
-    width: 40px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    text-align: center;
-    font-size: 16px;
-  }
-  
-  .cart-btn {
-    margin: 10px;
-    background-color: #748C70;
-    color: white;
-    border: none;
-    padding: 12px 24px; /* Increased padding */
-    font-size: 18px; /* Increased font size */
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-
-  .edit-product-btn a {
-    background-color: #748C70;
-    color: white;
-    border: none;
-    padding: 12px 24px; /* Increased padding */
-    font-size: 18px; /* Increased font size */
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-family: Montserrat;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 140%;
-    text-decoration: none;
-
-  }
-
-  .del-product-btn {
-    margin: 10px;
-  }
-
-  .buttons {
-    display: flex;
     flex-direction: column;
-    align-content: space-between;
   }
 
-  
-  .cart-btn:hover, .edit-product-btn a:hover {
-    background-color: #657B61; /* Darken the button color on hover */
+  .product-left,
+  .product-right {
+    width: 100%;
   }
+}
 
-  </style>
+</style>
+
   
