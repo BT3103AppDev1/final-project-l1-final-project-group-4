@@ -10,13 +10,11 @@
         <label for="quantity">Quantity:</label>
         <input v-model="quantity" type="number" id="quantity" min="1">
       </div>
-      <!-- Add v-if for user-type = Green Ranger -->
       <div class="buttons">
         <div v-if = "!seller" class="add-cart-btn">
           <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
         </div>
         <div v-if = "seller" class="edit-product-btn">
-          <!-- Add v-if for user-type = Eco-Entrepreneur -->
           <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink> 
         </div>
         <div v-if = "seller" class = "delete-button">
@@ -55,6 +53,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
+    console.log(to.params.id);
     const productRef = doc(db, 'Products', to.params.id);
     getDoc(productRef).then((productDoc) => {
       if (productDoc.exists) {
@@ -128,7 +127,7 @@ export default {
         return;
       }
 
-      const cartRef = collection(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart');
+      const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
       
       // Check if the product is already in the cart
       const productInCart = (await getDocs(cartRef)).docs.find(doc => doc.data().title === product.title);
