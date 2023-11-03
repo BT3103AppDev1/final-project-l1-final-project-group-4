@@ -13,6 +13,7 @@ import Register from "../views/RegisterView.vue"; // Added this import
 import AddThread from "../views/AddThread.vue"; // Added this import
 import AddReply from "../views/AddReply.vue"; // Added this import
 import Orders from "../views/Orders.vue";
+import Profile from "../views/ProfileView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,16 +64,20 @@ const router = createRouter({
       component: AddThread 
     },
     {
-      path: "/thread/:threadId",
+      path: "/:userType/:userId/thread/:threadId",
       name: "ThreadReply",
       component: () => import("../views/ThreadReplyView.vue"),
-      props: true, // to pass the threadId as a prop to the component
+      props: true  // to pass the parameters as props to the component
     },
+    
     {
-      path: "/thread/:id/addreply",
+      path: "/thread/:threadId/addreply/:userType/:userId",
       name: "AddReply",
       component: AddReply,
+      props: true
     },
+    
+    
     {
       path: "/login",
       name: "login",
@@ -87,6 +92,11 @@ const router = createRouter({
       path: '/orders',
       name: 'Orders',
       component: Orders
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile
     }
 
   ],
