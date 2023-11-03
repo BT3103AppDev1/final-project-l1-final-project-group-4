@@ -12,14 +12,14 @@
       </div>
       <!-- Add v-if for user-type = Green Ranger -->
       <div class="buttons">
-        <div class="add-cart-btn">
+        <div v-if = "!seller" class="add-cart-btn">
           <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
         </div>
-        <div class="edit-product-btn">
+        <div v-if = "seller" class="edit-product-btn">
           <!-- Add v-if for user-type = Eco-Entrepreneur -->
           <RouterLink :to="'/marketplace/product/' + product.id + '/edit'">Edit Product</RouterLink> 
         </div>
-        <div class = "delete-button">
+        <div v-if = "seller" class = "delete-button">
           <Button class="del-product-btn" icon="pi pi-times" severity="danger" rounded aria-label="Cancel" @click = "deleteProduct(product.title)"/>
         </div>
       </div>
@@ -28,8 +28,10 @@
 </template>
 
 <script>
+import firebaseApp from "@/firebase.js";
 import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
+
 
 const db = getFirestore();
 const auth = getAuth();
@@ -41,7 +43,10 @@ export default {
   data() {
     return {
       product: {},
-      quantity: 1
+      quantity: 1,
+      seller: false,
+      user : false,
+      userDocRef: false
     };
   },
   computed: {
@@ -72,6 +77,29 @@ export default {
       next(false);
     });
   },
+  async mounted() {
+    try {
+      const auth = getAuth(firebaseApp);
+      const user = auth.currentUser;
+      this.user = user;
+      console.log(this.user);
+      const userDocRef = doc(db, 'Users', this.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        console.log("Document data:", userDoc.data());
+      } else {
+        console.log("No such document!")
+      }
+      const userType = userDoc.data().userType;
+      console.log(userType);
+      if (this.user && userType == "Eco-Entrepreneur") {
+        this.seller = true;
+        console.log("a seller");
+      }
+    } catch(error) {
+      console.log(error);
+    }
+    },
   methods: {
 
     // need to add function to delete from user collection as well
@@ -82,6 +110,7 @@ export default {
                     life: 6000,
                 });
       await deleteDoc(doc(db, 'Products', productTitle));
+      await deleteDoc(doc(db, 'Eco-Entrepreneur', this.user.uid, 'Products', productTitle));
       this.$toast.add({
                     severity: "success",
                     summary: "Deleted Product",
@@ -229,7 +258,7 @@ export default {
   }
 
   .del-product-btn {
-    margin: 10px;
+    margin: 20px;
   }
 
   .buttons {
