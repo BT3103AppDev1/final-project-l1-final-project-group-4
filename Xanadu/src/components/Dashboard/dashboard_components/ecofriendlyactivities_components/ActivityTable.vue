@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1>
     <Toast> </Toast>
     <div class="card">
       <DataTable
@@ -13,21 +14,47 @@
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+        showGridlines
       >
-        <template #header>
-          <div
-            class="flex flex-wrap gap-2 align-items-center justify-content-between"
-          >
-            <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1>
-            <span class="p-input-icon-left">
+        <Toolbar class="mb-4">
+          <template #start>
+            <span class="p-input-icon-left" style="margin-right: 10px">
               <i class="pi pi-search" />
               <InputText
                 v-model="filters['global'].value"
                 placeholder="Search..."
               />
             </span>
+            <Button
+              label="Add Activity"
+              icon="pi pi-plus"
+              severity="success"
+              class="mr-2"
+              @click="openNew"
+              style="margin-right: 10px; background-color: #404e3e"
+            />
+            <Button
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              @click="confirmDeleteSelected"
+              :disabled="!selectedActivities || !selectedActivities.length"
+            />
+          </template>
+        </Toolbar>
+        <!-- <template #header>
+          <div
+          class="flex flex-wrap gap-2 align-items-center justify-content-between"
+          >
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText
+              v-model="filters['global'].value"
+                placeholder="Search..."
+              />
+            </span>
           </div>
-        </template>
+        </template> -->
 
         <Column
           selectionMode="multiple"
@@ -82,44 +109,35 @@
         >
         </Column>
 
-        <Column :exportable="false" style="min-width: 4rem; text-align: center">
+        <Column :exportable="false" style="text-align: center; width: 7%">
           <template #body="slotProps">
             <Button
               icon="pi pi-pencil"
               outlined
               class="mr-2"
               @click="editActivity(slotProps.data)"
-              style="margin: 5px"
+              style="
+                width: 3.5rem;
+                height: 3.5rem;
+                background-color: #404e3e;
+                color: white;
+              "
             />
             <Button
               icon="pi pi-times"
               outlined
               severity="danger"
               @click="confirmDeleteActivity(slotProps.data)"
-              style="margin: 5px"
+              style="
+                width: 3.5rem;
+                height: 3.5rem;
+                background-color: #c1333a;
+                color: white;
+              "
             />
           </template>
         </Column>
       </DataTable>
-      <Toolbar class="mb-4">
-        <template #start>
-          <Button
-            label="Add Activity"
-            icon="pi pi-plus"
-            severity="success"
-            class="mr-2"
-            @click="openNew"
-            style="margin-right: 10px; background-color: #404e3e"
-          />
-          <Button
-            label="Delete"
-            icon="pi pi-trash"
-            severity="danger"
-            @click="confirmDeleteSelected"
-            :disabled="!selectedActivities || !selectedActivities.length"
-          />
-        </template>
-      </Toolbar>
     </div>
 
     <Dialog
@@ -128,6 +146,11 @@
       header="Activity Details"
       :modal="true"
       class="p-fluid"
+      :pt="{
+        mask: {
+          style: 'backdrop-filter: blur(2px)',
+        },
+      }"
     >
       <div class="field">
         <label for="name">Name</label>
@@ -226,8 +249,20 @@
         </div>
       </div>
       <template #footer>
-        <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-        <Button label="Add" icon="pi pi-check" text @click="addActivity" />
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          text
+          @click="hideDialog"
+          style="background-color: #5a6d57; color: white"
+        />
+        <Button
+          label="Add"
+          icon="pi pi-check"
+          text
+          @click="addActivity"
+          style="background-color: #5a6d57; color: white"
+        />
       </template>
     </Dialog>
 
@@ -464,6 +499,9 @@ export default {
     },
     activityDialog(value) {
       if (value == false) {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = false;
         this.activityType = "";
       }
     },
@@ -694,6 +732,9 @@ export default {
   .p-column-header-content {
     text-align: center; // or center
     display: block !important;
+    // color: white;
+    // background: #404e3e;
+    // margin: 0px;
   }
 }
 </style>

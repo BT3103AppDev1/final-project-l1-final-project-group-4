@@ -38,6 +38,8 @@ import Card from "primevue/card";
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
 
+// import "@/assets/theme.css";
+
 const app = createApp(App);
 
 app.use(PrimeVue);

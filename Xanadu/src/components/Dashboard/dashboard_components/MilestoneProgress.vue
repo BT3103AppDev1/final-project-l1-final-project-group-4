@@ -1,3 +1,3 @@
 <template>
-  <h1>MilestoneProgress</h1>
+  <h1></h1>
 </template>
