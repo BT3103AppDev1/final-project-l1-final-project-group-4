@@ -35,6 +35,7 @@ import Divider from "primevue/divider";
 import Menubar from "primevue/menubar";
 import Chart from "primevue/chart";
 import Card from "primevue/card";
+// import Tailwind from "primevue/passthrough/tailwind";
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
 

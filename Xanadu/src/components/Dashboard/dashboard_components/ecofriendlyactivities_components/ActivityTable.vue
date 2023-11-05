@@ -14,7 +14,6 @@
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-        showGridlines
       >
         <Toolbar class="mb-4">
           <template #start>
@@ -31,7 +30,11 @@
               severity="success"
               class="mr-2"
               @click="openNew"
-              style="margin-right: 10px; background-color: #404e3e"
+              style="
+                margin-right: 10px;
+                background-color: #738678;
+                border-color: white;
+              "
             />
             <Button
               label="Delete"
@@ -67,7 +70,8 @@
           sortable
           style="min-width: 12rem; text-align: center"
           headerClass="column-text-right"
-        ></Column>
+        >
+        </Column>
         <Column
           field="activityDescription"
           header="Activity Description"
@@ -109,7 +113,7 @@
         >
         </Column>
 
-        <Column :exportable="false" style="text-align: center; width: 7%">
+        <Column :exportable="false" style="text-align: center; width: 10%">
           <template #body="slotProps">
             <Button
               icon="pi pi-pencil"
@@ -131,7 +135,7 @@
               style="
                 width: 3.5rem;
                 height: 3.5rem;
-                background-color: #c1333a;
+                background-color: #404e3e;
                 color: white;
               "
             />
@@ -148,7 +152,7 @@
       class="p-fluid"
       :pt="{
         mask: {
-          style: 'backdrop-filter: blur(2px)',
+          style: 'backdrop-filter: blur(2px); background-color: black',
         },
       }"
     >
@@ -736,5 +740,12 @@ export default {
     // background: #404e3e;
     // margin: 0px;
   }
+  // .p-sortable-column {
+  //   text-align: center; // or center
+  //   display: block !important;
+  //   color: white;
+  //   background: #404e3e;
+  //   // margin: 0px;
+  // }
 }
 </style>
