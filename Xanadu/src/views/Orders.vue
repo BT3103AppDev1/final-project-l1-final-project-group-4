@@ -1,14 +1,8 @@
-<template>
-    <!-- <DataTable  tableStyle="min-width: 50rem">
-    <Column field="code" header="Code"></Column>
-    <Column field="name" header="Name"></Column>
-    <Column field="category" header="Category"></Column>
-    <Column field="quantity" header="Quantity"></Column>
-</DataTable> -->
-    
-</template>
 
 <script>
+import Image from 'primevue/image';
+import Card from 'primevue/card';
+import Divider from 'primevue/divider';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';   // optional
@@ -25,7 +19,8 @@ export default {
         return {
             user: null,
             userType: null,
-            orders: {}
+            orders: [],
+            count: 0
         }
     },
 
@@ -43,20 +38,93 @@ export default {
             const orders = [];
             const coll = collection(db, this.userType, this.user.uid, 'Orders')
             const snapshot = await getCountFromServer(coll);
-            console.log('count: ', snapshot.data().count);
+            this.count = snapshot.data().count;
             const allOrders = await getDocs(coll);
-            allOrders.forEach(async (order) => {
-                // const productcoll = collection(order, 'products')
-                // const products = await getDocs(productcoll);
-                console.log(order.get('products'));
-                // const products = [];
-                // const allProducts = order.data().products;
-                // allProducts.forEach((product) => {
-                //     console.log(product.data().desc);
+            const promises = allOrders.docs.map(async (orderDoc)=> {
+                const productsRef = collection(orderDoc.ref, "products");
+                const productQuerySnapshot = await getDocs(productsRef);
+                const products = []
+                let totalcost = 0
+                productQuerySnapshot.forEach((productDoc) => {
+                    products.push( {
+                        title: productDoc.id,
+                        cost: productDoc.data().cost, 
+                        totalCost: productDoc.data().cost * productDoc.data().quantity,
+                        desc: productDoc.data().desc,
+                        dimensions: productDoc.data().dimensions,
+                        pictures: productDoc.data().pictures,
+                        quantity: productDoc.data().quantity,
+                        shipping: productDoc.data().shipping,
+                        shortdesc: productDoc.data().shortdesc
+                    })
+                    totalcost += productDoc.data().cost * productDoc.data().quantity;
+                })
+                orders.push( {
+                    order: orderDoc.id,
+                    address: orderDoc.data().address,
+                    products: products,
+                    totalCost: totalcost
+                })
+                console.log(orders);
             })
-
+            await Promise.all(promises);
+            this.orders = orders;
 
         })
     },
 }
 </script>
+
+<template>
+    <div v-if = "count == 0">
+        <Divider align = "center"> No Order Yet</Divider>
+    </div>
+    <div v-for= "order in orders">
+        <Divider align="center" type="solid" :class="$style.divider">
+                <b>{{ order.order }}</b>
+        </Divider>
+        
+    <div class="card">
+        <Card>
+            <template #title> Address </template>
+            <template #content>
+                <p class="m-0">
+                    {{ order.address }}
+                </p>
+            </template>
+        </Card>
+    </div>
+    <div>
+        <Card>
+            <template  #title> Products </template>
+            <template #content>
+                <DataTable scrollable scrollHeight="500px" :value = "order.products" tableStyle="min-width: 50rem">
+                    <Column field="title" header="Product"></Column>
+                    <Column header="Image">
+                        <template #body="slotProps">
+                            <Image :src="slotProps.data.pictures" alt="Image" width="200" preview />
+                        </template>
+                    </Column>
+                    <Column field="quantity" header="Quantity"></Column>
+                    <Column field="cost" header="Cost"></Column>
+                    <Column field="totalCost" header="Subtotal"></Column>
+                    <template class="text-right" #footer> Total Cost: ${{ order.totalCost }} </template>
+                </DataTable>
+            </template>
+        </Card>
+    </div>
+    </div>
+    
+</template>
+
+<style module>
+.divider {
+    font-size: 25px;
+    text-transform: uppercase;
+    color: #738678
+}
+
+.noOrders {
+    text-align: center;
+}
+</style>

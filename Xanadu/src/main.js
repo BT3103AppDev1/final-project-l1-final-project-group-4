@@ -13,6 +13,8 @@ import "primeicons/primeicons.css";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import Toast from "primevue/toast";
+import Card from 'primevue/card';
+import Image from 'primevue/image';
 import ToastService from "primevue/toastservice";
 import Calendar from "primevue/calendar";
 import DataTable from "primevue/datatable";
@@ -41,7 +43,8 @@ const app = createApp(App);
 app.use(PrimeVue);
 app.use(ToastService);
 app.use(DialogService);
-
+app.component("Image", Image);
+app.component("Card", Card)
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);
