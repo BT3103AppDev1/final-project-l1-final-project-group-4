@@ -14,7 +14,14 @@
 
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  arrayUnion
+} from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -26,13 +33,24 @@ export default {
   data() {
     return {
       finalTotal: 0,
-      paymentConfirmation: null
+      paymentConfirmation: null,
+      cartItems: [], // This should be populated with the items in the user's cart
+      currentUser: null // Holds the current user's information
     };
   },
   mounted() {
     if (this.$route.query.total) {
       this.finalTotal = parseFloat(this.$route.query.total);
     }
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.currentUser = user;
+        // Here you could also fetch the user's cart items if needed
+      } else {
+        // User is signed out
+        this.$router.push('/login'); // Redirect to login page or handle accordingly
+      }
+    });
   },
   methods: {
     onFileChange(e) {
@@ -44,19 +62,47 @@ export default {
 
       const storageRef = ref(storage, `confirmation/${this.paymentConfirmation.name}`);
       await uploadBytes(storageRef, this.paymentConfirmation);
-
       const downloadURL = await getDownloadURL(storageRef);
 
-      const ordersCollectionRef = collection(db, 'orders');
-      await addDoc(ordersCollectionRef, {
-        paymentConfirmationURL: downloadURL
-      });
+      try {
+        // Create the order
+        const orderRef = await addDoc(collection(db, 'orders'), {
+          user: this.currentUser.uid,
+          items: this.cartItems,
+          total: this.finalTotal,
+          paymentConfirmationURL: downloadURL,
+          status: 'pending' // Initial status of the order
+        });
 
-      alert("Confirmation uploaded successfully!");
+        // Update user's order list
+        const userRef = doc(db, 'users', this.currentUser.uid);
+        await updateDoc(userRef, {
+          orders: arrayUnion(orderRef.id) // Add the new order ID to the user's orders array
+        });
+
+        // Update each product with the username in their pendingOrders
+        for (const item of this.cartItems) {
+          const productRef = doc(db, 'products', item.id);
+          await updateDoc(productRef, {
+            pendingOrders: arrayUnion({
+              username: this.currentUser.displayName || this.currentUser.email,
+              orderId: orderRef.id,
+              quantity: item.quantity
+            })
+          });
+        }
+
+        alert("Order confirmed and records updated successfully!");
+
+      } catch (error) {
+        console.error("Error updating records: ", error);
+        alert("There was an error processing your order. Please try again.");
+      }
     }
   }
 }
 </script>
+
 
 
 <style>

@@ -8,6 +8,12 @@
         <h2 class="product-title">{{ product.title }}</h2>
         <div class="product-details">
           <div class="detail-section">
+            <div class="detail-section">
+            <h3>Categories:</h3>
+            <ul class="product-categories">
+              <li v-for="category in product.categories" :key="category">{{ category }}</li>
+            </ul>
+          </div>
             <h3>Description:</h3>
             <p class="product-description">{{ productDescription }}</p>
           </div>
@@ -110,7 +116,8 @@ export default {
             description: productData.desc,
             picture: productData.pictures,
             cost: productData.cost,
-            seller: productData.username
+            seller: productData.username,
+            categories: productData.categories,
           };
         });
       } else {
@@ -125,20 +132,41 @@ export default {
   methods: {
 
     // need to add function to delete from user collection as well
-    async deleteProduct(productTitle) {
-      this.$toast.add({
-                    severity: "info",
-                    summary: "Deleting Product",
-                    life: 6000,
-                });
-      await deleteDoc(doc(db, 'Products', productTitle));
-      this.$toast.add({
-                    severity: "success",
-                    summary: "Deleted Product",
-                    life: 6000,
-                });
-      this.$router.push('/Marketplace');
-      
+    async deleteProduct(productId) {
+        try {
+            this.$toast.add({
+                severity: "info",
+                summary: "Deleting Product",
+                life: 6000,
+            });
+
+            // Delete from the main 'Products' collection
+            await deleteDoc(doc(db, 'Products', productId));
+
+            // Check if userType and currentUser are available
+            if (this.userType && auth.currentUser) {
+                // Delete from the seller's 'Products' sub-collection using userType and current user's UID
+                await deleteDoc(doc(db, this.userType, auth.currentUser.uid, 'Products', productId));
+            } else {
+                throw new Error("User type or current user UID not found");
+            }
+
+            this.$toast.add({
+                severity: "success",
+                summary: "Deleted Product",
+                life: 6000,
+            });
+
+            this.$router.push('/Marketplace');
+        } catch (error) {
+            console.error("Error deleting product:", error);
+            this.$toast.add({
+                severity: "error",
+                summary: "Error deleting product",
+                detail: error.message,
+                life: 6000,
+            });
+        }
     },
 
     async addToCart(product, quantityToAdd) {
@@ -182,6 +210,21 @@ export default {
 
   
 <style>
+.product-categories {
+  list-style-type: none;
+  padding: 0;
+}
+
+.product-categories li {
+  background-color: #eff5f5;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 5px 15px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
 .product-view {
   display: flex;
   justify-content: center;

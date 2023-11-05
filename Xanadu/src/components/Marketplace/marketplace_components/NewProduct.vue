@@ -1,9 +1,9 @@
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore } from "firebase/firestore";
-import { setDoc, getDocs, doc, deleteDoc, getDoc, collection } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
-import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
+import { getFirestore, setDoc, getDoc, doc, collection, deleteDoc, getDocs } from "firebase/firestore";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // Import these functions only once
+
 
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
@@ -13,6 +13,7 @@ const storage = getStorage(firebaseApp);
 export default {
     data() {
         return {
+            
             showfile: false,
             img1: null,
             imageData: false,
@@ -23,17 +24,37 @@ export default {
             Dimensions: "",
             Desc: "",
             Cost: "",
+            categories: ["Electronics", "Clothing", "Home & Garden", "Books", "Toys & Games", "Sports & Outdoors", "Beauty & Personal Care"],
+            selectedCategories: [],
         }
     },
     mounted() {
-        const auth = getAuth(firebaseApp);  // 3. Check the authentication state
-        onAuthStateChanged(auth, (user) => {
+        const auth = getAuth(firebaseApp);
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                this.user = user
+                this.user = user;
+                await this.fetchUsername(user.uid);
             }
         });
     },
     methods : {
+
+        async fetchUsername(uid) {
+            try {
+                // Assuming 'Users' collection has a document for each user with the 'username' field
+                const userDocRef = doc(db, 'Users', uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    // Set the username in the component's data
+                    this.username = userDocSnap.data().username;
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.log("Error getting document:", error);
+            }
+        },
         triggerInput() {
             this.$refs.uploadPictures.click()
         },
@@ -78,7 +99,8 @@ export default {
                     desc: this.Desc,
                     pictures: this.img1,
                     cost: this.Cost,
-                    username: this.user.uid
+                    username: this.username,
+                    categories: this.selectedCategories,
                 });
 
 
@@ -92,6 +114,8 @@ export default {
                     desc: this.Desc,
                     pictures: this.img1,
                     cost: this.Cost,
+                    username: this.username,
+                    categories: this.selectedCategories,
                 });
                 
                 // Retrieve the newly added product from the correct location
@@ -105,265 +129,137 @@ export default {
                 });
 
                 this.$router.push('/Marketplace');
-            }
+            },
+            toggleCategory(category) {
+                if (this.selectedCategories.includes(category)) {
+                    this.selectedCategories = this.selectedCategories.filter(cat => cat !== category);
+                } else {
+                    this.selectedCategories.push(category);
+                }
+            },
     }
 }
 
 </script>
 
 <template>
-    <Toast></Toast>
-<div class="upperhalf">
-    <div class="AddImages" :style ="{'background-image' : 'url('+img1+')'}">
-        <div class="UploadImages">
-            <button @click ="triggerInput" id="UploadPictures">Upload Pictures</button>
-            <input type="file" 
-            ref = "uploadPictures"
-            @change="uploadPictures"
-            accept="image/*" >   
-
+    <div class="container">
+      <Toast></Toast>
+      <div class="image-uploader">
+        <div v-if="img1" class="preview-image" :style="{ backgroundImage: 'url(' + img1 + ')' }"></div>
+        <button @click="triggerInput" class="upload-btn">Upload Pictures</button>
+        <input type="file" ref="uploadPictures" @change="uploadPictures" accept="image/*" multiple hidden>
+      </div>
+      <div class="form-section">
+        <div class="form-group">
+          <input v-model="Title" type="text" placeholder="Title">
+          <input v-model="ShortDesc" type="text" placeholder="Short Description">
+          <input v-model.number="Cost" type="number" placeholder="Cost">
         </div>
-    </div>
-    <div class="titleAndDesc">
-        <input v-model="Title" type="text" id="Title" name="Title" placeholder="Title">
-        <input v-model="ShortDesc" type="text" id="ShortDesc" name="ShortDesc" placeholder="Short Description">
-        <input v-model.number="Cost" type="number" id="Cost" name="Cost" placeholder="Cost">
-    </div>
-</div>
-<div class="lowerhalf">
-    <div class="lowerleft">
-        <div id="productdetail">Product Detail</div>
-        <div id="dimension">
-            <h5 id="dimTitle">Dimensions </h5>
-            <input v-model="Dimensions" type="text" id="dimInput" name="dimensions" placeholder="Dimensions">
+        <div class="form-group">
+          <input v-model="Dimensions" type="text" placeholder="Dimensions (e.g., '10x10x0.5')">
+          <input v-model="Shipping" type="text" placeholder="Shipping and Return Information">
+          <textarea v-model="Desc" placeholder="Detailed Description"></textarea>
         </div>
-        <div id="shipping">
-            <h5 id="shipTitle">Shipping and Return</h5>
-            <input v-model="Shipping" type="text" id="shipInput" name="shipping" placeholder="Shipping And Return">
-        </div>    
-    </div>
-    <div class="lowerright">
-        <div id="description">
-            <h5 id="descTitle">Description </h5>
-            <input v-model="Desc" type="text" id="descInput" name="desc" placeholder="Description">
+      </div>
+      <div class="category-selector">
+        <h5>Select Category</h5>
+        <div class="categories">
+          <!-- Loop through categories for checkboxes -->
+          <label v-for="category in categories" :key="category" class="category-label">
+            <input type="checkbox" :value="category" v-model="selectedCategories">
+            {{ category }}
+          </label>
         </div>
-        <div id="addButton">
-            <button @click = "AddProduct" class="button">Add</button>
-        </div>
+      </div>
+      <button @click="AddProduct" class="submit-btn">Add Product</button>
     </div>
-</div>
-</template>
+  </template>
+  
+  
 
-<style>
-
-#addButton {
-    margin: 20px 0px 0px 0px;
-}
-
-.button {
-    background-color: #748C70;
-    padding: 16px;
-    width: 650px;
-    color: white;
-    font-family: Montserrat;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 140%; /* 22.4px */
-    text-transform: capitalize;
-}
-
-.button:hover {
-    background-color: #5A6D57;
-
-}
-.lowerhalf {
-    
-    margin: 11px 108px 0px 108px;
-    display: flex;
-}
-
-.lowerleft {
-    width: 650px;
-    height:512px;
-    align-items: center;
-    background-color: #F0F2EF;
-    display: block;
-}
-
-.lowerright {
-    margin: 0px 0px 0px 50px;
-    width: 650px;
-    height:512px;
-    align-items: center;
-    display: block;
-}
-
-#description {
-    height: 200px;
-    border: 1px solid #CBCBCB;
-    padding: 0px 24px 0px 24px;
-    background-color: #F0F2EF;
-}
-
-#descTitle {
-    color: var(--Black, #0C0C0C);
-
-    /* bodyXL */
-    font-family: Montserrat;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 180%; /* 36px */
-    text-transform: capitalize;
-    border-bottom: 1px solid #CBCBCB;
-}
-
-#productdetail {
-    height: 28px;
-    border: 1px solid #CBCBCB;
-    padding: 24px;
-    font-family: Montserrat;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 700;
-    text-transform: capitalize;
-}
-
-#dimTitle, #shipTitle {
-    color: var(--Primary, #748C70);
-    /* H5 */
-    font-family: Montserrat;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 700;
-    text-transform: capitalize;
-    
-}
-
-#dimension, #shipping {
-    display: block;
-    height: 215px;
-    border: 1px solid #CBCBCB;
-    padding: 0px 24px 0px 24px;
-
-}
-
-input[name="shipping"], input[name="dimensions"], input[name="desc"] {
-    border: 1px solid #CDD7CF;
-    width: 518px;
-    height: 76px;
-    background-color: #F0F2EF;;
-}
-
-input[name="shipping"]::placeholder,input[name="shipping"], input[name="dimensions"]::placeholder,input[name="dimensions"], input[name="desc"]::placeholder, input[name="desc"] {
-    font-family: Montserrat;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    text-transform: capitalize;
-}
-
-.upperhalf {
-    display: flex;
-    margin: 150px 108px 11px 108px;
-}
-
-input[name="Title"]::placeholder, input[name="Title"] {
-
-    /* H3 */
-    font-family: Montserrat;
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: 140%; /* 44.8px */
-    text-transform: capitalize;
-
-}
-
-input::placeholder {
-    color: #CDD7CF;
-}
-
-input[name="ShortDesc"]::placeholder, input[name="ShortDesc"],input[name="Cost"]::placeholder, input[name="Cost"]{
-    
-    /* bodyLG */
-    font-family: Montserrat;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 180%; /* 32.4px */
-    text-transform: capitalize;
-
-}
-
-input[name="Title"] {
-    display: flex;
-    width: 650px;
-    height: 60px;
-    flex-direction: row;
-    justify-content: center;
-    border: 1px solid #CBCBCB;
-    
-}
-
-input[name="ShortDesc"] {
-    display: flex;
-    width: 650px;
-    height: 60px;
-    flex-direction: row;
-    justify-content: center;
-    border: 1px solid #CBCBCB;
-}
-
-input[name="Cost"] {
-    margin: 10px 0px 0px 0px;
-    display: flex;
-    width: 200px;
-    height: 40px;
-    flex-direction: row;
-    justify-content: center;
-    border: 1px solid #CBCBCB;
-}
-
-#UploadPictures {
-    color: #000;
+  <style>
+  .container {
+    font-family: 'Montserrat', sans-serif;
+    max-width: 1200px;
+    margin: auto;
+    padding: 2rem;
+  }
+  
+  /* Use CSS variables for colors to maintain consistency and make it easier to change */
+  :root {
+    --primary-color: #748C70;
+    --secondary-color: #5A6F57;
+    --background-color: #F0F2EF;
+    --text-color: #333;
+    --border-color: #CDD7CF;
+  }
+  
+  .image-uploader {
+    margin-bottom: 2rem;
     text-align: center;
-    margin: 80px;
-
-    /* bodyLG */
-    font-family: Montserrat;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 400;
-    text-transform: capitalize;
-}
-.UploadImages {
-    border: 1px solid #CFD0CF;
-    width: 450px;
-    height: 200px;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    margin: 0 auto;
-
-}
-
-.AddImages {
-    width: 650px;
-    height:512px;
-    align-items: center;
-    background: #F5F5F5;
-    display: flex;
-    background-repeat: no-repeat;
+  }
+  
+  .preview-image {
+    width: 100%;
+    height: 256px;
     background-size: cover;
     background-position: center;
-}
-
-.titleAndDesc {
-    margin: 0px 0px 0px 50px;
-    width: 650px;
-    display: block;
-
-}
-</style>
+    border-radius: 5px;
+  }
+  
+  .upload-btn {
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .form-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .form-group {
+    flex: 1;
+    min-width: 250px;
+  }
+  
+  .form-group input, .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+  }
+  
+  .category-selector {
+    margin-bottom: 2rem;
+  }
+  
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .category-label {
+    font-size: 0.9rem;
+    user-select: none;
+    cursor: pointer;
+  }
+  
+  .submit-btn {
+    padding: 1rem 2rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  </style>
+  
