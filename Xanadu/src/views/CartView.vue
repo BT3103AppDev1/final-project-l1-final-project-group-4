@@ -43,7 +43,7 @@ export default {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const fbCartItems = [];
-        const allDocs = await getDocs(collection(db, 'Eco-Entrepreneur', user.uid, 'Cart'));
+        const allDocs = await getDocs(collection(db, 'Green Rangers', user.uid, 'Cart'));
 
         allDocs.forEach((doc) => {
           let item = doc.data();
@@ -66,7 +66,7 @@ export default {
         return;
       }
 
-      const itemRef = doc(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart', itemId);
+      const itemRef = doc(db, 'Green Rangers', currentUser.uid, 'Cart', itemId);
       await deleteDoc(itemRef);
       this.cartItems = this.cartItems.filter(item => item.id !== itemId);
     },
@@ -78,7 +78,7 @@ export default {
         return;
       }
 
-      const itemRef = doc(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart', item.id);
+      const itemRef = doc(db, 'Green Rangers', currentUser.uid, 'Cart', item.id);
       await updateDoc(itemRef, {
         quantity: item.quantity
       });

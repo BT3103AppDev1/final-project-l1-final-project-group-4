@@ -59,8 +59,10 @@
 </template>
 
 <script>
+import firebaseApp from "@/firebase.js";
 import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
+
 
 const db = getFirestore();
 const auth = getAuth();
@@ -73,7 +75,9 @@ export default {
     return {
       product: {},
       quantity: 1,
-      userType: null
+      seller: false,
+      user : false,
+      userDocRef: false
     };
   },
   async created() {
@@ -102,6 +106,7 @@ export default {
   },
   
   beforeRouteEnter(to, from, next) {
+    console.log(to.params.id);
     const productRef = doc(db, 'Products', to.params.id);
     getDoc(productRef).then((productDoc) => {
       if (productDoc.exists) {
@@ -129,6 +134,29 @@ export default {
       next(false);
     });
   },
+  async mounted() {
+    try {
+      const auth = getAuth(firebaseApp);
+      const user = auth.currentUser;
+      this.user = user;
+      console.log(this.user);
+      const userDocRef = doc(db, 'Users', this.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        console.log("Document data:", userDoc.data());
+      } else {
+        console.log("No such document!")
+      }
+      const userType = userDoc.data().userType;
+      console.log(userType);
+      if (this.user && userType == "Eco-Entrepreneur") {
+        this.seller = true;
+        console.log("a seller");
+      }
+    } catch(error) {
+      console.log(error);
+    }
+    },
   methods: {
 
     // need to add function to delete from user collection as well
@@ -177,7 +205,7 @@ export default {
         return;
       }
 
-      const cartRef = collection(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart');
+      const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
       
       // Check if the product is already in the cart
       const productInCart = (await getDocs(cartRef)).docs.find(doc => doc.data().title === product.title);
@@ -327,6 +355,26 @@ h3 {
   background-color: #45a049;
 }
 
+  .edit-product-btn a {
+    background-color: #748C70;
+    color: white;
+    border: none;
+    padding: 12px 24px; /* Increased padding */
+    font-size: 18px; /* Increased font size */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Montserrat;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 140%;
+    text-decoration: none;
+
+  }
+
+  .del-product-btn {
+    margin: 20px;
+  }
 .del-product-btn {
   background-color: #f44336;
   color: white;
