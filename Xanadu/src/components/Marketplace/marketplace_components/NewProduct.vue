@@ -35,7 +35,6 @@ export default {
             if (user) {
                 this.user = user;
                 await this.fetchUsername(user.uid);
-                console.log(this.user);
             }
         });
     },
