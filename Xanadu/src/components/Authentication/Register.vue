@@ -4,6 +4,7 @@
             <h1 class="CreateAccountTitle">Create Account</h1>
 
             <div class="flex justify-content-center p-fluid">
+                <!-- input: first name -->
                 <div class="field">
                     <span class="p-float-label">
                         <InputText
@@ -16,6 +17,7 @@
                     </span>
                 </div>
 
+                <!-- input: last name -->
                 <div class="field">
                     <span class="p-float-label">
                         <InputText
@@ -28,17 +30,19 @@
                     </span>
                 </div>
 
+                <!-- input: profile pic -->
                 <div class="field">
                     <p class="upload-pic-label">Upload profile picture</p>
                     <div class="UploadImages">
-                        <button @click ="triggerInput" id="UploadPictures">Upload Pictures</button>
+                        <button @click ="triggerInput1" id="UploadPictures">Upload Picture</button>
                         <input type="file" 
-                        ref = "uploadPictures"
-                        @change="uploadPictures"
+                        ref = "uploadPictures1"
+                        @change="uploadPictures1"
                         accept="image/*" >   
                     </div>
                 </div>
 
+                <!-- input: username -->
                 <div class="field">
                     <span class="p-float-label">
                         <InputText
@@ -51,6 +55,7 @@
                     </span>
                 </div>
 
+                <!-- input: email -->
                 <div class="field">
                     <span class="p-input-icon-right p-float-label">
                         <i class="pi pi-envelope" />
@@ -64,6 +69,7 @@
                     </span>
                 </div>
 
+                <!-- input: password -->
                 <div class="field">
                     <div class="p-float-label">
                         <Password v-model="password" id="password" required>
@@ -86,6 +92,7 @@
                     </div>
                 </div>
 
+                <!-- input: select user type -->
                 <div class="field userTypeField">
                     <RadioButton 
                         v-model="userType"
@@ -106,6 +113,32 @@
                         class="userTypeInput_style"
                     />
                     <label for="userTypeGreenRanger" class="radiobutton-label userTypeInput_style">Green Ranger</label>
+                </div>
+
+                <!-- input: (for sellers) address -->
+                <div class="field" v-if="userType == 'Eco-Entrepreneur'" style="margin-top: 10px">
+                    <span class="p-float-label">
+                        <InputText
+                            id="inputAddress"
+                            v-model="address"
+                            type="text"
+                            required
+                        />
+                        <label for="inputAddress">Address</label>
+                    </span>
+                </div>
+
+                <!-- input: (for sellers) payment -->
+                <div class="field" v-if="userType == 'Eco-Entrepreneur'">
+                    <p class="upload-pic-label">Upload payment QR code</p>
+                    <div class="UploadImages">
+                        <button @click ="triggerInput2" id="UploadPictures">Upload Picture</button>
+                        <input type="file" 
+                        ref = "uploadPictures2"
+                        @change="uploadPictures2"
+                        accept="image/*" 
+                        required>   
+                    </div>
                 </div>
 
                 <Button type="register" label="Register" class="mt-2 register-button" />
@@ -139,27 +172,29 @@ export default {
             password: "",
             userType: "",
             img1: null,
-            imageData: false,
+            imageData1: false,
+            address: "",
+            img2: null,
+            imageData2: false
         };
     },
 
     methods: {
-        triggerInput() {
-            this.$refs.uploadPictures.click()
+        triggerInput1() {
+            this.$refs.uploadPictures1.click()
         },
 
-        uploadPictures(event) {
+        uploadPictures1(event) {
             this.uploadValue=0;
             this.img1=null;
-            this.imageData = event.target.files[0];
-            this.onUpload()
-
+            this.imageData1 = event.target.files[0];
+            this.onUpload1()
         },
 
-        onUpload(){
+        onUpload1(){
             this.img1=null;
-            const childref = ref(storage, `${this.imageData.name}`)
-            const storageRef=uploadBytesResumable(childref,this.imageData);
+            const childref = ref(storage, `${this.imageData1.name}`)
+            const storageRef=uploadBytesResumable(childref,this.imageData1);
 
             storageRef.on(`state_changed`, snapshot=>{
                 this.uploadValue = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
@@ -169,6 +204,34 @@ export default {
                     this.img1 =url;
                     console.log(this.img1)
                     console.log(typeof this.img1)
+                });
+            });
+        },
+
+        triggerInput2() {
+            this.$refs.uploadPictures2.click()
+        },
+
+        uploadPictures2(event) {
+            this.uploadValue=0;
+            this.img2=null;
+            this.imageData2 = event.target.files[0];
+            this.onUpload2()
+        },
+
+        onUpload2(){
+            this.img2=null;
+            const childref = ref(storage, `${this.imageData2.name}`)
+            const storageRef=uploadBytesResumable(childref,this.imageData2);
+
+            storageRef.on(`state_changed`, snapshot=>{
+                this.uploadValue = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+            }, error=>{console.log(error.message)}, ()=>{
+                this.uploadValue=100;
+                getDownloadURL(storageRef.snapshot.ref).then((url)=>{
+                    this.img2 =url;
+                    console.log(this.img2)
+                    console.log(typeof this.img2)
                 });
             });
         },
@@ -190,30 +253,52 @@ export default {
                 .then((userCredential) => {
                 if (this.userType == "Eco-Entrepreneur") {
                     setDoc(doc(db, "Eco-Entrepreneur", userCredential.user.uid), {
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    username: this.username,
-                    email: this.email,
-                    profilePicture: this.img1,
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        username: this.username,
+                        email: this.email,
+                        profilePicture: this.img1,
+                        address: this.address,
+                        qrcodePicture: this.img2,
+                    });
+
+                    setDoc(doc(db, "Users", userCredential.user.uid), {
+                        userType: this.userType,
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        username: this.username,
+                        email: this.email,
+                        profilePicture: this.img1,
+                        address: this.address,
+                        qrcodePicture: this.img2,
                     });
                 } else if (this.userType == "Green Ranger"){
                     setDoc(doc(db, "Green Rangers", userCredential.user.uid), {
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    username: this.username,
-                    email: this.email,
-                    profilePicture: this.img1,
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        username: this.username,
+                        email: this.email,
+                        profilePicture: this.img1,
+                    });
+
+                    setDoc(doc(db, "Users", userCredential.user.uid), {
+                        userType: this.userType,
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        username: this.username,
+                        email: this.email,
+                        profilePicture: this.img1,
                     });
                 }
 
-                setDoc(doc(db, "Users", userCredential.user.uid), {
-                    userType: this.userType,
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    username: this.username,
-                    email: this.email,
-                    profilePicture: this.img1,
-                });
+                // setDoc(doc(db, "Users", userCredential.user.uid), {
+                //     userType: this.userType,
+                //     firstName: this.firstName,
+                //     lastName: this.lastName,
+                //     username: this.username,
+                //     email: this.email,
+                //     profilePicture: this.img1,
+                // });
 
                 const user = userCredential.user;
                 //console.log(user);
