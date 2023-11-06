@@ -14,9 +14,9 @@
 
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore, collection, addDoc, getDoc, writeBatch, doc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDoc, writeBatch, doc, getDocs } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
@@ -26,13 +26,20 @@ export default {
   data() {
     return {
       finalTotal: 0,
-      paymentConfirmation: null
+      paymentConfirmation: null,
+      shippingAddress: ''
     };
   },
   mounted() {
-    if (this.$route.query.total) {
-      this.finalTotal = parseFloat(this.$route.query.total);
+    // Retrieve the shipping address from the query parameters
+    const queryParams = this.$route.query;
+    if (queryParams.total) {
+      this.finalTotal = parseFloat(queryParams.total);
     }
+    if (queryParams.shippingAddress) {
+      this.shippingAddress = queryParams.shippingAddress;
+    }
+    // You can also decode and parse the cart items here if needed
   },
   methods: {
     onFileChange(e) {
@@ -41,7 +48,10 @@ export default {
     },
     async uploadImage() {
       if (!this.paymentConfirmation) return alert("No confirmation image provided.");
-
+      if (!this.shippingAddress) {
+        alert("Shipping address is missing.");
+        return;
+      }
       const storageRef = ref(storage, `confirmation/${this.paymentConfirmation.name}`);
       await uploadBytes(storageRef, this.paymentConfirmation);
       const downloadURL = await getDownloadURL(storageRef);
@@ -51,7 +61,6 @@ export default {
         return;
       }
 
-      // Retrieve the buyer's username
       const userRef = doc(db, 'Users', auth.currentUser.uid);
       const userSnap = await getDoc(userRef);
       if (!userSnap.exists() || !userSnap.data().username) {
@@ -64,29 +73,25 @@ export default {
       const timestamp = new Date();
       const batch = writeBatch(db);
 
-      // Create a new order for the user in the 'Users' collection
       const userOrderRef = doc(collection(db, 'Green Rangers', auth.currentUser.uid, 'Orders'));
       batch.set(userOrderRef, {
         orderPlacedAt: timestamp,
         total: this.finalTotal,
         paymentConfirmationURL: downloadURL,
-        status: 'Pending', // Example status, you can set it as you need
-        buyerUsername: buyerUsername // Include the buyer's username
+        status: 'Pending',
+        buyerUsername: buyerUsername,
+        shippingAddress: this.shippingAddress
       });
 
-      // For each item in the cart, add an entry to the 'Products' sub-collection
-      // and to each seller's 'Orders' collection
       for (const item of cartItemsWithSellers) {
-        // Add to the user's 'Products' sub-collection
         const productRef = doc(collection(userOrderRef, 'Products'));
         batch.set(productRef, {
           productName: item.title,
           productPrice: item.cost,
           productQuantity: item.quantity,
-          sellerUid: item.uid // UID of the seller
+          sellerUid: item.uid,
         });
 
-        // Add to the seller's 'Orders' collection
         const sellerOrdersRef = collection(db, 'Eco-Entrepreneur', item.uid, 'Orders');
         const sellerOrderDocRef = doc(sellerOrdersRef);
         batch.set(sellerOrderDocRef, {
@@ -100,13 +105,20 @@ export default {
         });
       }
 
-      // Commit the batch write to atomically add all the documents
+      const cartRef = collection(db, 'Users', auth.currentUser.uid, 'Cart');
+      const cartSnapshot = await getDocs(cartRef);
+      cartSnapshot.forEach((cartDoc) => {
+        batch.delete(cartDoc.ref);
+      });
+
       await batch.commit();
 
-      // Refresh the page and show the message
-      this.$nextTick(() => {
-        location.reload();
+      // Redirect the user to the marketplace page after the batch operation is completed
+      this.$router.push('/marketplace').then(() => {
         alert("Order placed and added to your orders successfully!");
+      }).catch(err => {
+        // Handle any errors that occur during navigation
+        console.error(err);
       });
     }
   }
