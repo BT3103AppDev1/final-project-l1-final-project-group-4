@@ -8,7 +8,7 @@
 
       <template #item="{ label, item, props, root, hasSubmenu }">
         <div>
-          <RouterLink v-if="item.route" v-slot="routerProps" :to="item.route">
+          <RouterLink v-if="isLoggedIn" v-slot="routerProps" :to="item.route">
             <span v-bind="props.icon" />
             <span v-bind="props.label">{{ label }}</span>
           </RouterLink>
@@ -16,13 +16,20 @@
       </template>
 
       <template #end>
-        <Button icon="pi pi-shopping-cart" @click="$router.push('/cart')" class="cart-button"></Button>
+        <!-- show the cart button is the user is a buyer -->
+        <Button v-if="isBuyer" icon="pi pi-shopping-cart" @click="$router.push('/cart')" class="cart-button"></Button>
+        <Button v-if="isSeller" @click="$router.push('/orders')" class="cart-button">Orders</Button>
+
         <div class="profile-dropdown">
           <Button icon="pi pi-user" class="profile-pic"></Button>
           <div class="dropdown-content">
+            <a v-if="isSeller" class="dropdown-item">Account: Eco-Entrepreneur</a>
+            <a v-if="isBuyer" class="dropdown-item">Account: Green Ranger</a>
+
             <a v-if="!isLoggedIn" @click="$router.push('/register')" class="dropdown-item">Register</a>
             <a v-if="!isLoggedIn" @click="$router.push('/login')" class="dropdown-item">Login</a>
-            <a v-if="isLoggedIn" @click="$router.push('/orders')" class="dropdown-item">Orders</a>
+            <!-- show the order tab under dropdown if the user is a seller -->
+            <a v-if="isBuyer" @click="$router.push('/orders')" class="dropdown-item">Orders</a>
             <a v-if="isLoggedIn" @click="$router.push('/profile')" class="dropdown-item">My Profile</a>
             <a v-if="isLoggedIn" @click="signOut" class="dropdown-item">Logout</a>
           </div>
@@ -36,16 +43,77 @@
 //brian - testing for conditional rendering of authentication buttons (register/login/logout)
 import firebaseApp from "../firebase.js"
 import {ref, watchEffect} from 'vue'
-const isLoggedIn = ref(true)
+import router from "../router/index.js";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+const isLoggedIn = ref(false)
+const isBuyer = ref(false)
+const isSeller = ref(false)
 
 const auth = getAuth();
-onAuthStateChanged(auth, function(user)  {
-      if (user) {
-        isLoggedIn.value = true // if we have a user
-      } else {
-        isLoggedIn.value = false // if we do not
+const db = getFirestore();
+
+//test
+router.beforeEach( (to, from, next) => {
+  // console.log("router beforeEach runned!")
+  // console.log("User status: ", isLoggedIn.value)
+
+  //clear user logged in status
+  isLoggedIn.value = false
+  isBuyer.value = false
+  isSeller.value = false
+
+  onAuthStateChanged(auth, function(user) {
+    // console.log("onAuthState runned!")
+
+    if(user){
+      isLoggedIn.value = true
+
+      //retrieve user type
+      const userDocRef = doc(db, "Users", user.uid)
+      const userDoc = getDoc(userDocRef)
+      userDoc.then((userDoc) => {
+        const userInfo = userDoc.data()
+        const userType = userInfo.userType
+
+        if(userType == "Eco-Entrepreneur") {
+          isSeller.value = true
+          // console.log("Is Seller type!")
+        } else if (userType == "Green Ranger") {
+          isBuyer.value = true
+          // console.log("Is buyer type!")
+        }
+      })
+    } 
+    else {
+      isLoggedIn.value = false
+    }
+
+    // console.log("User status after onAuthState: ", isLoggedIn.value)
+
+    //Pending warning
+    // The "next" callback was called more than once in one navigation guard when going from "/" to "/profile". It should be called exactly one time in each navigation guard. This will fail in production.
+    // console.log("the from.name : ", from.name)
+    // console.log("the to.name : ", to.name)
+
+    if (to.name!=='login' && to.name!=='register'){
+      if(!isLoggedIn.value){
+        console.log("User is not logged in. Redirecting...")
+        // not logged in, redirect
+        next({name: 'login'})
       }
+      else{
+        // is logged in, go whereever im going
+        next()
+      }
+    }
+    else {
+      // going login and register, does not require auth 
+      next()
+    }
   })
+
+})
+
 </script>
 
 <script>
@@ -141,7 +209,7 @@ li {
   position: absolute;
   right: 0;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 230px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1000;
 }
