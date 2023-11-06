@@ -93,7 +93,7 @@ export default {
 }
 
 .adding .title, .adding .description {
-    width: 95%; /* Reduce width for some padding effect */
+    width: 500px; /* Reduce width for some padding effect */
     padding: 8px;
     border: 2px solid #5a605c;
     border-radius: 7px;
@@ -105,7 +105,7 @@ export default {
 }
 
 .adding .description {
-    height: 100px; /* Specific height for the description textarea */
+    height: 150px; /* Specific height for the description textarea */
 }
 
 .adding .title input, .adding .description textarea {
@@ -115,6 +115,14 @@ export default {
     background-color: transparent; /* Transparent background */
     font-size: 16px; /* Font size */
     color: #333; /* Text color */
+}
+
+.adding .title input::placeholder,
+.adding .description textarea::placeholder {
+    font-family: 'Your Font Family', sans-serif; /* Replace with your desired font family */
+    font-size: 16px; /* Specify the font size you want for the placeholder */
+    color: #999999; /* Placeholder text color, change as needed */
+    opacity: 1; /* Make sure the placeholder is fully visible */
 }
 
 h2 {
@@ -135,6 +143,7 @@ button {
     cursor: pointer;
     transition: all 0.3s ease;
     align-self: center;
+    width: auto; /* Allow the button to size according to its content */
 }
 
 button:hover {
