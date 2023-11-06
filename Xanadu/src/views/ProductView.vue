@@ -73,6 +73,7 @@ export default {
   },
   data() {
     return {
+      userType: null,
       product: {},
       quantity: 1,
       seller: false,
@@ -82,22 +83,9 @@ export default {
   },
   async created() {
       const user = auth.currentUser;
-
       if (user) {
-          const ecoEntrepreneurDocRef = doc(db, "Eco-Entrepreneur", user.uid);
-          const ecoEntrepreneurDocSnap = await getDoc(ecoEntrepreneurDocRef);
-
-          if (ecoEntrepreneurDocSnap.exists()) {
-              this.userType = "Eco-Entrepreneur";
-          } else {
-              const greenRangersDocRef = doc(db, "Green Rangers", user.uid);
-              const greenRangersDocSnap = await getDoc(greenRangersDocRef);
-
-              if (greenRangersDocSnap.exists()) {
-                  this.userType = "Green Ranger";
-              }
-          }
-      }
+      this.userType = await this.determineUserType(user);
+    }
   },
   computed: {
     productDescription() {
@@ -123,6 +111,7 @@ export default {
             cost: productData.cost,
             seller: productData.username,
             categories: productData.categories,
+            uid: productData.uid,
           };
         });
       } else {
@@ -158,7 +147,22 @@ export default {
     }
     },
   methods: {
+    async determineUserType(user) {
+      const ecoEntrepreneurDocRef = doc(db, "Eco-Entrepreneur", user.uid);
+      const ecoEntrepreneurDocSnap = await getDoc(ecoEntrepreneurDocRef);
 
+      if (ecoEntrepreneurDocSnap.exists()) {
+        return "Eco-Entrepreneur";
+      } else {
+        const greenRangersDocRef = doc(db, "Green Rangers", user.uid);
+        const greenRangersDocSnap = await getDoc(greenRangersDocRef);
+
+        if (greenRangersDocSnap.exists()) {
+          return "Green Ranger";
+        }
+      }
+      return null; // Or some default userType
+    },
     // need to add function to delete from user collection as well
     async deleteProduct(productId) {
         try {
@@ -199,36 +203,53 @@ export default {
 
     async addToCart(product, quantityToAdd) {
       const currentUser = auth.currentUser;
+      const userType = await this.determineUserType(auth.currentUser);
+      const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
+      console.log("Adding to cart:", product.title, "Quantity:", quantityToAdd); // Debugging line
 
       if (!currentUser) {
+        console.error("No current user found.");
         alert("You must be logged in to add items to the cart.");
         return;
       }
 
-      const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
-      
-      // Check if the product is already in the cart
-      const productInCart = (await getDocs(cartRef)).docs.find(doc => doc.data().title === product.title);
+      if (!product.seller) {
+        console.error("Seller information is missing from the product details.");
+        return;
+      }
+  
+      try {
+        const cartSnapshot = await getDocs(cartRef);
+        const productInCart = cartSnapshot.docs.find(doc => doc.data().title === product.title);
 
-      if (productInCart) {
-        // Update the quantity of the existing product in the cart
-        const updatedQuantity = productInCart.data().quantity + quantityToAdd;
-        await updateDoc(doc(cartRef, productInCart.id), { quantity: updatedQuantity });
-        alert("Updated quantity in cart!");
-      } else {
-        // Add the product as a new entry to the cart
-        const productToAdd = {
-          title: product.title || "No title",
-          picture: product.picture,
-          description: this.productDescription,
-          quantity: quantityToAdd,
-          cost: product.cost
-        };
+        if (productInCart) {
+          const updatedQuantity = productInCart.data().quantity + quantityToAdd;
+          console.log("Product already in cart. Updating quantity:", updatedQuantity); // Debugging line
+          await updateDoc(doc(cartRef, productInCart.id), { quantity: updatedQuantity });
+          alert("Updated quantity in cart!");
+        } else {
+          const productToAdd = {
+            title: product.title,
+            picture: product.picture,
+            description: product.description || "No description",
+            quantity: quantityToAdd,
+            cost: product.cost,
+            seller: product.seller, // Make sure this is correctly sourced
+            categories: product.categories,
+            uid: product.uid,
+          };
 
-        await addDoc(cartRef, productToAdd);
-        alert("Added to cart!");
+          console.log("Product not in cart. Adding new item:", productToAdd); // Debugging line
+          await addDoc(cartRef, productToAdd);
+          alert("Added to cart!");
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert("Failed to add to cart!");
       }
     },
+
+
     EditProduct(product) {
       console.log("Edit Product: ", product);
     }

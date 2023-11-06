@@ -86,7 +86,10 @@ export default {
     checkout() {
       this.$router.push({
         path: '/confirmation',
-        query: { total: this.total.toFixed(2) } // Passing total as a query parameter
+        query: {
+          total: this.total.toFixed(2),
+          cartItems: encodeURIComponent(JSON.stringify(this.cartItems)) // Encode the cart items as a URL component
+        }
       });
     }
 

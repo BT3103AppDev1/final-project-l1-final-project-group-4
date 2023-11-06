@@ -26,6 +26,7 @@ export default {
             Cost: "",
             categories: ["Electronics", "Clothing", "Home & Garden", "Books", "Toys & Games", "Sports & Outdoors", "Beauty & Personal Care"],
             selectedCategories: [],
+            uid: null,
         }
     },
     mounted() {
@@ -101,6 +102,7 @@ export default {
                     cost: this.Cost,
                     username: this.username,
                     categories: this.selectedCategories,
+                    uid: this.user.uid,
                 });
 
 
@@ -116,6 +118,7 @@ export default {
                     cost: this.Cost,
                     username: this.username,
                     categories: this.selectedCategories,
+                    uid: this.user.uid,
                 });
                 
                 // Retrieve the newly added product from the correct location
