@@ -20,6 +20,7 @@ export default {
             lastName: '',
             timestamp: null,
             replyuserId: '',
+            profilepic: ''
         };
     },
     computed: {
@@ -45,6 +46,7 @@ export default {
             if (userSnapshot.exists()) {
                 this.firstName = userSnapshot.data().firstName || "N/A";  // Added default value for debugging
                 this.lastName = userSnapshot.data().lastName || "N/A";    // Added default value for debugging
+                this.profilepic = userSnapshot.data().profilePicture || "N/A";
 
                 console.log(`Fetched user data:`, userSnapshot.data());   // Debug log
             } else {
@@ -74,7 +76,8 @@ export default {
                     timestamp: Timestamp.fromDate(new Date()),
                     replyuserId: this.loggedInUserId,
                     firstName: this.firstName,
-                    lastName: this.lastName
+                    lastName: this.lastName,
+                    profilepic: this.profilepic
                 });
 
                 console.log('Reply added successfully');

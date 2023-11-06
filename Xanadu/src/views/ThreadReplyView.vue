@@ -5,9 +5,28 @@
         <router-link to="/Forum" class="back-button"> &lt;Back to Forum</router-link>
 
 
-        <div class="thread-detail">
-            <h2>{{ thread.title }}</h2>
-            <p>{{ thread.content }}</p>
+        <div class="forum-thread">
+            <div class="user-info"> 
+            <div class="profile-pic-username-container">
+                <div class="profile-picture">
+                    <img :src="threadUser.profilePicture" alt="User's profile picture" class="user-profile-img">
+                </div>
+                <div class="username">{{ threadUser.firstName }} {{ threadUser.lastName }}</div>
+            </div>
+        </div>
+            <div class="thread-details">
+                <div class="title-date-forum">
+                    <div class="thread-title">
+                        <b>{{ thread.title }}</b>
+                    </div>
+                    <!-- Date can be formatted for better appearance -->
+                    <div class="post-date">Posted on <span class="small-text">{{ thread.timestamp.toDate() }}</span></div>
+                </div>
+                <!-- Additional details or description can go here -->
+                <div class="description">
+                    {{ thread.content }}
+                </div>
+            </div>
         </div>
         <br>
         <Toast ref="toast" position="top-right" />
@@ -36,8 +55,12 @@
         <div v-for="reply in replies" :key="reply.id" class="forum-reply">
             <div class="user-info">
                 <!-- You can add user details here if they are associated with the reply -->
-                <div class="profile-picture"></div>
-                <div class="username">{{ reply.firstName }} {{ reply.lastName }}</div> <!-- Modified line -->
+                <div class="profile-pic-username-container">
+                    <div class="profile-picture">
+                        <img :src="reply.profilepic" alt="User's profile picture" class="user-profile-img">
+                    </div>
+                    <div class="username">{{ reply.firstName }} {{ reply.lastName }}</div> <!-- Modified line -->
+                </div>
             </div>
             <div class="reply-details">
                 <div class="title-date">
@@ -51,11 +74,11 @@
             </div>
             <div class="action-container" v-if="check === reply.replyuserId">
                 <!-- Conditionally display the delete button if the logged-in user's ID matches the userID of the reply -->
-                <Button  icon="pi pi-trash" outlined rounded severity="danger"
-                    @click="promptDeleteReply(reply.id)" style="margin: 5px" />
+                <Button icon="pi pi-trash" outlined rounded severity="danger" @click="promptDeleteReply(reply.id)"
+                    style="margin: 5px" />
             </div>
-            
-            
+
+
         </div>
     </div>
 </template>
@@ -82,7 +105,9 @@ export default {
             toast: null,   // Create a reference for the Toast
             deleteReplyDialog: false,  // For the visibility of the confirmation dialog
             replyIdToDelete: null,      // To temporarily store the reply ID for deletion
-            check: null
+            check: null,
+            threadUser: null
+
         };
     },
     async created() {
@@ -115,8 +140,16 @@ export default {
         });
 
         setTimeout(() => {
-      console.log("Direct test:", this.replies[0] ? this.replies[0].firstName : 'No userID');
-   }, 3000); 
+            console.log("Direct test:", this.replies[0] ? this.replies[0].firstName : 'No userID');
+        }, 3000);
+
+        const userRef = doc(db, this.userType, this.userId);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+            this.threadUser = { id: userDoc.id, ...userDoc.data() };
+        }
+
     },
 
 
@@ -170,7 +203,70 @@ export default {
 </script>
 
 <style scoped>
-/* Flex container for the top section */
+.forum-thread {
+    border: 1px solid black;
+    /* Black border */
+    border-bottom: 6px solid #ccc;
+    /* Grey shadow at the bottom */
+    padding: 10px;
+    margin: 20px;
+    background-color: #fff;
+    box-shadow: 0px 6px 6px -6px #888;
+    /* Grey shadow at the bottom */
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    /* Distribute content horizontally */
+}
+
+/* Styling for the user information container */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Align items to the left side */
+    text-align: left;
+    /* Align text to the left */
+    margin-right: 30px;
+    width: 100px;
+    /* You can adjust the width based on your layout needs */
+}
+
+.thread-details {
+    flex: 1;
+    /* Grow to fill available space */
+    padding: 0 10px;
+    /* Add some spacing */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Align title and date to the left */
+    justify-content: center;
+}
+
+/* Styling for thread title */
+.thread-title {
+    font-size: 20px;
+    text-align: left;
+    /* Align the title to the left */
+}
+
+/* Styling for post date (small text) */
+.post-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.small-text {
+    font-size: 12px;
+}
+
+/* Styling for thread description */
+.description {
+    text-align: left;
+    /* Center the description */
+    margin-top: 10px;
+}
 
 .reply-count {
     margin-left: 20px;
@@ -247,11 +343,26 @@ export default {
 .profile-picture {
     width: 60px;
     height: 60px;
-    background-color: #000;
-    /* Black dot */
+
     border-radius: 50%;
-    /* Round profile picture */
     margin-bottom: 5px;
+}
+
+.profile-pic-username-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-picture img {
+    width: 100%;
+    /* Make the image fill the container */
+    height: 100%;
+    /* Make the image fill the container */
+    object-fit: cover;
+    /* This will cover the area, no stretching */
+    border-radius: 50%;
+    /* Ensure the image is also round */
 }
 
 /* Styling for the username */
@@ -274,6 +385,11 @@ export default {
 .title-date {
     font-size: 12px;
     color: #888;
+}
+
+.title-date-forum {
+    font-size: 12px;
+    color: black;
 }
 
 .small-text {
@@ -318,5 +434,4 @@ export default {
 /* Change the color on hover for a better UX */
 .delete-button:hover {
     background-color: #e0e0e0;
-}
-</style>
+}</style>
