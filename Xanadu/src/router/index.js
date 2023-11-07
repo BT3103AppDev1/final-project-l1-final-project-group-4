@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import DashboardGR from "../views/DashboardViewGR.vue";
-import DashboardEE from "../views/DashboardViewEE.vue";
+// import DashboardGR from "../views/DashboardViewGR.vue";
+// import DashboardEE from "../views/DashboardViewEE.vue";
+import Dashboard from "../views/DashboardView.vue";
 import Forum from "../views/ForumView.vue";
 import Marketplace from "../views/MarketplaceView.vue";
 import Confirmation from "@/views/Confirmation.vue";
@@ -22,13 +23,9 @@ const router = createRouter({
     {
       path: "/dashboard",
       name: "dashboard",
-      component: DashboardGR,
+      component: Dashboard,
     },
-    {
-      path: "/dashboard_ee",
-      name: "dashboard_ee",
-      component: DashboardEE,
-    },
+
     {
       path: "/forum",
       name: "forum",

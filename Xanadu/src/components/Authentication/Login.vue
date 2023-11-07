@@ -52,20 +52,9 @@ export default {
       const db = getFirestore();
 
       signInWithEmailAndPassword(auth, this.email, this.password)
-        .then(async () => {
-          //   console.log(auth.currentUser.uid);
-          const userRef = doc(db, "Users", auth.currentUser.uid);
-          const userDoc = await getDoc(userRef);
-          const userData = userDoc.data();
-          console.log("User data:", userData);
-          if (userData.userType == "Green Ranger") {
-            this.$router.push("/dashboard");
-            console.log("You have entered Green Ranger Dashboard");
-          } else {
-            this.$router.push("/dashboard_ee");
-            console.log("You have entered Eco Entrepreneur Dashboard");
-          }
+        .then(() => {
           console.log("Login success!");
+          this.$router.push("/dashboard");
         })
         .catch((error) => {
           const errorCode = error.code;
