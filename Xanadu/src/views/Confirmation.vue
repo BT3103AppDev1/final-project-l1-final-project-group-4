@@ -14,9 +14,9 @@
 
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDoc, writeBatch, doc, getDocs } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
@@ -26,13 +26,20 @@ export default {
   data() {
     return {
       finalTotal: 0,
-      paymentConfirmation: null
+      paymentConfirmation: null,
+      shippingAddress: ''
     };
   },
   mounted() {
-    if (this.$route.query.total) {
-      this.finalTotal = parseFloat(this.$route.query.total);
+    // Retrieve the shipping address from the query parameters
+    const queryParams = this.$route.query;
+    if (queryParams.total) {
+      this.finalTotal = parseFloat(queryParams.total);
     }
+    if (queryParams.shippingAddress) {
+      this.shippingAddress = queryParams.shippingAddress;
+    }
+    // You can also decode and parse the cart items here if needed
   },
   methods: {
     onFileChange(e) {
@@ -41,18 +48,80 @@ export default {
     },
     async uploadImage() {
       if (!this.paymentConfirmation) return alert("No confirmation image provided.");
-
+      if (!this.shippingAddress) {
+        alert("Shipping address is missing.");
+        return;
+      }
       const storageRef = ref(storage, `confirmation/${this.paymentConfirmation.name}`);
       await uploadBytes(storageRef, this.paymentConfirmation);
-
       const downloadURL = await getDownloadURL(storageRef);
 
-      const ordersCollectionRef = collection(db, 'orders');
-      await addDoc(ordersCollectionRef, {
-        paymentConfirmationURL: downloadURL
+      if (!auth.currentUser) {
+        alert("You must be logged in to place an order.");
+        return;
+      }
+
+      const userRef = doc(db, 'Users', auth.currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists() || !userSnap.data().username) {
+        alert("Unable to retrieve buyer username. Please ensure your profile is complete.");
+        return;
+      }
+      const buyerUsername = userSnap.data().username;
+
+      const cartItemsWithSellers = JSON.parse(decodeURIComponent(this.$route.query.cartItems));
+      const timestamp = new Date();
+      const batch = writeBatch(db);
+
+      const userOrderRef = doc(collection(db, 'Green Rangers', auth.currentUser.uid, 'Orders'));
+      batch.set(userOrderRef, {
+        orderPlacedAt: timestamp,
+        total: this.finalTotal,
+        paymentConfirmationURL: downloadURL,
+        status: 'Pending',
+        buyerUsername: buyerUsername,
+        shippingAddress: this.shippingAddress,
       });
 
-      alert("Confirmation uploaded successfully!");
+      for (const item of cartItemsWithSellers) {
+        const productRef = doc(collection(userOrderRef, 'Products'));
+        batch.set(productRef, {
+          productName: item.title,
+          productPrice: item.cost,
+          productQuantity: item.quantity,
+          sellerUid: item.uid,
+          productCategory: item.categories,
+        });
+
+        const sellerOrdersRef = collection(db, 'Eco-Entrepreneur', item.uid, 'Orders');
+        const sellerOrderDocRef = doc(sellerOrdersRef);
+        batch.set(sellerOrderDocRef, {
+          productName: item.title,
+          productPrice: item.cost,
+          productQuantity: item.quantity,
+          buyerUid: auth.currentUser.uid,
+          buyerUsername: buyerUsername,
+          paymentConfirmationURL: downloadURL,
+          orderPlacedAt: timestamp,
+          productCategory: item.categories,
+        });
+      }
+
+      const cartRef = collection(db, 'Users', auth.currentUser.uid, 'Cart');
+      const cartSnapshot = await getDocs(cartRef);
+      cartSnapshot.forEach((cartDoc) => {
+        batch.delete(cartDoc.ref);
+      });
+
+      await batch.commit();
+
+      // Redirect the user to the marketplace page after the batch operation is completed
+      this.$router.push('/marketplace').then(() => {
+        alert("Order placed and added to your orders successfully!");
+      }).catch(err => {
+        // Handle any errors that occur during navigation
+        console.error(err);
+      });
     }
   }
 }
