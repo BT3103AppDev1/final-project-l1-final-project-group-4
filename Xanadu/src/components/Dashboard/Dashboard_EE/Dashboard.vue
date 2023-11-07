@@ -1,5 +1,6 @@
 <template>
   <div>
+    hello this is the EE dashboard
     <Toast></Toast>
     <div class="dashboardElements">
       <Graphs
