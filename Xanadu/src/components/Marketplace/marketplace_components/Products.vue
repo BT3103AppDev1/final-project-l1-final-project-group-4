@@ -1,22 +1,30 @@
 <template>
-  <div v-if="user" class="products">
-    <img class="productimage" src="@/assets/products page.png">
-    <div  v-if= "seller" class="add-product-btn">
-      <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
-    </div>
-    <div class="search-bar">
-      <input v-model="searchTerm" type="text" placeholder="Search for products...">
-    </div>
+  <div v-if="user" class="products-container">
+    <aside class="filters">
+      <div v-if="seller" class="add-product-btn">
+        <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
+      </div>
+      <div class="search-bar">
+        <input v-model="searchTerm" type="text" placeholder="Search for products...">
+      </div>
+      <div class="category-filter">
+        <h3>Categories</h3>
+        <div v-for="category in categories" :key="category" class="category-checkbox">
+          <input type="checkbox" :id="category" :value="category" v-model="selectedCategories">
+          <label :for="category">{{ category }}</label>
+        </div>
+      </div>
+    </aside>
     <div class="productlist">
       <div v-for="product in filteredProducts" :key="product.title" class="productcard">
-        <RouterLink :to="'/marketplace/product/' + product.id">
+        <RouterLink :to="'/marketplace/product/' + product.id" class="product-link">
           <div class="product-card">
             <div class="product-image-container">
               <img :src="product.picture" alt="Product Image" class="product-card-image">
             </div>
             <div class="product-details">
               <p class="product-title">{{ product.title }}</p>
-              <p class="product-description">{{ product.description || 'No description' }}</p>
+              <p class="product-description">{{ product.description || 'No description' }}  </p>
               <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
             </div>
           </div>
@@ -40,59 +48,91 @@ export default {
       searchTerm: '',
       user: false,
       userDocRef: false,
-      seller: false
+      seller: false,
+      selectedCategories: [],
+      categories: ["Reusable Goods", "Renewable Energy", "Organic Materials", "Waste Reduction"],
     };
   },
   computed: {
     filteredProducts() {
-      if (!this.searchTerm) return this.products;
-      const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-      return this.products.filter(product => 
-        product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
-        (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
-      );
-    },
+      let filtered = this.products;
 
+      // Filter by search term
+      if (this.searchTerm) {
+        const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
+        filtered = filtered.filter(product =>
+          product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+          (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
+        );
+      }
+
+      // Filter by selected categories
+      if (this.selectedCategories.length) {
+        filtered = filtered.filter(product =>
+          product.categories.some(category => this.selectedCategories.includes(category))
+        );
+      }
+
+      return filtered;
+    },
   },
+
+
+
+
   async mounted() {
+  try {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.user = user;
+        // Make sure this line is within the if(user) block to ensure that user.uid is defined
         this.userDocRef = doc(db, 'Users', this.user.uid);
       }
-    })
+    });
+
     const fbproducts = [];
     const alldocs = await getDocs(collection(db, 'Products'));
     alldocs.forEach((doc) => {
+      const productData = doc.data(); // Renamed to avoid any scope confusion
       fbproducts.push({
         id: doc.id,
-        title: doc.data().title,
-        description: doc.data().desc,
-        picture: doc.data().pictures,
-        cost: doc.data().cost  // Fetch the cost from Firestore
+        title: productData.title,
+        description: productData.desc,
+        picture: productData.pictures,
+        cost: productData.cost,
+        categories: Array.isArray(productData.categories) ? productData.categories : [] 
       });
     });
     this.products = fbproducts;
-    const userDoc = await getDoc(this.userDocRef);
-    const userType = userDoc.data().userType;
-    if (this.user && userType == "Eco-Entrepreneur") {
-      this.seller = true;
-      console.log("a seller");
-      const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'))
-      const sellerproducts = []
-      sellerdocs.forEach((doc) => {
-      sellerproducts.push({
-        id: doc.id,
-        title: doc.data().title,
-        description: doc.data().desc,
-        picture: doc.data().pictures,
-        cost: doc.data().cost  // Fetch the cost from Firestore
-      });
-      });
-      this.products = sellerproducts;
+
+    if (this.user) { // Ensure that this.user is defined before attempting to access userDocRef
+      const userDoc = await getDoc(this.userDocRef);
+      if (userDoc.exists()) {
+        const userType = userDoc.data().userType;
+        if (userType == "Eco-Entrepreneur") {
+          this.seller = true;
+          const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'));
+          const sellerproducts = [];
+          sellerdocs.forEach((doc) => {
+            const sellerData = doc.data(); // Renamed to avoid any scope confusion
+            sellerproducts.push({
+              id: doc.id,
+              title: sellerData.title,
+              description: sellerData.desc,
+              picture: sellerData.pictures,
+              cost: sellerData.cost
+            });
+          });
+          this.products = sellerproducts;
+        }
       }
-  },
+    }
+  } catch (error) {
+    console.error("An error occurred in the mounted hook:", error);
+  }
+},
+
 
 
 };
@@ -100,102 +140,32 @@ export default {
 
 
 <style>
-.product-cost {
-  font-size: 20px;
-  font-weight: bold;
-  color: #748C70; /* You can choose your preferred color */
+
+.product-link {
+  text-decoration: none; /* This will remove underline from the link */
 }
-.productlist {
+
+.products-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 20px; /* Provides even spacing between the cards. Can replace margin-right and margin-bottom. */
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  gap: 20px;
 }
 
-.productcard {
-  flex: 0 0 calc(33.33% - 20px);
-  box-sizing: border-box;
-  padding: 5px;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.productcard:hover {
-  transform: translateY(-5px); /* Lift card slightly on hover for a nice effect */
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Increase shadow depth on hover */
-}
-
-.product-card {
+/* Sidebar filters styling */
+.filters {
+  flex: 0 0 250px; /* Adjust the width of the sidebar as needed */
+  padding: 20px;
+  border-right: 2px solid #748C70;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  border: 2px solid #748C70;
-  text-align: center;
-  border-radius: 10px;
+  align-items: flex-start;
 }
 
-.product-image-container {
-  width: 200px; /* Set a fixed width for the square container */
-  height: 200px; /* Set a fixed height for the square container */
-  overflow: hidden; /* Hide any overflow */
-}
-
-.product-card-image {
-  width: 100%;
-  height: 100%; /* Make the image fill the square container */
-  object-fit: cover; /* Ensures image retains aspect ratio but fills space */
-  border-radius: 10px; /* Rounded edges for the image */
-}
-
-.product-details {
-  width: 100%;
-}
-
-.product-title {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #333; /* Darker text for readability */
-}
-
-.product-description {
-  font-size: 16px;
-  margin: 10px 0; /* Add some spacing above and below the description */
-  line-height: 1.5;
-  color: #555; /* Darker text for readability */
-}
-
-.products {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.productimage {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.add-product-btn a {
-  background-color: #748C70;
-  color: white;
-  width: 250px;
-  padding: 16px;
-  text-align: center;
-  margin-bottom: 20px;
-  font-family: Montserrat;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 140%;
-  text-transform: capitalize;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Search bar styling */
 .search-bar {
-  margin: 20px 0;
-  width: 80%;
-  max-width: 400px;
+  margin-bottom: 30px;
 }
 
 .search-bar input {
@@ -204,6 +174,167 @@ export default {
   border: 2px solid #748C70;
   border-radius: 5px;
   font-size: 16px;
+  box-sizing: border-box; /* Ensure padding doesn't increase width */
 }
 
+/* Category filter styling */
+.category-filter h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  align-self: flex-start;
+}
+
+.category-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Product list styling */
+.productlist {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.productcard {
+  flex: 0 0 calc(30% - 20px);
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.productcard:hover {
+  transform: scale(1.03);
+  box-shadow: 0 5px 15px 0 rgba(0,0,0,0.15);
+}
+
+/* Individual product card styling */
+.product-card {
+  padding: 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Make sure all cards are the same height */
+}
+
+.product-title,
+.product-description,
+.product-cost {
+  text-align: left; /* Align text to the left */
+  width: 100%; /* Ensure text spans the full width of the card */
+  text-decoration: none;
+}
+
+.product-title,
+.product-description {
+  max-height: 4.5em; /* Adjust as needed to control the height */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* rest of the properties */
+}
+
+.product-image-container {
+  width: 100%; /* Full width of card */
+  padding-top: 100%; /* Makes a square */
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f5f5f5; /* Placeholder color */
+  margin-bottom: 15px;
+}
+
+.product-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image retains aspect ratio but fills space */
+}
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align details to the start */
+}
+
+.product-title {
+  font-size: 18px;
+  margin-bottom: 0px; /* Reduced from whatever it was before */
+  color: #333;
+  font-weight: bold;
+}
+
+.product-description {
+  font-size: 16px;
+  margin-bottom: 0px;
+  color: #555;
+  height: auto; /* Changed from 3em to auto to allow text to determine height */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-cost {
+  font-size: 20px;
+  font-weight: bold;
+  color: #748C70;
+  margin-bottom: 0px; /* Add this if you want to control the gap between cost and the bottom of the card */
+}
+
+/* Add product button styling */
+.add-product-btn a {
+  background-color: #748C70;
+  color: white;
+  padding: 12px 16px;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block; /* So padding and margins apply correctly */
+  border-radius: 5px;
+}
+
+/* Checkbox styles */
+.category-checkbox input {
+  margin-right: 5px;
+}
+
+/* Ensure the layout doesn't break on smaller screens */
+@media (max-width: 768px) {
+  .products-container {
+    flex-direction: column;
+  }
+
+  .filters {
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-right: none;
+    border-bottom: 2px solid #748C70;
+    justify-content: center;
+  }
+
+  .productcard {
+    flex: 0 0 calc(50% - 20px);
+  }
+}
+
+/* Further responsive adjustments for very small screens */
+@media (max-width: 480px) {
+  .productcard {
+    flex: 0 0 100%; /* Full width cards on very small screens */
+  }
+}
 </style>
+

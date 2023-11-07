@@ -24,7 +24,7 @@ export default {
             Dimensions: "",
             Desc: "",
             Cost: "",
-            categories: ["Electronics", "Clothing", "Home & Garden", "Books", "Toys & Games", "Sports & Outdoors", "Beauty & Personal Care"],
+            categories: ["Reusable Goods", "Renewable Energy", "Organic Materials", "Waste Reduction"],
             selectedCategories: [],
             uid: null,
         }

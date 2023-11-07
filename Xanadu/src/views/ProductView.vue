@@ -7,13 +7,14 @@
       <div class="product-right">
         <h2 class="product-title">{{ product.title }}</h2>
         <div class="product-details">
+          <!-- Removed duplicate detail-section div -->
           <div class="detail-section">
-            <div class="detail-section">
             <h3>Categories:</h3>
             <ul class="product-categories">
               <li v-for="category in product.categories" :key="category">{{ category }}</li>
             </ul>
           </div>
+          <div class="detail-section">
             <h3>Description:</h3>
             <p class="product-description">{{ productDescription }}</p>
           </div>
