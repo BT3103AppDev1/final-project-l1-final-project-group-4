@@ -163,7 +163,7 @@ export default {
                         </template>
                     </Column>
                     <Column field="quantity" header="Quantity"></Column>
-                    <Column field="quantity" header="Quantity"></Column>
+                    <!-- <Column field="shortdesc" header="Short Description"></Column> -->
                     <Column header="Cost">
                         <template #body="slotProps">
                             ${{ slotProps.data.cost.toFixed(2) }}

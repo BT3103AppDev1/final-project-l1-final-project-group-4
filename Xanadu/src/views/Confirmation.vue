@@ -80,7 +80,7 @@ export default {
         paymentConfirmationURL: downloadURL,
         status: 'Pending',
         buyerUsername: buyerUsername,
-        shippingAddress: this.shippingAddress
+        shippingAddress: this.shippingAddress,
       });
 
       for (const item of cartItemsWithSellers) {
@@ -90,6 +90,7 @@ export default {
           productPrice: item.cost,
           productQuantity: item.quantity,
           sellerUid: item.uid,
+          productCategory: item.categories,
         });
 
         const sellerOrdersRef = collection(db, 'Eco-Entrepreneur', item.uid, 'Orders');
@@ -101,7 +102,8 @@ export default {
           buyerUid: auth.currentUser.uid,
           buyerUsername: buyerUsername,
           paymentConfirmationURL: downloadURL,
-          orderPlacedAt: timestamp
+          orderPlacedAt: timestamp,
+          productCategory: item.categories,
         });
       }
 
