@@ -1,5 +1,7 @@
 <template>
   <div>
+    hello this is the GR dashboard
+
     <Toast></Toast>
     <div class="dashboardElements">
       <Graphs
