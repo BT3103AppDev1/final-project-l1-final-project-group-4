@@ -197,24 +197,24 @@ export default {
       const db = getFirestore();
       const usersRef = collection(db, "Green Rangers");
       const customerRef = doc(usersRef, this.userId);
-      const pastOrdersRef = collection(customerRef, "Past Orders");
+      const pastOrdersRef = collection(customerRef, "Orders");
 
       const querySnapshot = await getDocs(pastOrdersRef);
 
       const promises = querySnapshot.docs.map(async (orderDoc) => {
-        const productsRef = collection(orderDoc.ref, "products");
+        const productsRef = collection(orderDoc.ref, "Products");
         const productQuerySnapshot = await getDocs(productsRef);
 
         productQuerySnapshot.forEach((productDoc) => {
           const data = productDoc.data();
-          const category = data.category;
-          const cost = data.cost;
-          const quantity = data.quantity;
+          const productCategory = data.productCategory;
+          const productPrice = data.productPrice;
+          const productQuantity = data.productQuantity;
 
-          if (purchases.hasOwnProperty(category)) {
-            purchases[category] += cost * quantity;
+          if (purchases.hasOwnProperty(productCategory)) {
+            purchases[productCategory] += productPrice * productQuantity;
           } else {
-            purchases[category] = cost * quantity;
+            purchases[productCategory] = productPrice * productQuantity;
           }
           // console.log(purchases);
         });
@@ -229,14 +229,14 @@ export default {
       const db = getFirestore();
       const usersRef = collection(db, "Green Rangers");
       const customerRef = doc(usersRef, this.userId);
-      const pastOrdersRef = collection(customerRef, "Threads");
+      const pastOrdersRef = collection(customerRef, "threads");
 
       const querySnapshot = await getDocs(pastOrdersRef);
       var threadsStarted = 0;
       var noOfComments = 0;
       const promises = querySnapshot.docs.map(async (orderDoc) => {
         threadsStarted += 1;
-        const repliesRef = collection(orderDoc.ref, "Replies");
+        const repliesRef = collection(orderDoc.ref, "replies");
         const replyQuerySnapshot = await getDocs(repliesRef);
 
         replyQuerySnapshot.forEach((reply) => {

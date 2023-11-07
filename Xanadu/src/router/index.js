@@ -20,8 +20,8 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/dashboard_gr",
-      name: "dashboard_gr",
+      path: "/dashboard",
+      name: "dashboard",
       component: DashboardGR,
     },
     {

@@ -59,7 +59,7 @@ export default {
           const userData = userDoc.data();
           console.log("User data:", userData);
           if (userData.userType == "Green Ranger") {
-            this.$router.push("/dashboard_gr");
+            this.$router.push("/dashboard");
             console.log("You have entered Green Ranger Dashboard");
           } else {
             this.$router.push("/dashboard_ee");
