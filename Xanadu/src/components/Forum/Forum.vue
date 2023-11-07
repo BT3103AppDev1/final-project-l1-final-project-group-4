@@ -26,8 +26,12 @@
       <div v-for="thread in filteredThreads" :key="thread.id" class="forum-thread">
         <div class="user-info">
           <!-- You can add user details here if they are associated with the thread -->
-          <div class="profile-picture"></div>
+          <div class="profile-pic-username-container">
+          <div class="profile-picture">
+            <img :src="thread.profilePicture" alt="User's profile picture" class="user-profile-img">
+          </div>
           <div class="username">{{ thread.firstName }} {{ thread.lastName }}</div>
+        </div>
         </div>
         <div class="thread-details">
           <div class="title-date">
@@ -194,7 +198,8 @@ export default {
           userGroup: group,
           userId: userDoc.id,
           firstName: userDoc.data().firstName, // Added this line
-          lastName: userDoc.data().lastName     // Added this line
+          lastName: userDoc.data().lastName,     // Added this line
+          profilePicture: userDoc.data().profilePicture 
         };
 
         // Fetch reply count for each thread
@@ -276,25 +281,39 @@ h1 {
 .user-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start; /* Align items to the left side */
+  text-align: left; /* Align text to the left */
   margin-right: 30px;
+  width: 100px; /* You can adjust the width based on your layout needs */
 }
 
 /* Styling for the profile picture (round) */
 .profile-picture {
-  width: 60px;
-  height: 60px;
-  background-color: #000;
-  /* Black dot */
-  border-radius: 50%;
-  /* Round profile picture */
-  margin-bottom: 5px;
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+    margin-bottom: 5px;
+}
+
+.profile-pic-username-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-picture img {
+  width: 100%; /* Make the image fill the container */
+  height: 100%; /* Make the image fill the container */
+  object-fit: cover; /* This will cover the area, no stretching */
+  border-radius: 50%; /* Ensure the image is also round */
 }
 
 /* Styling for the username */
 .username {
-  font-weight: bold;
+    font-weight: bold;
+    /* Make sure username text is centered if it wraps to a new line */
+    text-align: center;
 }
 
 /* Styling for thread details (title and date) */
