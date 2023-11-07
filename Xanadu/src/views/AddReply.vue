@@ -125,6 +125,13 @@ h2 {
     text-align: center;
 }
 
+textarea::placeholder {
+    font-family: 'Your Font Family', sans-serif; /* Replace with your desired font family */
+    font-size: 16px; /* Specify the font size you want for the placeholder */
+    color: #999999; /* Placeholder text color, change as needed */
+    opacity: 1; /* Make sure the placeholder is fully visible */
+}
+
 textarea {
     width: 90%;
     /* Reduce width for some padding effect */
