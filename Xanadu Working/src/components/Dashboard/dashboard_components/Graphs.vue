@@ -17,10 +17,10 @@ export default {
   },
   watch: {
     activityChartData(data) {
-      // console.log(
-      //   "activityChartData has been passed from Dashboard.vue to Graphs.vue. This is activityChartData:"
-      // );
-      // console.log(data);
+      console.log(
+        "activityChartData has been passed from Dashboard.vue to Graphs.vue. This is activityChartData:"
+      );
+      console.log(data);
     },
   },
 };

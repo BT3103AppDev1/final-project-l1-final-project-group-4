@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router/index.js";
 import PrimeVue from "primevue/config";
-import "primevue/resources/themes/vela-green/theme.css";
+import "primevue/resources/themes/saga-green/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import InputText from "primevue/inputtext";
@@ -24,13 +24,23 @@ import Toolbar from "primevue/toolbar";
 import RadioButton from "primevue/radiobutton";
 import Dialog from "primevue/dialog";
 import Textarea from "primevue/textarea";
+import Chart from "primevue/chart";
+import Card from "primevue/card";
+
+import { Progress } from "ant-design-vue";
+import { Tooltip } from "ant-design-vue";
+import "ant-design-vue/dist/reset.css";
 
 const app = createApp(App);
 
 app.use(PrimeVue);
 app.use(ToastService);
 app.use(DialogService);
+app.use(Progress);
+app.use(Tooltip);
 
+app.component("Card", Card);
+app.component("Chart", Chart);
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);

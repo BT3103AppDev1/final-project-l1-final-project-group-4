@@ -1,23 +1,39 @@
 <template>
   <div v-if="user" class="products">
-    <img class="productimage" src="@/assets/products page.png">
-    <div  v-if= "seller" class="add-product-btn">
+    <img class="productimage" src="@/assets/products page.png" />
+    <div v-if="seller" class="add-product-btn">
       <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
     </div>
     <div class="search-bar">
-      <input v-model="searchTerm" type="text" placeholder="Search for products...">
+      <input
+        v-model="searchTerm"
+        type="text"
+        placeholder="Search for products..."
+      />
     </div>
     <div class="productlist">
-      <div v-for="product in filteredProducts" :key="product.title" class="productcard">
+      <div
+        v-for="product in filteredProducts"
+        :key="product.title"
+        class="productcard"
+      >
         <RouterLink :to="'/marketplace/product/' + product.id">
           <div class="product-card">
             <div class="product-image-container">
-              <img :src="product.picture" alt="Product Image" class="product-card-image">
+              <img
+                :src="product.picture"
+                alt="Product Image"
+                class="product-card-image"
+              />
             </div>
             <div class="product-details">
               <p class="product-title">{{ product.title }}</p>
-              <p class="product-description">{{ product.description || 'No description' }}</p>
-              <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
+              <p class="product-description">
+                {{ product.description || "No description" }}
+              </p>
+              <p class="product-cost">
+                {{ product.cost ? `$${product.cost}` : "Price not available" }}
+              </p>
             </div>
           </div>
         </RouterLink>
@@ -28,8 +44,16 @@
 
 <script>
 import firebaseApp from "@/firebase.js";
-import { setDoc, getDocs, doc, deleteDoc, getDoc, collection, getFirestore } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
+import {
+  setDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  getDoc,
+  collection,
+  getFirestore,
+} from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // 1. Import required functions
 
 const db = getFirestore();
 
@@ -37,40 +61,41 @@ export default {
   data() {
     return {
       products: [],
-      searchTerm: '',
+      searchTerm: "",
       user: false,
       userDocRef: false,
-      seller: false
+      seller: false,
     };
   },
   computed: {
     filteredProducts() {
       if (!this.searchTerm) return this.products;
       const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-      return this.products.filter(product => 
-        product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
-        (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
+      return this.products.filter(
+        (product) =>
+          product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+          (product.description &&
+            product.description.toLowerCase().includes(lowerCaseSearchTerm))
       );
     },
-
   },
   async mounted() {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.user = user;
-        this.userDocRef = doc(db, 'Users', this.user.uid);
+        this.userDocRef = doc(db, "Users", this.user.uid);
       }
-    })
+    });
     const fbproducts = [];
-    const alldocs = await getDocs(collection(db, 'Products'));
+    const alldocs = await getDocs(collection(db, "Products"));
     alldocs.forEach((doc) => {
       fbproducts.push({
         id: doc.id,
         title: doc.data().title,
         description: doc.data().desc,
         picture: doc.data().pictures,
-        cost: doc.data().cost  // Fetch the cost from Firestore
+        cost: doc.data().cost, // Fetch the cost from Firestore
       });
     });
     this.products = fbproducts;
@@ -79,31 +104,30 @@ export default {
     if (this.user && userType == "Eco-Entrepreneur") {
       this.seller = true;
       console.log("a seller");
-      const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'))
-      const sellerproducts = []
+      const sellerdocs = await getDocs(
+        collection(db, "Eco-Entrepreneur", this.user.uid, "Products")
+      );
+      const sellerproducts = [];
       sellerdocs.forEach((doc) => {
-      sellerproducts.push({
-        id: doc.id,
-        title: doc.data().title,
-        description: doc.data().desc,
-        picture: doc.data().pictures,
-        cost: doc.data().cost  // Fetch the cost from Firestore
-      });
+        sellerproducts.push({
+          id: doc.id,
+          title: doc.data().title,
+          description: doc.data().desc,
+          picture: doc.data().pictures,
+          cost: doc.data().cost, // Fetch the cost from Firestore
+        });
       });
       this.products = sellerproducts;
-      }
+    }
   },
-
-
 };
 </script>
-
 
 <style>
 .product-cost {
   font-size: 20px;
   font-weight: bold;
-  color: #748C70; /* You can choose your preferred color */
+  color: #748c70; /* You can choose your preferred color */
 }
 .productlist {
   display: flex;
@@ -120,7 +144,9 @@ export default {
 }
 
 .productcard:hover {
-  transform: translateY(-5px); /* Lift card slightly on hover for a nice effect */
+  transform: translateY(
+    -5px
+  ); /* Lift card slightly on hover for a nice effect */
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Increase shadow depth on hover */
 }
 
@@ -129,7 +155,7 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 10px;
-  border: 2px solid #748C70;
+  border: 2px solid #748c70;
   text-align: center;
   border-radius: 10px;
 }
@@ -176,7 +202,7 @@ export default {
 }
 
 .add-product-btn a {
-  background-color: #748C70;
+  background-color: #748c70;
   color: white;
   width: 250px;
   padding: 16px;
@@ -201,9 +227,8 @@ export default {
 .search-bar input {
   width: 100%;
   padding: 10px;
-  border: 2px solid #748C70;
+  border: 2px solid #748c70;
   border-radius: 5px;
   font-size: 16px;
 }
-
 </style>

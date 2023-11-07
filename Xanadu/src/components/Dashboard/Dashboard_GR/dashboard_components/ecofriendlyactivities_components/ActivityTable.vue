@@ -1,27 +1,8 @@
 <template>
   <div>
+    <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1>
     <Toast> </Toast>
     <div class="card">
-      <Toolbar class="mb-4">
-        <template #start>
-          <Button
-            label="Add Eco-Friendly Activity"
-            icon="pi pi-plus"
-            severity="success"
-            class="mr-2"
-            @click="openNew"
-            style="margin-right: 10px"
-          />
-          <Button
-            label="Delete"
-            icon="pi pi-trash"
-            severity="danger"
-            @click="confirmDeleteSelected"
-            :disabled="!selectedActivities || !selectedActivities.length"
-          />
-        </template>
-      </Toolbar>
-
       <DataTable
         ref="dt"
         :value="activityData"
@@ -34,20 +15,49 @@
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
       >
-        <template #header>
-          <div
-            class="flex flex-wrap gap-2 align-items-center justify-content-between"
-          >
-            <h4 class="m-0">Manage Activities</h4>
-            <span class="p-input-icon-left">
+        <Toolbar class="mb-4">
+          <template #start>
+            <span class="p-input-icon-left" style="margin-right: 10px">
               <i class="pi pi-search" />
               <InputText
                 v-model="filters['global'].value"
                 placeholder="Search..."
               />
             </span>
+            <Button
+              label="Add Activity"
+              icon="pi pi-plus"
+              severity="success"
+              class="mr-2"
+              @click="openNew"
+              style="
+                margin-right: 10px;
+                background-color: #738678;
+                border-color: white;
+              "
+            />
+            <Button
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              @click="confirmDeleteSelected"
+              :disabled="!selectedActivities || !selectedActivities.length"
+            />
+          </template>
+        </Toolbar>
+        <!-- <template #header>
+          <div
+          class="flex flex-wrap gap-2 align-items-center justify-content-between"
+          >
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText
+              v-model="filters['global'].value"
+                placeholder="Search..."
+              />
+            </span>
           </div>
-        </template>
+        </template> -->
 
         <Column
           selectionMode="multiple"
@@ -58,51 +68,76 @@
           field="name"
           header="Name"
           sortable
-          style="min-width: 12rem"
-        ></Column>
+          style="min-width: 12rem; text-align: center"
+          headerClass="column-text-right"
+        >
+        </Column>
         <Column
           field="activityDescription"
           header="Activity Description"
           sortable
-          style="min-width: 12rem"
+          style="min-width: 12rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
         <Column
           field="sustainabilityPoints"
           header="Points"
           sortable
-          style="min-width: 16rem"
+          style="min-width: 8rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
-        <Column field="amount" header="Amount" sortable style="min-width: 8rem">
+        <Column
+          field="amount"
+          header="Amount"
+          sortable
+          style="min-width: 8rem; text-align: center"
+          headerClass="column-text-right"
+        >
           <template #body="slotProps">
-            {{ formatCurrency(slotProps.data.amount) }}
+            {{ formatAmount(slotProps.data) }}
           </template>
         </Column>
         <Column
           field="activityType"
           header="ActivityType"
           sortable
-          style="min-width: 10rem"
+          style="min-width: 10rem; text-align: center"
+          headerClass="column-text-right"
         ></Column>
-        <Column field="date" header="Date" style="min-width: 10rem" sortable>
+        <Column
+          field="date"
+          header="Date"
+          style="min-width: 10rem; text-align: center"
+          sortable
+          headerClass="column-text-right"
+        >
         </Column>
 
-        <Column :exportable="false" style="min-width: 8rem">
+        <Column :exportable="false" style="text-align: center; width: 10%">
           <template #body="slotProps">
             <Button
               icon="pi pi-pencil"
               outlined
-              rounded
               class="mr-2"
               @click="editActivity(slotProps.data)"
-              style="margin: 5px"
+              style="
+                width: 3.5rem;
+                height: 3.5rem;
+                background-color: #404e3e;
+                color: white;
+              "
             />
             <Button
-              icon="pi pi-trash"
+              icon="pi pi-times"
               outlined
-              rounded
               severity="danger"
               @click="confirmDeleteActivity(slotProps.data)"
-              style="margin: 5px"
+              style="
+                width: 3.5rem;
+                height: 3.5rem;
+                background-color: #404e3e;
+                color: white;
+              "
             />
           </template>
         </Column>
@@ -115,6 +150,11 @@
       header="Activity Details"
       :modal="true"
       class="p-fluid"
+      :pt="{
+        mask: {
+          style: 'backdrop-filter: blur(2px); background-color: black',
+        },
+      }"
     >
       <div class="field">
         <label for="name">Name</label>
@@ -147,7 +187,8 @@
               id="activityType1"
               name="activityType"
               value="Water Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
+              style="margin-right: 0.2rem"
             />
             <label for="activityType1">Water Conservation</label>
           </div>
@@ -156,7 +197,8 @@
               id="activityType2"
               name="activityType"
               value="Energy Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
+              style="margin-right: 0.2rem"
             />
             <label for="activityType2">Energy Conservation</label>
           </div>
@@ -165,7 +207,8 @@
               id="activityType3"
               name="activityType"
               value="Waste Reduction"
-              v-model="activity.activityType"
+              v-model="activityType"
+              style="margin-right: 0.2rem"
             />
             <label for="activityType3">Waste Reduction</label>
           </div>
@@ -175,12 +218,32 @@
       <div class="formgrid grid">
         <div class="field col">
           <label for="amount">Amount</label>
+          <br />
           <InputNumber
             id="amount"
             v-model="activity.amount"
             :minFractionDigits="0"
             :maxFractionDigits="2"
+            style="width: 85%"
           />
+          <h4
+            v-show="activityTypeWaterConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; L
+          </h4>
+          <h4
+            v-show="activityTypeWasteReduction"
+            style="display: inline; color: black"
+          >
+            &nbsp; Kg
+          </h4>
+          <h4
+            v-show="activityTypeEnergyConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; KwH
+          </h4>
         </div>
         <div class="field col">
           <label for="Date Picker">Date</label>
@@ -193,8 +256,20 @@
         </div>
       </div>
       <template #footer>
-        <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-        <Button label="Add" icon="pi pi-check" text @click="addActivity" />
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          text
+          @click="hideDialog"
+          style="background-color: #5a6d57; color: white"
+        />
+        <Button
+          label="Add"
+          icon="pi pi-check"
+          text
+          @click="addActivity"
+          style="background-color: #5a6d57; color: white"
+        />
       </template>
     </Dialog>
 
@@ -236,7 +311,8 @@
               id="activityType1"
               name="activityType"
               value="Water Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
+              style="margin-right: 0.2rem"
             />
             <label for="activityType1">Water Conservation</label>
           </div>
@@ -245,7 +321,8 @@
               id="activityType2"
               name="activityType"
               value="Energy Conservation"
-              v-model="activity.activityType"
+              v-model="activityType"
+              style="margin-right: 0.2rem"
             />
             <label for="activityType2">Energy Conservation</label>
           </div>
@@ -254,7 +331,8 @@
               id="activityType3"
               name="activityType"
               value="Waste Reduction"
-              v-model="activity.activityType"
+              v-model="activityType"
+              style="margin-right: 0.2rem"
             />
             <label for="activityType3">Waste Reduction</label>
           </div>
@@ -264,12 +342,32 @@
       <div class="formgrid grid">
         <div class="field col">
           <label for="amount">Amount</label>
+          <br />
           <InputNumber
             id="amount"
             v-model="activity.amount"
             :minFractionDigits="0"
             :maxFractionDigits="2"
+            style="width: 85%"
           />
+          <h4
+            v-show="activityTypeWaterConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; L
+          </h4>
+          <h4
+            v-show="activityTypeWasteReduction"
+            style="display: inline; color: black"
+          >
+            &nbsp; Kg
+          </h4>
+          <h4
+            v-show="activityTypeEnergyConservation"
+            style="display: inline; color: black"
+          >
+            &nbsp; KwH
+          </h4>
         </div>
         <div class="field col">
           <label for="Date Picker">Date</label>
@@ -361,6 +459,8 @@ import {
   getDocs,
   collection,
 } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 const db = getFirestore(firebaseApp);
 
 export default {
@@ -374,6 +474,11 @@ export default {
       selectedActivities: null,
       filters: {},
       submitted: false,
+      userId: "",
+      activityType: "",
+      activityTypeWaterConservation: false,
+      activityTypeEnergyConservation: false,
+      activityTypeWasteReduction: false,
     };
   },
   props: {
@@ -383,21 +488,54 @@ export default {
     activityData(data) {
       console.log(data);
     },
+    activityType(type) {
+      // console.log(type);
+      this.activity.activityType = type;
+      if (type == "Water Conservation") {
+        this.activityTypeWaterConservation = true;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = false;
+      }
+      if (type == "Energy Conservation") {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = true;
+        this.activityTypeWasteReduction = false;
+      }
+      if (type == "Waste Reduction") {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = true;
+      }
+    },
+    activityDialog(value) {
+      if (value == false) {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = false;
+        this.activityType = "";
+      }
+    },
   },
   created() {
     this.initFilters();
   },
   mounted() {
-    // console.log(this.activityData);
-    // ProductService.getProducts().then((data) => (this.products = data));
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      this.userId = auth.currentUser.uid;
+    });
   },
   methods: {
-    formatCurrency(value) {
-      if (value)
-        return value.toLocaleString("en-US", {
-          style: "currency",
-          currency: "USD",
-        });
+    formatAmount(data) {
+      if (data.activityType == "Waste Reduction") {
+        return String(data.amount) + " Kg";
+      }
+      if (data.activityType == "Water Conservation") {
+        return String(data.amount) + " L";
+      }
+      if (data.activityType == "Energy Conservation") {
+        return String(data.amount) + " KwH";
+      }
       return;
     },
     openNew() {
@@ -429,8 +567,12 @@ export default {
       date = `${day}/${month}/${year}`;
       let sustainabilityPoints = (this.activity.amount / 10).toFixed(3);
       try {
+        console.log(this.userId);
         const docRef = await addDoc(
-          collection(db, "Green Rangers/TestingAcct/Eco-Friendly Activities"),
+          collection(
+            db,
+            "Green Rangers/" + this.userId + "/Eco-Friendly Activities"
+          ),
           {
             name: this.activity.name,
             activityType: this.activity.activityType,
@@ -461,7 +603,10 @@ export default {
       this.activity = {};
     },
     editActivity(activity) {
+      this.activityType = activity.activityType;
+      console.log(activity.activityType);
       this.activity = { ...activity };
+      // this.activityType = activity.activityType;
       this.editActivityDialog = true;
     },
     async updateActivity() {
@@ -475,7 +620,7 @@ export default {
       var data = this.activity;
       const activityDoc = await doc(
         db,
-        "Green Rangers/TestingAcct/Eco-Friendly Activities/" + data.id
+        "Green Rangers/" + this.userId + "/Eco-Friendly Activities/" + data.id
       );
       var date = data.date;
       if (typeof data.date === "string") {
@@ -523,7 +668,9 @@ export default {
       await deleteDoc(
         doc(
           db,
-          "Green Rangers/TestingAcct/Eco-Friendly Activities/" +
+          "Green Rangers/" +
+            this.userId +
+            "/Eco-Friendly Activities/" +
             this.activity.id
         )
       );
@@ -552,7 +699,10 @@ export default {
         await deleteDoc(
           doc(
             db,
-            "Green Rangers/TestingAcct/Eco-Friendly Activities/" + activity.id
+            "Green Rangers/" +
+              this.userId +
+              "/Eco-Friendly Activities/" +
+              activity.id
           )
         );
       });
@@ -575,3 +725,33 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.ecoFriendlyActivityHeader {
+  color: var(--neutral-gray-404040, #404040);
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.75rem; /* 39.063% */
+  letter-spacing: 0.1rem;
+}
+</style>
+
+<style lang="scss">
+.column-text-right {
+  .p-column-header-content {
+    text-align: center; // or center
+    display: block !important;
+    // color: white;
+    // background: #404e3e;
+    // margin: 0px;
+  }
+  // .p-sortable-column {
+  //   text-align: center; // or center
+  //   display: block !important;
+  //   color: white;
+  //   background: #404e3e;
+  //   // margin: 0px;
+  // }
+}
+</style>

@@ -466,7 +466,10 @@ export default {
       alert("Saving your Eco-Friendly Activity Data!");
       try {
         const docRef = await addDoc(
-          collection(db, "Green Rangers/TestingAcct/Eco-Friendly Activities"),
+          collection(
+            db,
+            "Green Rangers/yElxtPHYsvV8hrUsiaJNuvg16Jf1/Eco-Friendly Activities"
+          ),
           {
             name: this.activity.name,
             activityType: this.activity.activityType,
@@ -505,7 +508,8 @@ export default {
       var data = this.activity;
       const activityDoc = await doc(
         db,
-        "Green Rangers/TestingAcct/Eco-Friendly Activities/" + data.id
+        "Green Rangers/yElxtPHYsvV8hrUsiaJNuvg16Jf1/Eco-Friendly Activities/" +
+          data.id
       );
       var date = data.date;
       if (typeof data.date === "string") {
@@ -553,7 +557,7 @@ export default {
       await deleteDoc(
         doc(
           db,
-          "Green Rangers/TestingAcct/Eco-Friendly Activities/" +
+          "Green Rangers/yElxtPHYsvV8hrUsiaJNuvg16Jf1/Eco-Friendly Activities/" +
             this.activity.id
         )
       );

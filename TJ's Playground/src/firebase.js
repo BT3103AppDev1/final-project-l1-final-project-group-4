@@ -1,12 +1,12 @@
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDnwDAQyT6RZBpDJ6xA44fErSGnh0NcvLU",
-  authDomain: "democpp-ad20e.firebaseapp.com",
-  projectId: "democpp-ad20e",
-  storageBucket: "democpp-ad20e.appspot.com",
-  messagingSenderId: "356634824019",
-  appId: "1:356634824019:web:ff03e3eea7d90dde2465a6",
+  apiKey: "AIzaSyApU6qH8LtPRps5Jfp2M4qSomIqoDtz7y8",
+  authDomain: "xanadu-40991.firebaseapp.com",
+  projectId: "xanadu-40991",
+  storageBucket: "xanadu-40991.appspot.com",
+  messagingSenderId: "20725188269",
+  appId: "1:20725188269:web:62b13c3a62108d197ca824",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
