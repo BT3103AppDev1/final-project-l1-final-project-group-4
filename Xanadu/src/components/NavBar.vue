@@ -26,8 +26,8 @@
             <a v-if="isSeller" class="dropdown-item">Account: Eco-Entrepreneur</a>
             <a v-if="isBuyer" class="dropdown-item">Account: Green Ranger</a>
 
-            <a v-if="!isLoggedIn" @click="$router.push('/register')" class="dropdown-item">Register</a>
-            <a v-if="!isLoggedIn" @click="$router.push('/login')" class="dropdown-item">Login</a>
+            <a v-if="!isLoggedIn" @click="goToRegister" class="dropdown-item">Register</a>
+            <a v-if="!isLoggedIn" @click="goToLogin" class="dropdown-item">Login</a>
             <!-- show the order tab under dropdown if the user is a seller -->
             <a v-if="isBuyer" @click="$router.push('/orders')" class="dropdown-item">Orders</a>
             <a v-if="isLoggedIn" @click="$router.push('/profile')" class="dropdown-item">My Profile</a>
@@ -40,81 +40,54 @@
 </template>
 
 <script setup>
-//brian - testing for conditional rendering of authentication buttons (register/login/logout)
-import firebaseApp from "../firebase.js"
-import {ref, watchEffect} from 'vue'
+import { onMounted, ref } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import router from "../router/index.js";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
-const isLoggedIn = ref(false)
-const isBuyer = ref(false)
-const isSeller = ref(false)
 
-const auth = getAuth();
 const db = getFirestore();
+const auth = getAuth();
 
-//test
-router.beforeEach( (to, from, next) => {
-  // console.log("router beforeEach runned!")
-  // console.log("User status: ", isLoggedIn.value)
+const isLoggedIn = ref(false);
+const isBuyer = ref(false);
+const isSeller = ref(false);
 
-  //clear user logged in status
-  isLoggedIn.value = false
-  isBuyer.value = false
-  isSeller.value = false
+// Define the names of your public pages
+const publicPages = ['login', 'register', 'landing'];
 
-  onAuthStateChanged(auth, function(user) {
-    // console.log("onAuthState runned!")
+onMounted(() => {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is signed in
+      isLoggedIn.value = true;
+      const userDocRef = doc(db, 'Users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-    if(user){
-      isLoggedIn.value = true
-
-      //retrieve user type
-      const userDocRef = doc(db, "Users", user.uid)
-      const userDoc = getDoc(userDocRef)
-      userDoc.then((userDoc) => {
-        const userInfo = userDoc.data()
-        const userType = userInfo.userType
-
-        if(userType == "Eco-Entrepreneur") {
-          isSeller.value = true
-          // console.log("Is Seller type!")
-        } else if (userType == "Green Ranger") {
-          isBuyer.value = true
-          // console.log("Is buyer type!")
-        }
-      })
-    } 
-    else {
-      isLoggedIn.value = false
-    }
-
-    // console.log("User status after onAuthState: ", isLoggedIn.value)
-
-    //Pending warning
-    // The "next" callback was called more than once in one navigation guard when going from "/" to "/profile". It should be called exactly one time in each navigation guard. This will fail in production.
-    // console.log("the from.name : ", from.name)
-    // console.log("the to.name : ", to.name)
-
-    if (to.name!=='login' && to.name!=='register'){
-      if(!isLoggedIn.value){
-        console.log("User is not logged in. Redirecting...")
-        // not logged in, redirect
-        next({name: 'login'})
+      if (userDocSnap.exists()) {
+        const userInfo = userDocSnap.data();
+        isSeller.value = userInfo.userType === 'Eco-Entrepreneur';
+        isBuyer.value = userInfo.userType === 'Green Ranger';
       }
-      else{
-        // is logged in, go whereever im going
-        next()
-      }
+    } else {
+      // No user is signed in
+      isLoggedIn.value = false;
+      isSeller.value = false;
+      isBuyer.value = false;
     }
-    else {
-      // going login and register, does not require auth 
-      next()
-    }
-  })
+  });
+});
 
-})
+router.beforeEach((to, from, next) => {
+  const isPublicPage = publicPages.includes(to.name);
 
+  if (!isPublicPage && !isLoggedIn.value) {
+    next({ name: 'landing' });
+  } else {
+    next();
+  }
+});
 </script>
+
 
 <script>
 import { RouterLink } from "vue-router";
@@ -145,6 +118,14 @@ export default {
           this.$router.push("/");
         }).catch((error) => console.log(error));
     },
+    goToLogin() {
+    console.log('Login button clicked');
+    this.$router.push('/login');
+  },
+  goToRegister() {
+    console.log('Register button clicked');
+    this.$router.push('/register');
+  },
   },
 };
 </script>
