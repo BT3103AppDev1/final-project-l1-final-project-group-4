@@ -48,6 +48,7 @@ import router from "../router/index.js";
 const db = getFirestore();
 const auth = getAuth();
 
+const isLoading = ref(true); // New ref to handle the loading state
 const isLoggedIn = ref(false);
 const isBuyer = ref(false);
 const isSeller = ref(false);
@@ -55,29 +56,42 @@ const isSeller = ref(false);
 // Define the names of your public pages
 const publicPages = ['login', 'register', 'landing'];
 
-onMounted(() => {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      // User is signed in
-      isLoggedIn.value = true;
-      const userDocRef = doc(db, 'Users', user.uid);
-      const userDocSnap = await getDoc(userDocRef);
+const checkUserStatus = async () => {
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      isLoading.value = true; // Start loading
+      if (user) {
+        // User is signed in
+        isLoggedIn.value = true;
+        const userDocRef = doc(db, 'Users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
 
-      if (userDocSnap.exists()) {
-        const userInfo = userDocSnap.data();
-        isSeller.value = userInfo.userType === 'Eco-Entrepreneur';
-        isBuyer.value = userInfo.userType === 'Green Ranger';
+        if (userDocSnap.exists()) {
+          const userInfo = userDocSnap.data();
+          isSeller.value = userInfo.userType === 'Eco-Entrepreneur';
+          isBuyer.value = userInfo.userType === 'Green Ranger';
+        }
+      } else {
+        // No user is signed in
+        isLoggedIn.value = false;
+        isSeller.value = false;
+        isBuyer.value = false;
       }
-    } else {
-      // No user is signed in
-      isLoggedIn.value = false;
-      isSeller.value = false;
-      isBuyer.value = false;
-    }
+      isLoading.value = false; // Stop loading
+      resolve();
+    });
   });
+};
+
+onMounted(async () => {
+  await checkUserStatus();
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  if (isLoading.value) {
+    await checkUserStatus(); // Wait for auth check to finish if still loading
+  }
+
   const isPublicPage = publicPages.includes(to.name);
 
   if (!isPublicPage && !isLoggedIn.value) {
@@ -87,6 +101,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 </script>
+
 
 
 <script>
