@@ -13,6 +13,8 @@ import "primeicons/primeicons.css";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import Toast from "primevue/toast";
+import Card from 'primevue/card';
+import Image from 'primevue/image';
 import ToastService from "primevue/toastservice";
 import Calendar from "primevue/calendar";
 import DataTable from "primevue/datatable";
@@ -34,7 +36,6 @@ import Password from "primevue/password";
 import Divider from "primevue/divider";
 import Menubar from "primevue/menubar";
 import Chart from "primevue/chart";
-import Card from "primevue/card";
 // import Tailwind from "primevue/passthrough/tailwind";
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");
@@ -49,6 +50,7 @@ app.use(DialogService);
 
 app.component("Card", Card);
 app.component("Chart", Chart);
+app.component("Image", Image);
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);

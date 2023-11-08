@@ -17,7 +17,12 @@
       </div>
     </div>
     
-    <!-- Display total cost -->
+    
+    <div class="cart-address">
+      <label for="address">Shipping Address:</label>
+      <input v-model="shippingAddress" id="address" type="text" placeholder="Enter your address" />
+    </div>
+
     <div class="cart-total">
       <strong>Total:</strong> ${{ total.toFixed(2) }}
     </div>
@@ -36,14 +41,15 @@ const auth = getAuth();
 export default {
   data() {
     return {
-      cartItems: []
+      cartItems: [],
+      shippingAddress: ''
     };
   },
   mounted() {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const fbCartItems = [];
-        const allDocs = await getDocs(collection(db, 'Eco-Entrepreneur', user.uid, 'Cart'));
+        const allDocs = await getDocs(collection(db, 'Green Rangers', user.uid, 'Cart'));
 
         allDocs.forEach((doc) => {
           let item = doc.data();
@@ -67,7 +73,7 @@ export default {
         return;
       }
 
-      const itemRef = doc(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart', itemId);
+      const itemRef = doc(db, 'Green Rangers', currentUser.uid, 'Cart', itemId);
       await deleteDoc(itemRef);
       this.cartItems = this.cartItems.filter(item => item.id !== itemId);
     },
@@ -79,17 +85,25 @@ export default {
         return;
       }
 
-      const itemRef = doc(db, 'Eco-Entrepreneur', currentUser.uid, 'Cart', item.id);
+      const itemRef = doc(db, 'Green Rangers', currentUser.uid, 'Cart', item.id);
       await updateDoc(itemRef, {
         quantity: item.quantity
       });
     },
     checkout() {
+      if (!this.shippingAddress) {
+        alert("Please enter your shipping address.");
+        return;
+      }
       this.$router.push({
         path: '/confirmation',
-        query: { total: this.total.toFixed(2) } // Passing total as a query parameter
+        query: {
+          total: this.total.toFixed(2),
+          cartItems: encodeURIComponent(JSON.stringify(this.cartItems)),
+          shippingAddress: this.shippingAddress // Pass the shipping address as a query parameter
+        }
       });
-    }
+    },
 
   },
   computed: {
@@ -106,6 +120,45 @@ export default {
 </script>
 
 <style>
+.cart-address {
+  width: 100%;
+  margin: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cart-address label {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #748C70; /* Adjust the color to match your theme */
+}
+
+.cart-address input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e2e2e2; /* Lighter border color for a subtle look */
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 20px; /* Add some space below the input field */
+}
+
+/* Style for the confirm address button if you choose to add one */
+.confirm-address-button {
+  padding: 10px 20px;
+  background-color: #748C70;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 16px;
+}
+
+.confirm-address-button:hover {
+  background-color: #657B61;
+}
+
 .cart {
   display: flex;
   flex-direction: column;
