@@ -1,18 +1,5 @@
 <template>
-    <div class="profile-container">
-        <div class="info-box">
-            <h1>Profile Page</h1>
-            <div class="image-container">
-                <img :src="profilePicture" alt="Profile Image" class="profile-image">
-            </div>
-            <div class="user-details">
-                <span>First Name: <b>{{ firstName }}</b></span>
-                <span>Last Name: <b>{{ lastName }}</b></span>
-                <span>Email: <b>{{ email }}</b></span>
-                <span>Account Type: <b>{{ userType }}</b></span>
-            </div>
-        </div>
-    </div>
+<h1>hi</h1>
 </template>
 
 <script>
