@@ -1,12 +1,17 @@
 <template>
-<h1>hi</h1>
-</template>
-
-<style scoped>
-body {
-  background-image: url('https://example.com/image/path?access_token=92958154-9ec6-403c-8e0e-ee4ae0393db0');
-  background-size: cover;
-  background-position: center;
-}
-
-</style>
+    <div class="background-container">
+      <!-- Your content here -->
+    </div>
+  </template>
+  
+  <style scoped>
+  .background-container {
+    background-image: url('../assets/background.png');
+    background-size: cover; /* This will cover the entire container area */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    height: 87vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+  }
+  </style>
+  
