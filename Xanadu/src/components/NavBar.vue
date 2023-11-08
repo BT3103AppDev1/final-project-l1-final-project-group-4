@@ -26,8 +26,8 @@
             <a v-if="isSeller" class="dropdown-item">Account: Eco-Entrepreneur</a>
             <a v-if="isBuyer" class="dropdown-item">Account: Green Ranger</a>
 
-            <a v-if="!isLoggedIn" @click="goToRegister" class="dropdown-item">Register</a>
-            <a v-if="!isLoggedIn" @click="goToLogin" class="dropdown-item">Login</a>
+            <a v-if="!isLoggedIn" @click="$router.push('/register')" class="dropdown-item">Register</a>
+            <a v-if="!isLoggedIn" @click="$router.push('/login')" class="dropdown-item">Login</a>
             <!-- show the order tab under dropdown if the user is a seller -->
             <a v-if="isBuyer" @click="$router.push('/orders')" class="dropdown-item">Orders</a>
             <a v-if="isLoggedIn" @click="$router.push('/profile')" class="dropdown-item">My Profile</a>
@@ -40,11 +40,16 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+//brian - testing for conditional rendering of authentication buttons (register/login/logout)
+import firebaseApp from "../firebase.js"
+import {ref, watchEffect} from 'vue'
 import router from "../router/index.js";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+const isLoggedIn = ref(false)
+const isBuyer = ref(false)
+const isSeller = ref(false)
 
+const auth = getAuth();
 const db = getFirestore();
 const auth = getAuth();
 
@@ -133,14 +138,6 @@ export default {
           this.$router.push("/");
         }).catch((error) => console.log(error));
     },
-    goToLogin() {
-    console.log('Login button clicked');
-    this.$router.push('/login');
-  },
-  goToRegister() {
-    console.log('Register button clicked');
-    this.$router.push('/register');
-  },
   },
 };
 </script>

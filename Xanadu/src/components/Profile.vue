@@ -1,17 +1,14 @@
 <template>
-    <div class="profile-container">
-        <div class="info-box">
-            <h1>Profile Page</h1>
-            <div class="image-container">
-                <img :src="profilePicture" alt="Profile Image" class="profile-image">
-            </div>
-            <div class="user-details">
-                <span>First Name: <b>{{ firstName }}</b></span>
-                <span>Last Name: <b>{{ lastName }}</b></span>
-                <span>Email: <b>{{ email }}</b></span>
-                <span>Account Type: <b>{{ userType }}</b></span>
-            </div>
+    <h1>THIS IS Profile Page</h1>
+
+    <div class="info_box">
+        <div class="product-image-container">
+            <img :src="profilePicture" alt="Product Image" class="product-card-image">
         </div>
+        <span>First Name: {{firstName}}</span>
+        <span>Last Name: {{lastName}}</span>
+        <span>Email: {{email}}</span>
+        <span>Account Type: {{userType}}</span>
     </div>
 </template>
 
@@ -64,46 +61,7 @@ export default {
 </script>
 
 <style scoped>
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-}
-
-.info-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background: #fff; /* Change as needed */
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    max-width: 350px; /* Adjust as needed */
-    width: 100%; /* Responsive width */
-    margin: auto;
-}
-
-.image-container {
-    margin-bottom: 20px;
-}
-
-.profile-image {
-    width: 150px; /* Adjust size as needed */
-    height: 150px; /* Adjust size as needed */
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.user-details span {
+span{
     display: block;
-    margin: 10px 0; /* Adjust the spacing as needed */
-    text-align: center; /* Ensures text is centered */
-    width: 100%; /* Ensures span takes the full width */
-}
-
-h1 {
-    margin-bottom: 20px; /* Adjust the spacing as needed */
 }
 </style>
