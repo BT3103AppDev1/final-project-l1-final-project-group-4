@@ -1,14 +1,28 @@
 <template>
   <div class="card">
-    <div class="cardTitle">Forum Comments</div>
-    <div class="cardContent">{{ noOfComments }}</div>
+    <div class="cardTitle">Highest Earning Category</div>
+    <div class="cardContent">{{ categoryName }}</div>
+    <div class="cardContent">${{ categoryEarning }}</div>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      categoryName: "",
+      categoryEarning: 0,
+    };
+  },
   props: {
-    noOfComments: Number,
+    category: Array,
+  },
+  watch: {
+    category(category) {
+      // console.log(category);
+      this.categoryName = category[0];
+      this.categoryEarning = category[1];
+    },
   },
 };
 </script>

@@ -5,18 +5,33 @@
 
       <div class="pieChart">
         <h4>Money Spent by Product Category</h4>
-        <MarketplacePieChartVue :salesData="salesData" />
+        <MarketplacePieChart :salesData="salesData" />
+      </div>
+      <div class="cards">
+        <HighestEarningCategoryCard :category="highestEarningCategories[0]" />
+        <SecondHighestEarningCategoryCard
+          :category="highestEarningCategories[1]"
+        />
+        <ThirdHighestEarningCategoryCard
+          :category="highestEarningCategories[2]"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import MarketplacePieChartVue from "./graphs_components/MarketplacePieChart.vue";
+import HighestEarningCategoryCard from "./graphs_components/HighestEarningCategoryCard.vue";
+import MarketplacePieChart from "./graphs_components/MarketplacePieChart.vue";
+import ThirdHighestEarningCategoryCard from "./graphs_components/ThirdHighestEarningCategoryCard.vue";
+import SecondHighestEarningCategoryCard from "./graphs_components/SecondHighestEarningCategoryCard.vue";
 
 export default {
   components: {
-    MarketplacePieChartVue,
+    MarketplacePieChart,
+    HighestEarningCategoryCard,
+    SecondHighestEarningCategoryCard,
+    ThirdHighestEarningCategoryCard,
   },
   props: {
     salesData: Object,
@@ -24,9 +39,9 @@ export default {
   },
   watch: {
     salesData(data) {
-      // console.log(
-      //   "purchasesData has been passed from Dashboard.vue to Graphs.vue. This is purchasesData:"
-      // );
+      // console.log(data);
+    },
+    highestEarningCategories(data) {
       // console.log(data);
     },
   },

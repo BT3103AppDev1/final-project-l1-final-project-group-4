@@ -1,14 +1,28 @@
 <template>
   <div class="card">
-    <div class="cardTitle">Forum Threads Started</div>
-    <div class="cardContent">{{ threadsStarted }}</div>
+    <div class="cardTitle">Third Highest Earning Category</div>
+    <div class="cardContent">{{ categoryName }}</div>
+    <div class="cardContent">${{ categoryEarning }}</div>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      categoryName: "",
+      categoryEarning: 0,
+    };
+  },
   props: {
-    threadsStarted: Number,
+    category: Array,
+  },
+  watch: {
+    category(category) {
+      // console.log(category);
+      this.categoryName = category[0];
+      this.categoryEarning = category[1];
+    },
   },
 };
 </script>
@@ -18,6 +32,7 @@ export default {
   display: flex;
   width: 100%;
   height: 100%;
+  /* padding: 0px 23px 15px 23px; */
   padding: 0rem 0rem 0.5rem 0rem;
   margin: 0rem 0rem 2rem 0rem;
   flex-direction: column;

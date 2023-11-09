@@ -8,19 +8,14 @@
         :key="refreshComp"
       />
     </div>
-
-    <!-- <EcoFriendlyActivities
-      :activityData="activityData"
-      @added="refresh"
-      @deletedActivity="refresh"
-      @activityEdited="refresh"
-      :key="refreshComp"
-    /> -->
+    <div>
+      <BestAndWorstSellers :bestAndWorstSellersInfo="bestAndWorstSellersInfo" />
+    </div>
   </div>
 </template>
 
 <script>
-// import EcoFriendlyActivities from "./dashboard_components/EcoFriendlyActivities.vue";
+import BestAndWorstSellers from "./dashboard_components/BestAndWorstSellers.vue";
 import Graphs from "./dashboard_components/Graphs.vue";
 import firebaseApp from "@/firebase.js";
 import { getFirestore } from "firebase/firestore";
@@ -31,7 +26,7 @@ const db = getFirestore(firebaseApp);
 
 export default {
   components: {
-    // EcoFriendlyActivities,
+    BestAndWorstSellers,
     Graphs,
   },
   data() {
@@ -44,6 +39,7 @@ export default {
       productCategorySpending: [],
       salesData: null,
       highestEarningCategories: [],
+      bestAndWorstSellersInfo: {},
     };
   },
   async mounted() {
@@ -58,14 +54,16 @@ export default {
   watch: {
     async userId(userId) {
       this.sales = await this.getSalesData();
+      this.bestAndWorstSellersInfo = await this.getBestAndWorstSellersInfo();
+      console.log(this.bestAndWorstSellersInfo);
     },
     sales(sales) {
       console.log(sales);
       var sortedSales = Object.entries(sales);
       sortedSales.sort((a, b) => b[1] - a[1]);
-      console.log(sortedSales);
+      // console.log(sortedSales);
       this.highestEarningCategories = sortedSales.slice(0, 3);
-      console.log(this.highestEarningCategories);
+      // console.log(this.highestEarningCategories);
 
       this.productCategories = Object.keys(sales);
       // console.log(this.productCategories);
@@ -90,6 +88,67 @@ export default {
       this.refreshComp += 1;
     },
 
+    async getBestAndWorstSellersInfo() {
+      var quantityOfProductsSold = {};
+      var detailsOfProductsSold = {};
+      const db = getFirestore();
+      const usersRef = collection(db, "Eco-Entrepreneur");
+      const customerRef = doc(usersRef, this.userId);
+      const pastOrdersRef = collection(customerRef, "Orders");
+
+      const querySnapshot = await getDocs(pastOrdersRef);
+
+      querySnapshot.forEach((productDoc) => {
+        const data = productDoc.data();
+        // console.log(data);
+        const productName = data.productName;
+        var productPrice = data.productPrice.toString();
+        const productQuantity = data.productQuantity;
+        const productCategory = data.productCategory;
+        var categories = "";
+        for (const cat of productCategory) {
+          categories = categories + cat + ", ";
+        }
+        categories = categories.slice(0, -2);
+        console.log(categories);
+        productPrice = "$" + productPrice;
+        if (quantityOfProductsSold.hasOwnProperty(productName)) {
+          quantityOfProductsSold[productName] += productQuantity;
+        } else {
+          quantityOfProductsSold[productName] = productQuantity;
+        }
+        if (detailsOfProductsSold.hasOwnProperty(productName)) {
+          // detailOfProductsSold[productName] += productQuantity;
+        } else {
+          detailsOfProductsSold[productName] = {
+            productName: productName,
+            productPrice: productPrice,
+            productQuantity: productQuantity,
+            productCategory: categories,
+          };
+        }
+      });
+      // console.log(quantityOfProductsSold);
+      // console.log(detailsOfProductsSold);
+
+      quantityOfProductsSold = Object.entries(quantityOfProductsSold);
+      quantityOfProductsSold.sort((a, b) => b[1] - a[1]);
+      // console.log(quantityOfProductsSold);
+      var bestAndWorstSellers = quantityOfProductsSold.map(
+        (subArray) => subArray[0]
+      );
+      // var worstSellers = bestSellers.slice(-5);
+      // bestSellers = bestSellers.slice(0, 5);
+      var bestAndWorstSellersInfo = {
+        bestAndWorstSellersInfo: bestAndWorstSellers,
+        // worstSellers: worstSellers,
+        details: detailsOfProductsSold,
+      };
+      // console.log(bestAndWorstSellers);
+
+      return bestAndWorstSellersInfo;
+    },
+
     async getSalesData() {
       var sales = {};
       const db = getFirestore();
@@ -101,7 +160,7 @@ export default {
 
       querySnapshot.forEach((productDoc) => {
         const data = productDoc.data();
-        console.log(data);
+        // console.log(data);
         const productCategory = data.productCategory;
         const productPrice = data.productPrice;
         const productQuantity = data.productQuantity;
