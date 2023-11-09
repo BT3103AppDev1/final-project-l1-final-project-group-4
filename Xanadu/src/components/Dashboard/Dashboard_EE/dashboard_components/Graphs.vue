@@ -5,56 +5,43 @@
 
       <div class="pieChart">
         <h4>Money Spent by Product Category</h4>
-        <MarketplacePieChartVue :purchasesData="purchasesData" />
+        <MarketplacePieChart :salesData="salesData" />
       </div>
       <div class="cards">
-        <TopSpendingProductCategoryCard
-          :highestSpendingProductCategory="highestSpendingProductCategory"
+        <HighestEarningCategoryCard :category="highestEarningCategories[0]" />
+        <SecondHighestEarningCategoryCard
+          :category="highestEarningCategories[1]"
         />
-        <ForumThreadsStartedCard :threadsStarted="threadsStarted" />
-        <NoOfCommentsCard :noOfComments="noOfComments" />
-      </div>
-      <div class="activityChart">
-        <h4>Eco-Friendly Activities Points</h4>
-        <ActivityChart :activityChartData="activityChartData" />
+        <ThirdHighestEarningCategoryCard
+          :category="highestEarningCategories[2]"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import MarketplacePieChartVue from "./graphs_components/MarketplacePieChart.vue";
-import TopSpendingProductCategoryCard from "./graphs_components/TopSpendingProductCategoryCard.vue";
-import ForumThreadsStartedCard from "./graphs_components/ForumThreadsStartedCard.vue";
-import NoOfCommentsCard from "./graphs_components/ForumCommentsCard.vue";
-import ActivityChart from "./graphs_components/ActivityChart.vue";
+import HighestEarningCategoryCard from "./graphs_components/HighestEarningCategoryCard.vue";
+import MarketplacePieChart from "./graphs_components/MarketplacePieChart.vue";
+import ThirdHighestEarningCategoryCard from "./graphs_components/ThirdHighestEarningCategoryCard.vue";
+import SecondHighestEarningCategoryCard from "./graphs_components/SecondHighestEarningCategoryCard.vue";
 
 export default {
   components: {
-    ActivityChart,
-    MarketplacePieChartVue,
-    TopSpendingProductCategoryCard,
-    ForumThreadsStartedCard,
-    NoOfCommentsCard,
+    MarketplacePieChart,
+    HighestEarningCategoryCard,
+    SecondHighestEarningCategoryCard,
+    ThirdHighestEarningCategoryCard,
   },
   props: {
-    activityChartData: Object,
-    purchasesData: Object,
-    threadsStarted: Number,
-    noOfComments: Number,
-    highestSpendingProductCategory: String,
+    salesData: Object,
+    highestEarningCategories: Array,
   },
   watch: {
-    activityChartData(data) {
-      // console.log(
-      //   "activityChartData has been passed from Dashboard.vue to Graphs.vue. This is activityChartData:"
-      // );
+    salesData(data) {
       // console.log(data);
     },
-    purchasesData(data) {
-      // console.log(
-      //   "purchasesData has been passed from Dashboard.vue to Graphs.vue. This is purchasesData:"
-      // );
+    highestEarningCategories(data) {
       // console.log(data);
     },
   },
@@ -63,26 +50,18 @@ export default {
 
 <style scoped>
 .pieChart {
-  width: 23%;
+  width: 50%;
   height: 100%;
   flex-shrink: 0;
   float: left;
-  margin-right: 18.5%;
 }
 
 .cards {
   margin-top: 4rem;
-  width: 20%;
+  width: 40%;
   height: 100%;
   flex-shrink: 0;
-  float: left;
+  float: right;
   margin-right: 2%;
-}
-
-.activityChart {
-  width: 33%;
-  height: 100%;
-  flex-shrink: 0;
-  float: left;
 }
 </style>

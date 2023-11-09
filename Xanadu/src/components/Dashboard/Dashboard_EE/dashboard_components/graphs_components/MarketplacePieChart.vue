@@ -2,7 +2,7 @@
   <div>
     <Chart
       type="pie"
-      :data="purchasesData"
+      :data="salesData"
       :options="chartOptions"
       style="width: 80%; height: 100%"
     />
@@ -13,7 +13,7 @@
 export default {
   name: "marketplacePieChart",
   props: {
-    purchasesData: Object,
+    salesData: Object,
   },
   data() {
     return {
@@ -42,7 +42,7 @@ export default {
             labels: {
               // display: true,
               font: {
-                size: 15,
+                size: 25,
               },
               usePointStyle: true,
               color: textColor,

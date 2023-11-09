@@ -1,14 +1,28 @@
 <template>
   <div class="card">
-    <div class="cardTitle">Top Spending Product Category</div>
-    <div class="cardContent">{{ highestSpendingProductCategory }}</div>
+    <div class="cardTitle">Second Highest Earning Category</div>
+    <div class="cardContent">{{ categoryName }}</div>
+    <div class="cardContent">${{ categoryEarning }}</div>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      categoryName: "",
+      categoryEarning: 0,
+    };
+  },
   props: {
-    highestSpendingProductCategory: String,
+    category: Array,
+  },
+  watch: {
+    category(category) {
+      // console.log(category);
+      this.categoryName = category[0];
+      this.categoryEarning = category[1];
+    },
   },
 };
 </script>
@@ -18,7 +32,6 @@ export default {
   display: flex;
   width: 100%;
   height: 100%;
-  /* padding: 0px 23px 15px 23px; */
   padding: 0rem 0rem 0.5rem 0rem;
   margin: 0rem 0rem 2rem 0rem;
   flex-direction: column;
@@ -40,8 +53,8 @@ export default {
 
 .cardContent {
   display: flex;
-  width: 223px;
-  height: 41px;
+  width: 100%;
+  height: 2.5rem;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;

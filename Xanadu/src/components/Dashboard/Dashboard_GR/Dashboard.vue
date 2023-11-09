@@ -1,7 +1,5 @@
 <template>
   <div>
-    hello this is the GR dashboard
-
     <Toast></Toast>
     <div class="dashboardElements">
       <Graphs
@@ -54,7 +52,6 @@ export default {
       productCategories: [],
       productCategorySpending: [],
       purchasesData: null,
-      totalSpending: 0, // this would be used for progress bar
       threadsStarted: 0,
       noOfComments: 0,
       highestSpendingProductCategory: "",
@@ -102,8 +99,8 @@ export default {
         datasets: [
           {
             data: this.productCategorySpending,
-            backgroundColor: ["#738678", "#E4D5A3", "#5F192C"],
-            hoverBackgroundColor: ["#838678", "#E4D5C3", "#6F192C"],
+            backgroundColor: ["#738678", "#E4D5A3", "#5F192C", "#C86368"],
+            hoverBackgroundColor: ["#838678", "#E4D5C3", "#6F192C", "#E86368"],
           },
         ],
       };
@@ -212,13 +209,14 @@ export default {
           const productCategory = data.productCategory;
           const productPrice = data.productPrice;
           const productQuantity = data.productQuantity;
-
-          if (purchases.hasOwnProperty(productCategory)) {
-            purchases[productCategory] += productPrice * productQuantity;
-          } else {
-            purchases[productCategory] = productPrice * productQuantity;
+          const amountSpent = productPrice * productQuantity;
+          for (const cat of productCategory) {
+            if (purchases.hasOwnProperty(cat)) {
+              purchases[cat] += amountSpent;
+            } else {
+              purchases[cat] = amountSpent;
+            }
           }
-          // console.log(purchases);
         });
       });
 
