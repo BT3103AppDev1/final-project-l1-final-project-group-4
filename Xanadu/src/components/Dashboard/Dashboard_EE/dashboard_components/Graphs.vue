@@ -50,26 +50,18 @@ export default {
 
 <style scoped>
 .pieChart {
-  width: 23%;
+  width: 50%;
   height: 100%;
   flex-shrink: 0;
   float: left;
-  margin-right: 18.5%;
 }
 
 .cards {
   margin-top: 4rem;
-  width: 20%;
+  width: 40%;
   height: 100%;
   flex-shrink: 0;
-  float: left;
+  float: right;
   margin-right: 2%;
-}
-
-.activityChart {
-  width: 33%;
-  height: 100%;
-  flex-shrink: 0;
-  float: left;
 }
 </style>

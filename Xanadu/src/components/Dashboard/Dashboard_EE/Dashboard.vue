@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast></Toast>
     <div class="dashboardElements">
       <Graphs
         :salesData="salesData"
@@ -184,6 +183,6 @@ export default {
   width: 100%;
   height: 100%;
   flex-shrink: 0;
-  margin-bottom: 30rem;
+  margin-bottom: 50rem;
 }
 </style>

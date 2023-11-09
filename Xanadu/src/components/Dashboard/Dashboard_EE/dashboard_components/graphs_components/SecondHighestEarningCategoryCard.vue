@@ -53,8 +53,8 @@ export default {
 
 .cardContent {
   display: flex;
-  width: 223px;
-  height: 41px;
+  width: 100%;
+  height: 2.5rem;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;

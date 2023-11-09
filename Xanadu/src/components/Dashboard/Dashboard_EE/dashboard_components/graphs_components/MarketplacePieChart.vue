@@ -42,7 +42,7 @@ export default {
             labels: {
               // display: true,
               font: {
-                size: 15,
+                size: 25,
               },
               usePointStyle: true,
               color: textColor,
