@@ -39,7 +39,7 @@
             </button>
             <input
               type="file"
-              
+              v-show="false"
               ref="uploadPictures1"
               @change="uploadPictures1"
               accept="image/*"
