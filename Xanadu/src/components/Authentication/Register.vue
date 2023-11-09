@@ -39,6 +39,7 @@
             </button>
             <input
               type="file"
+              
               ref="uploadPictures1"
               @change="uploadPictures1"
               accept="image/*"
@@ -150,6 +151,7 @@
               @change="uploadPictures2"
               accept="image/*"
               required
+              v-show="false"
             />
           </div>
         </div>
