@@ -194,6 +194,7 @@ export default {
 
     async getPurchasesData() {
       var purchases = {};
+      // console.log("hello")
       const db = getFirestore();
       const usersRef = collection(db, "Green Rangers");
       const customerRef = doc(usersRef, this.userId);
@@ -208,6 +209,7 @@ export default {
         productQuerySnapshot.forEach((productDoc) => {
           const data = productDoc.data();
           const productCategory = data.productCategory;
+          // console.log(productCategory);
           const productPrice = data.productPrice;
           const productQuantity = data.productQuantity;
 
