@@ -7,7 +7,8 @@
         :key="refreshComp"
       />
     </div>
-    <div>
+    <h1 class="tableHeader">Past Order Details</h1>
+    <div class="eeDashboardTable">
       <BestAndWorstSellers :bestAndWorstSellersInfo="bestAndWorstSellersInfo" />
     </div>
   </div>
@@ -53,7 +54,7 @@ export default {
   watch: {
     async userId(userId) {
       this.sales = await this.getSalesData();
-      this.bestAndWorstSellersInfo = await this.getBestAndWorstSellersInfo();
+      this.bestAndWorstSellersInfo = await this.getSalesDetails();
       console.log(this.bestAndWorstSellersInfo);
     },
     sales(sales) {
@@ -61,8 +62,18 @@ export default {
       var sortedSales = Object.entries(sales);
       sortedSales.sort((a, b) => b[1] - a[1]);
       // console.log(sortedSales);
-      this.highestEarningCategories = sortedSales.slice(0, 3);
-      // console.log(this.highestEarningCategories);
+      sortedSales = sortedSales.slice(0, 3);
+
+      sortedSales = sortedSales.map(function (item) {
+        var obj = {};
+        obj["category"] = item[0];
+        obj["amountEarned"] = "$" + item[1].toString();
+        return obj;
+      });
+      this.highestEarningCategories = sortedSales;
+      console.log(this.highestEarningCategories);
+
+      console.log(this.highestEarningCategories);
 
       this.productCategories = Object.keys(sales);
       // console.log(this.productCategories);
@@ -86,8 +97,7 @@ export default {
       console.log("refreshed!");
       this.refreshComp += 1;
     },
-
-    async getBestAndWorstSellersInfo() {
+    async getSalesDetails() {
       var quantityOfProductsSold = {};
       var detailsOfProductsSold = {};
       const db = getFirestore();
@@ -127,6 +137,8 @@ export default {
           };
         }
       });
+      const details = Object.values(detailsOfProductsSold);
+      console.log(details);
       // console.log(quantityOfProductsSold);
       // console.log(detailsOfProductsSold);
 
@@ -183,6 +195,29 @@ export default {
   width: 100%;
   height: 100%;
   flex-shrink: 0;
-  margin-bottom: 50rem;
+  margin-bottom: 32%;
+  padding: 0rem 2rem 0rem 2rem;
+}
+
+.eeDashboardTable {
+  width: 94.5%;
+  height: 100%;
+  flex-shrink: 0;
+  margin-left: 2.5rem;
+  padding: 0rem 0rem 0rem 0rem;
+  margin-bottom: 3rem;
+  border: 0.15rem solid #738678;
+  border-radius: 0.1rem;
+}
+
+.tableHeader {
+  margin-left: 2rem;
+  text-align: center;
+  color: var(--neutral-gray-404040, #404040);
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.75rem; /* 39.063% */
+  letter-spacing: 0.1rem;
 }
 </style>

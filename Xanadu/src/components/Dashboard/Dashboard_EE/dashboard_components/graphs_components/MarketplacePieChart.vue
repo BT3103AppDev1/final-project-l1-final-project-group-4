@@ -1,10 +1,11 @@
 <template>
   <div>
+    <h4 class="graphTitle">Amount Earned by Product Category</h4>
     <Chart
       type="pie"
       :data="salesData"
       :options="chartOptions"
-      style="width: 80%; height: 100%"
+      style="width: 95%; height: 100%"
     />
   </div>
 </template>
@@ -26,11 +27,13 @@ export default {
       const textColor = documentStyle.getPropertyValue("--text-color");
 
       return {
+        aspectRatio: 1.4,
         plugins: {
           legend: {
             responsive: true,
             boxHeight: 500,
             position: "right",
+
             // title: {
             //   display: true,
             //   text: "Product Categories",
@@ -42,7 +45,7 @@ export default {
             labels: {
               // display: true,
               font: {
-                size: 25,
+                size: 18,
               },
               usePointStyle: true,
               color: textColor,
@@ -58,3 +61,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.graphTitle {
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.5rem; /* 39.063% */
+  letter-spacing: 0.05rem;
+  color: var(--neutral-gray-404040, #404040);
+}
+</style>

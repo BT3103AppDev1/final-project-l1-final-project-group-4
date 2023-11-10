@@ -25,7 +25,6 @@
 
 <script>
 import EcoFriendlyActivities from "./dashboard_components/EcoFriendlyActivities.vue";
-import MilestoneProgress from "./dashboard_components/MilestoneProgress.vue";
 import Graphs from "./dashboard_components/Graphs.vue";
 import firebaseApp from "@/firebase.js";
 import { getFirestore } from "firebase/firestore";
@@ -37,7 +36,6 @@ const db = getFirestore(firebaseApp);
 export default {
   components: {
     EcoFriendlyActivities,
-    MilestoneProgress,
     Graphs,
   },
   data() {
@@ -261,7 +259,7 @@ export default {
 }
 
 .ecoFriendlyActivitiesTable {
-  width: 97%;
+  width: 96%;
   height: 100%;
   flex-shrink: 0;
   margin-left: 2rem;
