@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1>
+    <!-- <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1> -->
     <Toast> </Toast>
     <div class="card">
       <DataTable
@@ -14,6 +14,7 @@
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+        removableSort
       >
         <Toolbar class="mb-4">
           <template #start>

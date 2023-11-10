@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import EcoFriendlyActivities from "./dashboard_components/EcoFriendlyActivities.vue";
-import MilestoneProgress from "./dashboard_components/MilestoneProgress.vue";
-import Graphs from "./dashboard_components/Graphs.vue";
+import EcoFriendlyActivities from "../Xanadu/src/components/Dashboard/dashboard_components/EcoFriendlyActivities.vue";
+import MilestoneProgress from "../Xanadu/src/components/Dashboard/dashboard_components/MilestoneProgress.vue";
+import Graphs from "../Xanadu/src/components/Dashboard/dashboard_components/Graphs.vue";
 import firebaseApp from "@/firebase.js";
 import { getFirestore } from "firebase/firestore";
 import { doc, getDocs, collection } from "firebase/firestore";

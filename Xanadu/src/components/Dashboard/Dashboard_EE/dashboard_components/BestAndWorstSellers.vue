@@ -11,25 +11,29 @@
         field="productCategory"
         header="Categories"
         sortable
-        style="width: 25%"
+        style="width: 25%; text-align: center; font-size: 1.25rem"
+        headerClass="column-text-right"
       ></Column>
       <Column
         field="productName"
         header="Name"
         sortable
-        style="width: 25%"
+        style="width: 25%; text-align: center; font-size: 1.25rem"
+        headerClass="column-text-right"
       ></Column>
       <Column
         field="productPrice"
         header="Price"
         sortable
-        style="width: 25%"
+        style="width: 25%; text-align: center; font-size: 1.25rem"
+        headerClass="column-text-right"
       ></Column>
       <Column
         field="productQuantity"
         header="Quantity Sold"
         sortable
-        style="width: 25%"
+        style="width: 25%; text-align: center; font-size: 1.25rem"
+        headerClass="column-text-right"
       ></Column>
     </DataTable>
   </div>
@@ -65,3 +69,22 @@ export default {
   // },
 };
 </script>
+
+<style lang="scss">
+.column-text-right {
+  .p-column-header-content {
+    text-align: center; // or center
+    display: block !important;
+    // color: white;
+    // background: #404e3e;
+    // margin: 0px;
+  }
+  // .p-sortable-column {
+  //   text-align: center; // or center
+  //   display: block !important;
+  //   color: white;
+  //   background: #404e3e;
+  //   // margin: 0px;
+  // }
+}
+</style>

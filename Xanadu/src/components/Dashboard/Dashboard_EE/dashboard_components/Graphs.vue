@@ -1,19 +1,15 @@
 <template>
   <div>
     <div>
-      <h1>Dashboard</h1>
+      <h1 class="dashboardHeader">Dashboard</h1>
 
       <div class="pieChart">
-        <h4>Money Spent by Product Category</h4>
         <MarketplacePieChart :salesData="salesData" />
       </div>
-      <div class="cards">
-        <HighestEarningCategoryCard :category="highestEarningCategories[0]" />
-        <SecondHighestEarningCategoryCard
-          :category="highestEarningCategories[1]"
-        />
-        <ThirdHighestEarningCategoryCard
-          :category="highestEarningCategories[2]"
+      <h4 class="graphTitle">Top 3 Profitable Product Categories</h4>
+      <div class="eeDashboardTable">
+        <HighestEarningCategories
+          :highestEarningCategories="highestEarningCategories"
         />
       </div>
     </div>
@@ -21,17 +17,13 @@
 </template>
 
 <script>
-import HighestEarningCategoryCard from "./graphs_components/HighestEarningCategoryCard.vue";
+import HighestEarningCategories from "./HighestEarningCategories.vue";
 import MarketplacePieChart from "./graphs_components/MarketplacePieChart.vue";
-import ThirdHighestEarningCategoryCard from "./graphs_components/ThirdHighestEarningCategoryCard.vue";
-import SecondHighestEarningCategoryCard from "./graphs_components/SecondHighestEarningCategoryCard.vue";
 
 export default {
   components: {
     MarketplacePieChart,
-    HighestEarningCategoryCard,
-    SecondHighestEarningCategoryCard,
-    ThirdHighestEarningCategoryCard,
+    HighestEarningCategories,
   },
   props: {
     salesData: Object,
@@ -50,18 +42,43 @@ export default {
 
 <style scoped>
 .pieChart {
-  width: 50%;
+  width: 40%;
   height: 100%;
   flex-shrink: 0;
   float: left;
 }
 
-.cards {
-  margin-top: 4rem;
-  width: 40%;
+.eeDashboardTable {
+  width: 45%;
   height: 100%;
   flex-shrink: 0;
   float: right;
-  margin-right: 2%;
+  margin-left: 0rem;
+  margin-right: 1rem;
+  padding: 0rem 0rem 0rem 0rem;
+  margin-bottom: 3rem;
+  border: 0.15rem solid #738678;
+  border-radius: 0.1rem;
+}
+
+.dashboardHeader {
+  margin-top: 2.5rem;
+  font-size: 3rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.75rem; /* 39.063% */
+  letter-spacing: 0.1rem;
+  color: var(--neutral-gray-404040, #404040);
+}
+
+.graphTitle {
+  margin-top: 2.5rem;
+  margin-left: 63rem;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.5rem; /* 39.063% */
+  letter-spacing: 0.05rem;
+  color: var(--neutral-gray-404040, #404040);
 }
 </style>
