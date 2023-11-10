@@ -1,4 +1,6 @@
 <template>
+    <br>
+    <router-link to="/Forum" class="back-button"> &lt;Back to Forum</router-link>
     <div class="adding">
         <h2 class="reply-title">Add Thread</h2>
         <form @submit.prevent="addThread">
@@ -80,6 +82,23 @@ export default {
 
 
 <style scoped>
+
+.back-button {
+    display: block;
+    width: 120px;
+    /* Adjust the width for your desired square size */
+    height: 30px;
+    /* Same as width for a square button */
+    color: black;
+    text-align: left;
+    text-decoration: none;
+    margin-left: 20px;
+    line-height: 30px;
+}
+
+.back-button:hover {
+    background-color: #e0e0e0;
+}
 .adding {
     background-color: #738678; /* Xanadu color */
     padding: 30px;
