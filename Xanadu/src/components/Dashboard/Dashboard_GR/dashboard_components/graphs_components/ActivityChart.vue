@@ -1,11 +1,6 @@
 <template>
   <div class="card">
-    <Chart
-      type="bar"
-      :data="activityChartData"
-      :options="chartOptions"
-      class="columnChart"
-    />
+    <Chart type="bar" :data="activityChartData" :options="chartOptions" />
   </div>
 </template>
 
@@ -36,8 +31,7 @@ export default {
       const surfaceBorder = documentStyle.getPropertyValue("--surface-border");
 
       return {
-        maintainAspectRatio: false,
-        aspectRatio: 0.8,
+        aspectRatio: 1.35,
         plugins: {
           legend: {
             display: false,
@@ -79,9 +73,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.columnChart {
-  width: 100%;
-  height: 20rem;
-}
-</style>
+<style scoped></style>

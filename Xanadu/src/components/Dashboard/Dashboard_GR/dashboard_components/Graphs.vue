@@ -1,10 +1,9 @@
 <template>
   <div>
     <div>
-      <h1>Dashboard</h1>
+      <h1 class="ecoFriendlyActivityHeader">Dashboard</h1>
 
       <div class="pieChart">
-        <h4>Money Spent by Product Category</h4>
         <MarketplacePieChartVue :purchasesData="purchasesData" />
       </div>
       <div class="cards">
@@ -15,7 +14,7 @@
         <NoOfCommentsCard :noOfComments="noOfComments" />
       </div>
       <div class="activityChart">
-        <h4>Eco-Friendly Activities Points</h4>
+        <h4 class="graphTitle">Eco-Friendly Activities Points</h4>
         <ActivityChart :activityChartData="activityChartData" />
       </div>
     </div>
@@ -63,16 +62,15 @@ export default {
 
 <style scoped>
 .pieChart {
-  width: 23%;
+  width: 35%;
   height: 100%;
   flex-shrink: 0;
   float: left;
-  margin-right: 18.5%;
 }
 
 .cards {
-  margin-top: 4rem;
-  width: 20%;
+  margin-top: 2%;
+  width: 30%;
   height: 100%;
   flex-shrink: 0;
   float: left;
@@ -84,5 +82,24 @@ export default {
   height: 100%;
   flex-shrink: 0;
   float: left;
+}
+
+.ecoFriendlyActivityHeader {
+  margin-top: 2.5rem;
+  font-size: 3rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.75rem; /* 39.063% */
+  letter-spacing: 0.1rem;
+  color: var(--neutral-gray-404040, #404040);
+}
+
+.graphTitle {
+  color: var(--neutral-gray-404040, #404040);
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.5rem; /* 39.063% */
+  letter-spacing: 0.05rem;
 }
 </style>

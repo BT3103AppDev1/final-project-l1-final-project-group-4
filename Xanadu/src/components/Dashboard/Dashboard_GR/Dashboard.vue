@@ -11,15 +11,14 @@
         :key="refreshComp"
       />
     </div>
-
-    <MilestoneProgress />
-
+    <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1>
     <EcoFriendlyActivities
       :activityData="activityData"
       @added="refresh"
       @deletedActivity="refresh"
       @activityEdited="refresh"
       :key="refreshComp"
+      class="ecoFriendlyActivitiesTable"
     />
   </div>
 </template>
@@ -257,6 +256,29 @@ export default {
   width: 100%;
   height: 100%;
   flex-shrink: 0;
-  margin-bottom: 30rem;
+  margin-bottom: 31%;
+  padding: 0rem 2rem 0rem 2rem;
+}
+
+.ecoFriendlyActivitiesTable {
+  width: 97%;
+  height: 100%;
+  flex-shrink: 0;
+  margin-left: 2rem;
+  margin-right: 3rem;
+  padding: 0rem 0rem 0rem 0rem;
+  margin-bottom: 3rem;
+  border: 0.3rem solid #738678;
+  border-radius: 0.2rem;
+}
+
+.ecoFriendlyActivityHeader {
+  margin-left: 2rem;
+  color: var(--neutral-gray-404040, #404040);
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 0.75rem; /* 39.063% */
+  letter-spacing: 0.1rem;
 }
 </style>
