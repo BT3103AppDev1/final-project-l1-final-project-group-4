@@ -256,7 +256,7 @@ export default {
   width: 100%;
   height: 100%;
   flex-shrink: 0;
-  margin-bottom: 31%;
+  margin-bottom: 32%;
   padding: 0rem 2rem 0rem 2rem;
 }
 
@@ -268,8 +268,8 @@ export default {
   margin-right: 3rem;
   padding: 0rem 0rem 0rem 0rem;
   margin-bottom: 3rem;
-  border: 0.3rem solid #738678;
-  border-radius: 0.2rem;
+  border: 0.15rem solid #738678;
+  border-radius: 0.1rem;
 }
 
 .ecoFriendlyActivityHeader {
