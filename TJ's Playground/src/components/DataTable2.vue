@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast> </Toast>
     <div class="card">
       <Toolbar class="mb-4">
         <template #start>
@@ -17,6 +16,23 @@
             severity="danger"
             @click="confirmDeleteSelected"
             :disabled="!selectedProducts || !selectedProducts.length"
+          />
+        </template>
+
+        <template #end>
+          <FileUpload
+            mode="basic"
+            accept="image/*"
+            :maxFileSize="1000000"
+            label="Import"
+            chooseLabel="Import"
+            class="mr-2 inline-block"
+          />
+          <Button
+            label="Export"
+            icon="pi pi-upload"
+            severity="help"
+            @click="exportCSV($event)"
           />
         </template>
       </Toolbar>
@@ -65,6 +81,16 @@
           sortable
           style="min-width: 16rem"
         ></Column>
+        <Column header="Image">
+          <template #body="slotProps">
+            <img
+              :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
+              :alt="slotProps.data.image"
+              class="shadow-2 border-round"
+              style="width: 64px"
+            />
+          </template>
+        </Column>
         <Column field="price" header="Price" sortable style="min-width: 8rem">
           <template #body="slotProps">
             {{ formatCurrency(slotProps.data.price) }}
@@ -76,6 +102,33 @@
           sortable
           style="min-width: 10rem"
         ></Column>
+        <Column
+          field="rating"
+          header="Reviews"
+          sortable
+          style="min-width: 12rem"
+        >
+          <template #body="slotProps">
+            <Rating
+              :modelValue="slotProps.data.rating"
+              :readonly="true"
+              :cancel="false"
+            />
+          </template>
+        </Column>
+        <Column
+          field="inventoryStatus"
+          header="Status"
+          sortable
+          style="min-width: 12rem"
+        >
+          <template #body="slotProps">
+            <Tag
+              :value="slotProps.data.inventoryStatus"
+              :severity="getStatusLabel(slotProps.data.inventoryStatus)"
+            />
+          </template>
+        </Column>
         <Column :exportable="false" style="min-width: 8rem">
           <template #body="slotProps">
             <Button
@@ -104,6 +157,12 @@
       :modal="true"
       class="p-fluid"
     >
+      <img
+        v-if="product.image"
+        :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`"
+        :alt="product.image"
+        class="block m-auto pb-3"
+      />
       <div class="field">
         <label for="name">Name</label>
         <InputText
@@ -126,6 +185,36 @@
           rows="3"
           cols="20"
         />
+      </div>
+
+      <div class="field">
+        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
+        <Dropdown
+          id="inventoryStatus"
+          v-model="product.inventoryStatus"
+          :options="statuses"
+          required="true"
+          optionLabel="label"
+          placeholder="Select a Status"
+        >
+          <template #value="slotProps">
+            <div v-if="slotProps.value && slotProps.value.value">
+              <Tag
+                :value="slotProps.value.value"
+                :severity="getStatusLabel(slotProps.value.label)"
+              />
+            </div>
+            <div v-else-if="slotProps.value && !slotProps.value.value">
+              <Tag
+                :value="slotProps.value"
+                :severity="getStatusLabel(slotProps.value)"
+              />
+            </div>
+            <span v-else>
+              {{ slotProps.placeholder }}
+            </span>
+          </template>
+        </Dropdown>
       </div>
 
       <div class="field">
@@ -248,52 +337,48 @@
 
 <script>
 import { FilterMatchMode } from "primevue/api";
-// import { ProductService } from "@/service/ProductService";
 
 export default {
-  props: {
-    products: Array,
-  },
   data() {
     return {
-      //   products: [
-      //     {
-      //       id: "1000",
-      //       code: "f230fh0g3",
-      //       name: "Bamboo Watch",
-      //       description: "Product Description",
-      //       image: "bamboo-watch.jpg",
-      //       price: 65,
-      //       category: "Accessories",
-      //       quantity: 24,
-      //       inventoryStatus: "INSTOCK",
-      //       rating: 5,
-      //     },
-      //     {
-      //       id: "2000",
-      //       code: "f230fh0g3",
-      //       name: "Bamboo Watch",
-      //       description: "Product Description",
-      //       image: "bamboo-watch.jpg",
-      //       price: 65,
-      //       category: "Accessories",
-      //       quantity: 24,
-      //       inventoryStatus: "INSTOCK",
-      //       rating: 5,
-      //     },
-      //     {
-      //       id: "3000",
-      //       code: "f230fh0g3",
-      //       name: "Bamboo Watch",
-      //       description: "Product Description",
-      //       image: "bamboo-watch.jpg",
-      //       price: 65,
-      //       category: "Accessories",
-      //       quantity: 24,
-      //       inventoryStatus: "INSTOCK",
-      //       rating: 5,
-      //     },
-      //   ],
+      products: [
+        {
+          id: "1000",
+          code: "f230fh0g3",
+          name: "Bamboo Watch",
+          description: "Product Description",
+          image: "bamboo-watch.jpg",
+          price: 65,
+          category: "Accessories",
+          quantity: 24,
+          inventoryStatus: "INSTOCK",
+          rating: 5,
+        },
+        {
+          id: "1001",
+          code: "f230fh0g3",
+          name: "Bamboo Watch",
+          description: "Product Description",
+          image: "bamboo-watch.jpg",
+          price: 65,
+          category: "Accessories",
+          quantity: 24,
+          inventoryStatus: "INSTOCK",
+          rating: 5,
+        },
+        {
+          id: "1001",
+          code: "f230fh0g3",
+          name: "Bamboo Watch",
+          description: "Product Description",
+          image: "bamboo-watch.jpg",
+          price: 65,
+          category: "Accessories",
+          quantity: 24,
+          inventoryStatus: "INSTOCK",
+          rating: 5,
+        },
+      ],
       productDialog: false,
       deleteProductDialog: false,
       deleteProductsDialog: false,
@@ -301,18 +386,15 @@ export default {
       selectedProducts: null,
       filters: {},
       submitted: false,
-      //   statuses: [
-      //     { label: "INSTOCK", value: "instock" },
-      //     { label: "LOWSTOCK", value: "lowstock" },
-      //     { label: "OUTOFSTOCK", value: "outofstock" },
-      //   ],
+      statuses: [
+        { label: "INSTOCK", value: "instock" },
+        { label: "LOWSTOCK", value: "lowstock" },
+        { label: "OUTOFSTOCK", value: "outofstock" },
+      ],
     };
   },
   created() {
     this.initFilters();
-  },
-  mounted() {
-    // ProductService.getProducts().then((data) => (this.products = data));
   },
   methods: {
     formatCurrency(value) {
@@ -376,9 +458,9 @@ export default {
       this.deleteProductDialog = true;
     },
     deleteProduct() {
-      // this.products = this.products.filter((val) => val.id !== this.product.id);
+      this.products = this.products.filter((val) => val.id !== this.product.id);
       this.deleteProductDialog = false;
-      // this.product = {};
+      this.product = {};
       this.$toast.add({
         severity: "success",
         summary: "Successful",

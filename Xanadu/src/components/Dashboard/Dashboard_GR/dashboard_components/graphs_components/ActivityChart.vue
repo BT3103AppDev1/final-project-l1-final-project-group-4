@@ -22,7 +22,6 @@ export default {
       this.chartOptions = this.setChartOptions();
     },
   },
-
   methods: {
     setChartOptions() {
       const documentStyle = getComputedStyle(document.documentElement);
