@@ -8,7 +8,7 @@
       />
     </div>
     <h1 class="tableHeader">Past Order Details</h1>
-    <div class="eeDashboardTable">
+    <div>
       <BestAndWorstSellers :bestAndWorstSellersInfo="bestAndWorstSellersInfo" />
     </div>
   </div>
@@ -84,8 +84,8 @@ export default {
         datasets: [
           {
             data: this.productCategorySpending,
-            backgroundColor: ["#738678", "#E4D5A3", "#5F192C", "#C86368"],
-            hoverBackgroundColor: ["#838678", "#E4D5C3", "#6F192C", "#E86368"],
+            backgroundColor: ["#738678", "#E4D5A3", "#E6E6E6", "#C86368"],
+            hoverBackgroundColor: ["#838678", "#E4D5C3", "#E0E0D0", "#E86368"],
           },
         ],
       };
@@ -192,22 +192,11 @@ export default {
 
 <style scoped>
 .dashboardElements {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 67vh;
   flex-shrink: 0;
-  margin-bottom: 32%;
-  padding: 0rem 2rem 0rem 2rem;
-}
-
-.eeDashboardTable {
-  width: 94.5%;
-  height: 100%;
-  flex-shrink: 0;
-  margin-left: 2.5rem;
-  padding: 0rem 0rem 0rem 0rem;
-  margin-bottom: 3rem;
-  border: 0.15rem solid #738678;
-  border-radius: 0.1rem;
+  margin-bottom: 5vh;
+  padding: 0vh 2vw 0vh 2vw;
 }
 
 .tableHeader {

@@ -18,9 +18,8 @@ export default {
   display: flex;
   width: 100%;
   height: 100%;
-  /* padding: 0px 23px 15px 23px; */
-  padding: 0rem 0rem 0.5rem 0rem;
-  margin: 0rem 0rem 2rem 0rem;
+  padding: 1vh 0rem 1vh 0rem;
+  margin: 0rem 0rem 3.5vh 0rem;
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
@@ -29,19 +28,17 @@ export default {
 .cardTitle {
   color: var(--White, #fff);
   text-align: center;
-  /* buttonLG */
-  /* font-family: Montserrat; */
-  font-size: 1.25rem;
+  font-size: 1.5vw;
   font-style: normal;
   font-weight: 400;
-  line-height: 180%; /* 28.8px */
+
   text-transform: capitalize;
 }
 
 .cardContent {
   display: flex;
-  width: 25rem;
-  height: 4rem;
+  width: 100%;
+  height: 8vh;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
@@ -51,10 +48,10 @@ export default {
 
   text-edge: cap;
   /* font-family: Montserrat; */
-  font-size: 2.5rem;
+  font-size: 3vw;
   font-style: normal;
   font-weight: 700;
   line-height: 40%; /* 39.063% */
-  letter-spacing: 0.2rem;
+  letter-spacing: 0.1vw;
 }
 </style>

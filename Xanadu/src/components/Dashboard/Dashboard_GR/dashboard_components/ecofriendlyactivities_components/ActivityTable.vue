@@ -15,6 +15,7 @@
         :rowsPerPageOptions="[5, 10, 25]"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
         removableSort
+        class="ecoFriendlyActivitiesTable"
       >
         <Toolbar class="mb-4">
           <template #start>
@@ -386,8 +387,15 @@
           icon="pi pi-times"
           text
           @click="hideEditDialog"
+          style="background-color: #5a6d57; color: white"
         />
-        <Button label="Save" icon="pi pi-check" text @click="updateActivity" />
+        <Button
+          label="Save"
+          icon="pi pi-check"
+          text
+          @click="updateActivity"
+          style="background-color: #5a6d57; color: white"
+        />
       </template>
     </Dialog>
 
@@ -399,11 +407,11 @@
     >
       <div class="confirmation-content">
         <i
-          class="pi pi-exclamation-triangle mr-3"
+          class="pi pi-exclamation-triangle"
           style="font-size: 2rem; margin: 10px"
         />
         <span v-if="activity"
-          >Are you sure you want to delete <b>{{ activity.name }}</b
+          >Delete <b>{{ activity.name }}</b
           >?</span
         >
       </div>
@@ -425,10 +433,11 @@
       :modal="true"
     >
       <div class="confirmation-content">
-        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-        <span v-if="activity"
-          >Are you sure you want to delete the selected activities?</span
-        >
+        <i
+          class="pi pi-exclamation-triangle"
+          style="font-size: 2rem; margin: 10px"
+        />
+        <span v-if="activity">Delete the selected activities?</span>
       </div>
       <template #footer>
         <Button
@@ -516,6 +525,14 @@ export default {
         this.activityType = "";
       }
     },
+    editActivityDialog(value) {
+      if (value == false) {
+        this.activityTypeWaterConservation = false;
+        this.activityTypeEnergyConservation = false;
+        this.activityTypeWasteReduction = false;
+        this.activityType = "";
+      }
+    },
   },
   created() {
     this.initFilters();
@@ -553,55 +570,70 @@ export default {
       this.submitted = false;
     },
     async addActivity() {
-      this.$toast.add({
-        severity: "info",
-        summary: "Adding Activity...",
-        // detail: "Activity Deleted",
-        life: 3000,
-      });
-      console.log(this.activity);
-      var date = this.activity.date;
-      const dateObject = new Date(date);
-      const year = dateObject.getFullYear();
-      const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-      const day = String(dateObject.getDate()).padStart(2, "0");
-      date = `${day}/${month}/${year}`;
-      let sustainabilityPoints = (this.activity.amount / 10).toFixed(3);
-      try {
-        console.log(this.userId);
-        const docRef = await addDoc(
-          collection(
-            db,
-            "Green Rangers/" + this.userId + "/Eco-Friendly Activities"
-          ),
-          {
-            name: this.activity.name,
-            activityType: this.activity.activityType,
-            activityDescription: this.activity.activityDescription,
-            amount: this.activity.amount,
-            sustainabilityPoints: sustainabilityPoints,
-            date: date,
-          }
-        );
-        console.log(
-          "Eco-friendly activity Document added with ID: ",
-          docRef.id
-        );
-      } catch (error) {
-        console.error("Error adding document: ", error);
-      }
-      this.$emit("added");
-      this.$toast.add({
-        severity: "success",
-        summary: "Activity Added!",
-        // detail: "Activity Deleted",
-        life: 3000,
-      });
-      console.log("Input box resetted, 'added' was emitted");
+      if (
+        this.activity.name == null ||
+        this.activity.activityType == null ||
+        this.activity.activityDescription == null ||
+        this.activity.amount == null ||
+        this.activity.date == null
+      ) {
+        this.$toast.add({
+          severity: "info",
+          summary: "Please fill in all fields!",
+          life: 3000,
+        });
+      } else {
+        this.$toast.add({
+          severity: "info",
+          summary: "Adding Activity...",
+          // detail: "Activity Deleted",
+          life: 3000,
+        });
+        console.log(this.activity);
+        var date = this.activity.date;
+        const dateObject = new Date(date);
+        const year = dateObject.getFullYear();
+        const month = String(dateObject.getMonth() + 1).padStart(2, "0");
+        const day = String(dateObject.getDate()).padStart(2, "0");
+        date = `${day}/${month}/${year}`;
+        let sustainabilityPoints = (this.activity.amount / 10).toFixed(3);
 
-      this.submitted = true; // dont touch
-      this.activityDialog = false; // dont touch
-      this.activity = {};
+        try {
+          console.log(this.userId);
+          const docRef = await addDoc(
+            collection(
+              db,
+              "Green Rangers/" + this.userId + "/Eco-Friendly Activities"
+            ),
+            {
+              name: this.activity.name,
+              activityType: this.activity.activityType,
+              activityDescription: this.activity.activityDescription,
+              amount: this.activity.amount,
+              sustainabilityPoints: sustainabilityPoints,
+              date: date,
+            }
+          );
+          console.log(
+            "Eco-friendly activity Document added with ID: ",
+            docRef.id
+          );
+        } catch (error) {
+          console.error("Error adding document: ", error);
+        }
+        this.$emit("added");
+        this.$toast.add({
+          severity: "success",
+          summary: "Activity Added!",
+          // detail: "Activity Deleted",
+          life: 3000,
+        });
+        console.log("Input box resetted, 'added' was emitted");
+
+        this.submitted = true; // dont touch
+        this.activityDialog = false; // dont touch
+        this.activity = {};
+      }
     },
     editActivity(activity) {
       this.activityType = activity.activityType;
@@ -612,47 +644,63 @@ export default {
     },
     async updateActivity() {
       //   console.log(this.activity);
-      this.$toast.add({
-        severity: "info",
-        summary: "Updating Activity...",
-        // detail: "Activity Deleted",
-        life: 3000,
-      });
-      var data = this.activity;
-      const activityDoc = await doc(
-        db,
-        "Green Rangers/" + this.userId + "/Eco-Friendly Activities/" + data.id
-      );
-      var date = data.date;
-      if (typeof data.date === "string") {
+      if (
+        this.activity.name == "" ||
+        this.activity.activityType == null ||
+        this.activity.activityDescription == "" ||
+        this.activity.amount == null ||
+        this.activity.date == null
+      ) {
+        // console.log(this.activity.name == null);
+        // console.log(this.activity.amount == null);
+        this.$toast.add({
+          severity: "info",
+          summary: "Please fill in all fields!",
+          life: 3000,
+        });
       } else {
-        const dateObject = new Date(date);
-        const year = dateObject.getFullYear();
-        const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-        const day = String(dateObject.getDate()).padStart(2, "0");
-        date = `${day}/${month}/${year}`;
-      }
-      var points = (data.amount / 10).toFixed(3);
-      await updateDoc(activityDoc, {
-        name: data.name,
-        activityDescription: data.activityDescription,
-        activityType: data.activityType,
-        amount: data.amount,
-        sustainabilityPoints: points,
-        date: date,
-      });
-      this.$emit("activityEdited");
-      this.$toast.add({
-        severity: "success",
-        summary: "Activity Updated!",
-        // detail: "Activity Deleted",
-        life: 3000,
-      });
-      console.log("activityEdited");
+        this.$toast.add({
+          severity: "info",
+          summary: "Updating Activity...",
+          // detail: "Activity Deleted",
+          life: 3000,
+        });
+        var data = this.activity;
+        const activityDoc = await doc(
+          db,
+          "Green Rangers/" + this.userId + "/Eco-Friendly Activities/" + data.id
+        );
+        var date = data.date;
+        if (typeof data.date === "string") {
+        } else {
+          const dateObject = new Date(date);
+          const year = dateObject.getFullYear();
+          const month = String(dateObject.getMonth() + 1).padStart(2, "0");
+          const day = String(dateObject.getDate()).padStart(2, "0");
+          date = `${day}/${month}/${year}`;
+        }
+        var points = (data.amount / 10).toFixed(3);
+        await updateDoc(activityDoc, {
+          name: data.name,
+          activityDescription: data.activityDescription,
+          activityType: data.activityType,
+          amount: data.amount,
+          sustainabilityPoints: points,
+          date: date,
+        });
+        this.$emit("activityEdited");
+        this.$toast.add({
+          severity: "success",
+          summary: "Activity Updated!",
+          // detail: "Activity Deleted",
+          life: 3000,
+        });
+        console.log("activityEdited");
 
-      this.submitted = true; // dont touch
-      this.editActivityDialog = false; // dont touch
-      this.activity = {};
+        this.submitted = true; // dont touch
+        this.editActivityDialog = false; // dont touch
+        this.activity = {};
+      }
     },
 
     confirmDeleteActivity(activity) {
@@ -735,6 +783,15 @@ export default {
   font-weight: 700;
   line-height: 0.75rem; /* 39.063% */
   letter-spacing: 0.1rem;
+}
+
+.ecoFriendlyActivitiesTable {
+  width: 95vw;
+  flex-shrink: 0;
+  margin-left: 2vw;
+  margin-bottom: 5vh;
+  border: 0.15vw solid #738678;
+  border-radius: 0.1vw;
 }
 </style>
 

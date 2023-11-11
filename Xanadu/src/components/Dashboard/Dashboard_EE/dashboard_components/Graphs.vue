@@ -6,8 +6,8 @@
       <div class="pieChart">
         <MarketplacePieChart :salesData="salesData" />
       </div>
-      <h4 class="graphTitle">Top 3 Profitable Product Categories</h4>
-      <div class="eeDashboardTable">
+
+      <div>
         <HighestEarningCategories
           :highestEarningCategories="highestEarningCategories"
         />
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import HighestEarningCategories from "./HighestEarningCategories.vue";
+import HighestEarningCategories from "./graphs_components/HighestEarningCategories.vue";
 import MarketplacePieChart from "./graphs_components/MarketplacePieChart.vue";
 
 export default {
@@ -62,23 +62,12 @@ export default {
 }
 
 .dashboardHeader {
-  margin-top: 2.5rem;
-  font-size: 3rem;
+  margin-top: 2.5vw;
+  font-size: 3vw;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.75rem; /* 39.063% */
-  letter-spacing: 0.1rem;
-  color: var(--neutral-gray-404040, #404040);
-}
-
-.graphTitle {
-  margin-top: 2.5rem;
-  margin-left: 63rem;
-  font-size: 1.25rem;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 0.5rem; /* 39.063% */
-  letter-spacing: 0.05rem;
+  line-height: 0.75vw; /* 39.063% */
+  letter-spacing: 0.1vw;
   color: var(--neutral-gray-404040, #404040);
 }
 </style>
