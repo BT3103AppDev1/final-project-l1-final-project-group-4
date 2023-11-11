@@ -107,7 +107,7 @@ export default {
         });
       }
 
-      const cartRef = collection(db, 'Users', auth.currentUser.uid, 'Cart');
+      const cartRef = collection(db, 'Green Rangers', auth.currentUser.uid, 'Cart');
       const cartSnapshot = await getDocs(cartRef);
       cartSnapshot.forEach((cartDoc) => {
         batch.delete(cartDoc.ref);

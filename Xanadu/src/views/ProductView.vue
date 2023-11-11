@@ -203,52 +203,50 @@ export default {
     },
 
     async addToCart(product, quantityToAdd) {
-      const currentUser = auth.currentUser;
-      const userType = await this.determineUserType(auth.currentUser);
-      const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
-      console.log("Adding to cart:", product.title, "Quantity:", quantityToAdd); // Debugging line
+  const currentUser = auth.currentUser;
 
-      if (!currentUser) {
-        console.error("No current user found.");
-        alert("You must be logged in to add items to the cart.");
-        return;
-      }
+  if (!currentUser) {
+    console.error("No current user found.");
+    alert("You must be logged in to add items to the cart.");
+    return;
+  }
 
-      if (!product.seller) {
-        console.error("Seller information is missing from the product details.");
-        return;
-      }
-  
-      try {
-        const cartSnapshot = await getDocs(cartRef);
-        const productInCart = cartSnapshot.docs.find(doc => doc.data().title === product.title);
+  if (!product.seller) {
+    console.error("Seller information is missing from the product details.");
+    return;
+  }
 
-        if (productInCart) {
-          const updatedQuantity = productInCart.data().quantity + quantityToAdd;
-          console.log("Product already in cart. Updating quantity:", updatedQuantity); // Debugging line
-          await updateDoc(doc(cartRef, productInCart.id), { quantity: updatedQuantity });
-          alert("Updated quantity in cart!");
-        } else {
-          const productToAdd = {
-            title: product.title,
-            picture: product.picture,
-            description: product.description || "No description",
-            quantity: quantityToAdd,
-            cost: product.cost,
-            seller: product.seller, // Make sure this is correctly sourced
-            categories: product.categories,
-            uid: product.uid,
-          };
+  try {
+    const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
+    const cartSnapshot = await getDocs(cartRef);
+    const productInCart = cartSnapshot.docs.find(doc => doc.data().title === product.title);
 
-          console.log("Product not in cart. Adding new item:", productToAdd); // Debugging line
-          await addDoc(cartRef, productToAdd);
-          alert("Added to cart!");
-        }
-      } catch (error) {
-        console.error("Error adding to cart:", error);
-        alert("Failed to add to cart!");
-      }
-    },
+    if (productInCart) {
+      const updatedQuantity = productInCart.data().quantity + quantityToAdd;
+      await updateDoc(doc(cartRef, productInCart.id), { quantity: updatedQuantity });
+      alert("Updated quantity in cart!");
+    } else {
+      const productToAdd = {
+        title: product.title,
+        picture: product.picture,
+        description: product.description || "No description",
+        quantity: quantityToAdd,
+        cost: product.cost,
+        seller: product.seller,
+        categories: product.categories,
+        uid: product.uid,
+      };
+      await addDoc(cartRef, productToAdd);
+      alert("Added to cart!");
+    }
+    // Redirect to the marketplace after the product is added to the cart
+    this.$router.push('/marketplace');
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    alert("Failed to add to cart!");
+  }
+},
+
 
 
     EditProduct(product) {
