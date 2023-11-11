@@ -104,6 +104,7 @@ export default {
           paymentConfirmationURL: downloadURL,
           orderPlacedAt: timestamp,
           productCategory: item.categories,
+          shippingAddress: this.shippingAddress,
         });
       }
 
