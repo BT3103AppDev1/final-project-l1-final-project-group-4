@@ -12,8 +12,13 @@
           </div>
         </div>
       </div>
-      <div class="cart-item-actions">
-        <button @click="removeFromCart(item.id)" class="cart-remove-button">Remove</button>
+      <div class="cart-item-right">
+        <div class="cart-item-cost">
+          <span>${{ (item.cost * item.quantity).toFixed(2) }}</span>
+        </div>
+        <div class="cart-item-actions">
+          <button @click="removeFromCart(item.id)" class="cart-remove-button">Remove</button>
+        </div>
       </div>
     </div>
     
@@ -131,115 +136,137 @@ export default {
 .cart-address label {
   font-size: 18px;
   margin-bottom: 10px;
-  color: #748C70; /* Adjust the color to match your theme */
+  color: #5e8c61; /* A softer green for better readability */
 }
 
 .cart-address input {
   width: 100%;
   padding: 15px;
-  border: 2px solid #e2e2e2; /* Lighter border color for a subtle look */
+  border: 2px solid #e2e2e2;
   border-radius: 8px;
   font-size: 16px;
-  margin-bottom: 20px; /* Add some space below the input field */
-}
-
-/* Style for the confirm address button if you choose to add one */
-.confirm-address-button {
-  padding: 10px 20px;
-  background-color: #748C70;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 16px;
-}
-
-.confirm-address-button:hover {
-  background-color: #657B61;
+  margin-bottom: 20px;
 }
 
 .cart {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 40px; /* Increased padding for a more spacious layout */
+  background-color: #f9f9f9; /* A light background to soothe the eyes */
+  border-radius: 8px; /* Rounded corners for the cart container */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
 }
+
 h1 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 28px; /* Larger heading for emphasis */
+  color: #333; /* Darker color for better contrast */
+  margin-bottom: 30px; /* More space around the heading */
 }
+
 .cart-item {
   display: flex;
+  justify-content: space-between; /* Align children on both ends */
   align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
   margin-bottom: 20px;
 }
+
+.cart-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Align price and button to the right */
+}
+
+.cart-item-cost {
+  margin-bottom: 10px; /* Space between cost and remove button */
+  font-size: 18px;
+  font-weight: 500;
+}
+
 .cart-item-details {
   display: flex;
   align-items: center;
 }
+
 .cart-item-image {
-  width: 80px;
-  height: 80px;
+  width: 100px; /* Larger image for better visibility */
+  height: 100px;
   object-fit: cover;
-  margin-right: 10px;
-  border-radius: 5px;
+  margin-right: 20px; /* More space between image and details */
+  border-radius: 8px;
 }
+
 .cart-item-info {
   display: flex;
   flex-direction: column;
 }
+
 .cart-item-title {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 500;
+  width: 300px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
 }
+
 .cart-item-quantity {
   display: flex;
   align-items: center;
-  margin-top: 5px;
+  margin-top: 10px; /* More space between title and quantity */
 }
+
 .cart-item-quantity span {
-  margin-right: 5px;
+  margin-right: 10px; /* More space around quantity label */
 }
+
 .cart-item-quantity input {
-  width: 40px;
-  padding: 5px;
+  width: 60px; /* Larger input for easier interaction */
+  padding: 10px; /* More padding inside input */
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: 5px;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
 }
-.cart-item-actions {
-  margin-left: auto;
-}
+
 .cart-remove-button {
-  background-color: #ff4d4d;
+  background-color: #f44336; /* A more standard red for delete buttons */
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 10px 15px; /* Larger button for easier interaction */
   font-size: 16px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 .cart-remove-button:hover {
-  background-color: #ff3333;
+  background-color: #d32f2f; /* Darker shade on hover for feedback */
 }
+
 .checkout-button {
-  background-color: #748C70;
+  background-color: #5e8c61; /* Soft green color for the checkout button */
   color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 15px 30px; /* Larger button for prominence */
+  font-size: 18px; /* Larger font size for readability */
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-top: 20px;
+  margin-top: 30px; /* More space above the checkout button */
 }
+
 .checkout-button:hover {
-  background-color: #657B61;
+  background-color: #4b704d; /* A darker shade for interactive feedback */
 }
+
 .cart-total {
-  margin-top: 20px;
-  font-size: 20px;
+  font-size: 22px; /* Larger font size for total cost */
+  font-weight: 600; /* Bolder font for emphasis */
+  margin-top: 30px; /* More space above the total */
+  self-align: flex-end; /* Align total to the right */
 }
 </style>
