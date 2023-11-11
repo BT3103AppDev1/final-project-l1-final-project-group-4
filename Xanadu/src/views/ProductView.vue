@@ -32,7 +32,7 @@
           </div>
           <div class="detail-section">
             <h3>Price:</h3>
-            <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
+            <p class="product-cost">{{ product.cost ? `$${product.cost.toFixed(2)}` : 'Price not available' }}</p>
           </div>
           <div class="detail-section">
             <h3>Seller:</h3>
