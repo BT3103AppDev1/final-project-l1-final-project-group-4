@@ -1,4 +1,5 @@
 <template>
+<div v-if="isSeller">
     <div class="upperhalf">
         <div class="AddImages" :style ="{'background-image' : 'url('+
         imgdisplay+')'}">
@@ -40,10 +41,65 @@
             </div>
         </div>
     </div>
-    </template>
+</div>
+<div v-else class="Not-found">
+    <h3 id="Title">Page Not Found !! </h3>
+    <button class= "return-button" @click="$router.push('/marketplace')">Return to Marketplace</button>
+</div>
+
+</template>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import router from "../router/index.js";
+
+const db1 = getFirestore();
+const auth1 = getAuth();
+
+const isLoading = ref(true); // New ref to handle the loading state
+const isLoggedIn = ref(false);
+const isBuyer = ref(false);
+const isSeller = ref(false);
+
+// Define the names of your public pages
+const publicPages = ['login', 'register', 'landing'];
+
+const checkUserStatus = async () => {
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth1, async (user) => {
+      isLoading.value = true; // Start loading
+      if (user) {
+        // User is signed in
+        isLoggedIn.value = true;
+        const userDocRef = doc(db1, 'Users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userInfo = userDocSnap.data();
+          isSeller.value = userInfo.userType === 'Eco-Entrepreneur';
+          isBuyer.value = userInfo.userType === 'Green Ranger';
+        }
+      } else {
+        // No user is signed in
+        isLoggedIn.value = false;
+        isSeller.value = false;
+        isBuyer.value = false;
+      }
+      isLoading.value = false; // Stop loading
+      resolve();
+    });
+  });
+};
+
+onMounted(async () => {
+  await checkUserStatus();
+});
+</script>
 
 <script>
-import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
+import {uploadBytes, getDownloadURL, uploadBytesResumable, getStorage } from "firebase/storage";
   import { getFirestore, doc, getDoc, collection, addDoc, updateDoc } from "firebase/firestore";
   import { getAuth, onAuthStateChanged } from "firebase/auth";
   import firebaseApp from "@/firebase.js";
@@ -618,5 +674,22 @@ input[name="Cost"] {
     width: 650px;
     display: block;
 
+}
+
+.Not-found{
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+}
+
+.return-button{
+    background-color: #748C70;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 </style>
