@@ -6,6 +6,7 @@
       :sortOrder="-1"
       removableSort
       tableStyle="min-width: 50rem"
+      class="eeDashboardTable"
     >
       <Column
         field="productCategory"
@@ -86,5 +87,16 @@ export default {
   //   background: #404e3e;
   //   // margin: 0px;
   // }
+}
+</style>
+
+<style scoped>
+.eeDashboardTable {
+  width: 95vw;
+  flex-shrink: 0;
+  margin-left: 2vw;
+  margin-bottom: 5vh;
+  border: 0.15vw solid #738678;
+  border-radius: 0.1vw;
 }
 </style>

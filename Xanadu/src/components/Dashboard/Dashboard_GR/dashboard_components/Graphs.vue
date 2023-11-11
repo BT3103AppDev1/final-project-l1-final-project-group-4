@@ -45,15 +45,9 @@ export default {
   },
   watch: {
     activityChartData(data) {
-      // console.log(
-      //   "activityChartData has been passed from Dashboard.vue to Graphs.vue. This is activityChartData:"
-      // );
       // console.log(data);
     },
     purchasesData(data) {
-      // console.log(
-      //   "purchasesData has been passed from Dashboard.vue to Graphs.vue. This is purchasesData:"
-      // );
       // console.log(data);
     },
   },
@@ -63,7 +57,7 @@ export default {
 <style scoped>
 .pieChart {
   width: 35%;
-  height: 100%;
+  height: 13.5vh;
   flex-shrink: 0;
   float: left;
 }
@@ -85,21 +79,21 @@ export default {
 }
 
 .ecoFriendlyActivityHeader {
-  margin-top: 2.5rem;
-  font-size: 3rem;
+  margin-top: 2.5vw;
+  font-size: 3vw;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.75rem; /* 39.063% */
-  letter-spacing: 0.1rem;
+  line-height: 0.75vw; /* 39.063% */
+  letter-spacing: 0.1vw;
   color: var(--neutral-gray-404040, #404040);
 }
 
 .graphTitle {
-  color: var(--neutral-gray-404040, #404040);
-  font-size: 1.25rem;
+  font-size: 1.3vw;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.5rem; /* 39.063% */
-  letter-spacing: 0.05rem;
+  line-height: 0.5vh; /* 39.063% */
+  letter-spacing: 0.05vw;
+  color: var(--neutral-gray-404040, #404040);
 }
 </style>
