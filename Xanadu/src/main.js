@@ -48,6 +48,8 @@ app.use(PrimeVue);
 app.use(ToastService);
 app.use(DialogService);
 
+app.component("Image", Image);
+app.component("Divider", Divider);
 app.component("Card", Card);
 app.component("Chart", Chart);
 app.component("Image", Image);
