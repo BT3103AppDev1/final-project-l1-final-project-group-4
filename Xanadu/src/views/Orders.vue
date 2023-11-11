@@ -1,8 +1,10 @@
 <template>
   <div>
+    <Toast></Toast>
     <div v-if="seller">
-      <SellerOrders />
-      <SellerOrdersTJ />
+      <!-- <SellerOrders /> -->
+      <SellerPendingOrders @fulfilled="fulfilled" :key="refreshComp" />
+      <SellerFulfilledOrders :key="refreshComp" />
     </div>
     <div v-else>
       <BuyerOrders />
@@ -12,7 +14,8 @@
 
 <script>
 import SellerOrders from "../components/Marketplace/marketplace_components/SellerOrders.vue";
-import SellerOrdersTJ from "../components/Marketplace/marketplace_components/SellerOrdersTJ.vue";
+import SellerPendingOrders from "../components/Marketplace/marketplace_components/SellerPendingOrders.vue";
+import SellerFulfilledOrders from "../components/Marketplace/marketplace_components/SellerFulfilledOrders.vue";
 import BuyerOrders from "../components/Marketplace/marketplace_components/BuyerOrders.vue";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebaseApp from "@/firebase.js";
@@ -24,10 +27,17 @@ export default {
   components: {
     SellerOrders,
     BuyerOrders,
-    SellerOrdersTJ,
+    SellerPendingOrders,
+    SellerFulfilledOrders,
   },
   data() {
-    return { user: "", userType: "", userDocRef: "", seller: false };
+    return {
+      user: "",
+      userType: "",
+      userDocRef: "",
+      seller: false,
+      refreshComp: 0,
+    };
   },
   async mounted() {
     const auth = getAuth(firebaseApp);
@@ -42,6 +52,12 @@ export default {
         }
       }
     });
+  },
+  methods: {
+    async fulfilled() {
+      console.log("fulfilled");
+      this.refreshComp += 1;
+    },
   },
 };
 </script>

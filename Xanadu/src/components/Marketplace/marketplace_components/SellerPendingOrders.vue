@@ -33,9 +33,15 @@ export default {
       // I need to add all these orders to the fulfilled orders collection
       // console.log(this.selectedOrders);
       // console.log(this.user.uid);
+      this.$toast.add({
+        severity: "info",
+        summary: "Shipping Orders...",
+        // detail: "Activity Deleted",
+        life: 3000,
+      });
       for (var order of this.selectedOrders) {
         console.log(order);
-        order.address = "";
+
         order.status = "Fulfilled";
         // console.log(order);
 
@@ -47,36 +53,31 @@ export default {
             ),
             order
           );
-          console.log(
-            "Order added with ID: ",
-            docRef.id + " to Fulfilled Orders"
+          await deleteDoc(
+            doc(
+              db,
+              "Eco-Entrepreneur/" + this.user.uid + "/Orders/" + order.order
+            )
           );
         } catch (error) {
           console.error("Error adding Order to Fulfilled Orders: ", error);
         }
       }
+      this.$toast.add({
+        severity: "success",
+        summary: "Orders Shipped!",
+        // detail: "Activity Deleted",
+        life: 3000,
+      });
 
       // then I need to delete all these orders from the Orders collection
 
       this.confirmShipAndFulfilDialog = false;
       this.selectedOrders = null;
+      this.$emit("fulfilled");
     },
   },
-  watch: {
-    selectedProduct(newlyfulfilledproducts, oldfulfilledproducts) {
-      oldfulfilledproducts.filter((product) => {
-        !newlyfulfilledproducts.some((product2) => {
-          product.id == product2.id;
-        });
-      });
-      for (let product of oldfulfilledproducts) {
-        product.status = "pending";
-      }
-      for (let product of newlyfulfilledproducts) {
-        product.status = "fulfilled";
-      }
-    },
-  },
+
   async mounted() {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
@@ -123,6 +124,7 @@ export default {
 
 <template>
   <div>
+    <Toast> </Toast>
     <div>
       <Divider align="center" :class="$style.ordersHeader"
         >PENDING ORDERS:</Divider
@@ -159,6 +161,12 @@ export default {
             </template>
           </Toolbar>
           <Column
+            selectionMode="multiple"
+            style="width: 5vw; text-align: center"
+            :exportable="false"
+            headerClass="column-text-right"
+          ></Column>
+          <Column
             field="product"
             header="Product"
             headerClass="column-text-right"
@@ -184,12 +192,14 @@ export default {
             header="Quantity"
             headerClass="column-text-right"
             style="text-align: center"
+            sortable
           ></Column>
           <Column
             field="address"
             header="Address"
             headerClass="column-text-right"
             style="text-align: center"
+            sortable
           ></Column>
           <Column
             field="orderDate"
@@ -197,11 +207,6 @@ export default {
             sortable
             headerClass="column-text-right"
             style="text-align: center"
-          ></Column>
-          <Column
-            selectionMode="multiple"
-            style="width: 3rem; text-align: center"
-            :exportable="false"
           ></Column>
         </DataTable>
       </div>
