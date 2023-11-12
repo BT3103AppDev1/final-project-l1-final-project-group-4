@@ -44,6 +44,7 @@
             <label for="quantity">Quantity:</label>
             <input v-model="quantity" type="number" id="quantity" min="1">
           </div>
+          <br>
           <div class="buttons">
             <div v-if="userType === 'Green Ranger'" class="add-cart-btn">
               <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>

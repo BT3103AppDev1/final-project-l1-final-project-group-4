@@ -74,7 +74,6 @@ import {
   doc,
   collection,
   getDocs,
-  where
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { getAuth } from "firebase/auth";
@@ -168,52 +167,43 @@ export default {
     },
 
     async searchThreads() {
-      this.threads = [];
+      let allThreads = [];
 
       for (const group of this.userGroups) {
-        // Get all users under the group
         const userCollectionRef = collection(this.db, group);
         const usersSnapshot = await getDocs(userCollectionRef);
 
-        for (const userDoc of usersSnapshot.docs) {
-          // Fetch threads for each user under the group
+        const threadsPromises = usersSnapshot.docs.map(userDoc => {
           const threadsCollectionRef = collection(this.db, group, userDoc.id, 'threads');
-          const threadsSnapshot = await getDocs(threadsCollectionRef);
+          return getDocs(threadsCollectionRef).then(threadsSnapshot => {
+            return threadsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+              userGroup: group,
+              userId: userDoc.id,
+              firstName: userDoc.data().firstName,
+              lastName: userDoc.data().lastName,
+              profilePicture: userDoc.data().profilePicture,
+              repliesCount: 0
+            }));
+          });
+        });
 
-          this.fetchRepliesCount(threadsSnapshot.docs, group, userDoc);
-        }
+        const groupThreads = await Promise.all(threadsPromises);
+        allThreads = allThreads.concat(groupThreads.flat());
       }
-      this.threads.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
-    },
 
-    fetchRepliesCount(docs, group, userDoc) {
-      const threadsData = [];
-      let threadsCount = docs.length;
+      allThreads.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
 
-      docs.forEach(doc => {
-        const threadData = {
-          id: doc.id,
-          ...doc.data(),
-          repliesCount: 0,
-          userGroup: group,
-          userId: userDoc.id,
-          firstName: userDoc.data().firstName, // Added this line
-          lastName: userDoc.data().lastName,     // Added this line
-          profilePicture: userDoc.data().profilePicture 
-        };
-
-        // Fetch reply count for each thread
-        onSnapshot(collection(this.db, group, userDoc.id, 'threads', doc.id, 'replies'), replySnapshot => {
-          threadData.repliesCount = replySnapshot.docs.length;
-          threadsData.push(threadData);
-
-          threadsCount -= 1;
-          if (threadsCount === 0) {
-            this.threads = [...this.threads, ...threadsData];
-          }
+      allThreads.forEach(thread => {
+        const repliesRef = collection(this.db, thread.userGroup, thread.userId, 'threads', thread.id, 'replies');
+        onSnapshot(repliesRef, replySnapshot => {
+          thread.repliesCount = replySnapshot.docs.length;
         });
       });
-    }
+
+      this.threads = allThreads;
+    },
   }
 }
 </script>
