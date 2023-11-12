@@ -54,14 +54,11 @@ export default {
               meta.data.forEach((metaData) => {
                 const dataset = metaData.$context.dataset;
                 const datasetIndex = metaData.$context.dataIndex;
-                const value = dataset.data[datasetIndex];
-                const percent =
-                  "$" +
-                  value +
-                  " (" +
-                  Math.round((value / dataSum) * 1000) / 10 +
-                  "%" +
-                  ")";
+                var value = dataset.data[datasetIndex];
+                value = value.toFixed(2);
+                var percentage = Math.round((value / dataSum) * 1000) / 10;
+                percentage = percentage.toFixed(1);
+                const percent = "$" + value + " (" + percentage + "%" + ")";
                 const mid_radius =
                   metaData.innerRadius +
                   (metaData.outerRadius - metaData.innerRadius) * 0.7;
