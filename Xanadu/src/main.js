@@ -52,7 +52,6 @@ app.component("Image", Image);
 app.component("Divider", Divider);
 app.component("Card", Card);
 app.component("Chart", Chart);
-app.component("Image", Image);
 app.component("RadioButton", RadioButton);
 app.component("Dialog", Dialog);
 app.component("Textarea", Textarea);
@@ -72,7 +71,6 @@ app.component("InputText", InputText);
 app.component("Toast", Toast);
 app.directive("focustrap", FocusTrap);
 app.component("Password", Password);
-app.component("Divider", Divider);
 app.component("Menubar", Menubar);
 
 // createApp(App).use(router).use(VueChartkick).mount("#app");

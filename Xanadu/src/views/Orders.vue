@@ -2,7 +2,6 @@
   <div>
     <Toast></Toast>
     <div v-if="seller">
-      <!-- <SellerOrders /> -->
       <SellerPendingOrders @fulfilled="fulfilled" :key="refreshComp" />
       <SellerFulfilledOrders :key="refreshComp" />
     </div>
@@ -13,7 +12,6 @@
 </template>
 
 <script>
-import SellerOrders from "../components/Marketplace/marketplace_components/SellerOrders.vue";
 import SellerPendingOrders from "../components/Marketplace/marketplace_components/SellerPendingOrders.vue";
 import SellerFulfilledOrders from "../components/Marketplace/marketplace_components/SellerFulfilledOrders.vue";
 import BuyerOrders from "../components/Marketplace/marketplace_components/BuyerOrders.vue";
@@ -25,7 +23,6 @@ const db = getFirestore();
 
 export default {
   components: {
-    SellerOrders,
     BuyerOrders,
     SellerPendingOrders,
     SellerFulfilledOrders,
