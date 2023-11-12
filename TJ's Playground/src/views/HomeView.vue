@@ -1,14 +1,14 @@
 <template>
   <main>
     <Toast></Toast>
-    <DataTable
+    <!-- <DataTable
       :activityData="activityData"
       @added="refresh"
       @deletedActivity="refresh"
       @activityEdited="refresh"
       :key="refreshComp"
-    />
-    <!-- <DataTable2 :products="activityData" /> -->
+    /> -->
+    <DataTable2 />
     <!-- <TheWelcome /> -->
     <!-- <AddActivityBox />
     <AddActivity /> -->
@@ -40,12 +40,12 @@
 
 <script>
 import TheWelcome from "../components/TheWelcome.vue";
-import DataTable from "../components/DataTable.vue";
+// import DataTable from "../components/DataTable.vue";
 import ProgressBar from "../components/ProgressBar.vue";
 import HighestSpendingProductCategoryCard from "../components/HighestSpendingProductCategoryCard.vue";
 import NoOfCommentsCard from "../components/NoOfCommentsCard.vue";
 import ThreadsStartedCard from "../components/ThreadsStartedCard.vue";
-// import DataTable2 from "../components/DataTable2.vue";
+import DataTable2 from "../components/DataTable2.vue";
 // import AddActivityBox from "../components/AddActivityBox.vue";
 // import AddActivity from "../components/AddActivity.vue";
 // import EcoFriendlyActivities from "../components/EcoFriendlyActivities.vue";
@@ -56,9 +56,9 @@ const db = getFirestore(firebaseApp);
 
 export default {
   components: {
-    DataTable,
+    // DataTable,
     ProgressBar,
-    // DataTable2,
+    DataTable2,
     TheWelcome,
     HighestSpendingProductCategoryCard,
     NoOfCommentsCard,

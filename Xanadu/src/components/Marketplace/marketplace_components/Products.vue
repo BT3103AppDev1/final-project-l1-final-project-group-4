@@ -29,7 +29,7 @@
             <div class="product-details">
               <p class="product-title">{{ product.title }}</p>
               <p class="product-description">{{ product.description || 'No description' }}  </p>
-              <p class="product-cost">{{ product.cost ? `$${product.cost}` : 'Price not available' }}</p>
+              <p class="product-cost">{{ product.cost ? `$${product.cost.toFixed(2)}` : 'Price not available' }}</p>
             </div>
           </div>
         </RouterLink>
