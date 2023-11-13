@@ -5,19 +5,39 @@
         <RouterLink :to="'/marketplace/AddProduct'">Add Product</RouterLink>
       </div>
       <div class="search-bar">
-        <input v-model="searchTerm" type="text" placeholder="Search for products...">
+        <input
+          v-model="searchTerm"
+          type="text"
+          placeholder="Search for products..."
+        />
       </div>
       <div v-if="!seller" class="category-filter">
         <h3>Categories</h3>
-        <div v-for="category in categories" :key="category" class="category-checkbox">
-          <input type="checkbox" :id="category" :value="category" v-model="selectedCategories">
+        <div
+          v-for="category in categories"
+          :key="category"
+          class="category-checkbox"
+        >
+          <input
+            type="checkbox"
+            :id="category"
+            :value="category"
+            v-model="selectedCategories"
+          />
           <label :for="category">{{ category }}</label>
         </div>
       </div>
     </aside>
     <div class="productlist">
-      <div v-for="product in filteredProducts" :key="product.title" class="productcard">
-        <RouterLink :to="'/marketplace/product/' + product.id" class="product-link">
+      <div
+        v-for="product in filteredProducts"
+        :key="product.title"
+        class="productcard"
+      >
+        <RouterLink
+          :to="'/marketplace/product/' + product.id"
+          class="product-link"
+        >
           <div class="product-card">
             <div class="product-image-container">
               <img
@@ -28,8 +48,16 @@
             </div>
             <div class="product-details">
               <p class="product-title">{{ product.title }}</p>
-              <p class="product-description">{{ product.description || 'No description' }}  </p>
-              <p class="product-cost">{{ product.cost ? `$${product.cost.toFixed(2)}` : 'Price not available' }}</p>
+              <p class="product-description">
+                {{ product.description || "No description" }}
+              </p>
+              <p class="product-cost">
+                {{
+                  product.cost
+                    ? `$${product.cost.toFixed(2)}`
+                    : "Price not available"
+                }}
+              </p>
             </div>
           </div>
         </RouterLink>
@@ -62,7 +90,12 @@ export default {
       userDocRef: false,
       seller: false,
       selectedCategories: [],
-      categories: ["Reusable Goods", "Renewable Energy", "Organic Materials", "Waste Reduction"],
+      categories: [
+        "Reusable Goods",
+        "Renewable Energy",
+        "Organic Materials",
+        "Waste Reduction",
+      ],
     };
   },
   computed: {
@@ -72,16 +105,20 @@ export default {
       // Filter by search term
       if (this.searchTerm) {
         const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-        filtered = filtered.filter(product =>
-          product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
-          (product.description && product.description.toLowerCase().includes(lowerCaseSearchTerm))
+        filtered = filtered.filter(
+          (product) =>
+            product.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+            (product.description &&
+              product.description.toLowerCase().includes(lowerCaseSearchTerm))
         );
       }
 
       // Filter by selected categories
       if (this.selectedCategories.length) {
-        filtered = filtered.filter(product =>
-          product.categories.some(category => this.selectedCategories.includes(category))
+        filtered = filtered.filter((product) =>
+          product.categories.some((category) =>
+            this.selectedCategories.includes(category)
+          )
         );
       }
 
@@ -89,69 +126,67 @@ export default {
     },
   },
 
-
-
-
   async mounted() {
-  try {
-    const auth = getAuth(firebaseApp);
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.user = user;
-        // Make sure this line is within the if(user) block to ensure that user.uid is defined
-        this.userDocRef = doc(db, 'Users', this.user.uid);
-      }
-    });
-
-    const fbproducts = [];
-    const alldocs = await getDocs(collection(db, "Products"));
-    alldocs.forEach((doc) => {
-      const productData = doc.data(); // Renamed to avoid any scope confusion
-      fbproducts.push({
-        id: doc.id,
-        title: productData.title,
-        description: productData.desc,
-        picture: productData.pictures,
-        cost: productData.cost,
-        categories: Array.isArray(productData.categories) ? productData.categories : [] 
+    try {
+      const auth = getAuth(firebaseApp);
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          this.user = user;
+          // Make sure this line is within the if(user) block to ensure that user.uid is defined
+          this.userDocRef = doc(db, "Users", this.user.uid);
+        }
       });
-    });
-    this.products = fbproducts;
 
-    if (this.user) { // Ensure that this.user is defined before attempting to access userDocRef
-      const userDoc = await getDoc(this.userDocRef);
-      if (userDoc.exists()) {
-        const userType = userDoc.data().userType;
-        if (userType == "Eco-Entrepreneur") {
-          this.seller = true;
-          const sellerdocs = await getDocs(collection(db, 'Eco-Entrepreneur', this.user.uid, 'Products'));
-          const sellerproducts = [];
-          sellerdocs.forEach((doc) => {
-            const sellerData = doc.data(); // Renamed to avoid any scope confusion
-            sellerproducts.push({
-              id: doc.id,
-              title: sellerData.title,
-              description: sellerData.desc,
-              picture: sellerData.pictures,
-              cost: sellerData.cost
+      const fbproducts = [];
+      const alldocs = await getDocs(collection(db, "Products"));
+      alldocs.forEach((doc) => {
+        const productData = doc.data(); // Renamed to avoid any scope confusion
+        fbproducts.push({
+          id: doc.id,
+          title: productData.title,
+          description: productData.desc,
+          picture: productData.pictures,
+          cost: productData.cost,
+          categories: Array.isArray(productData.categories)
+            ? productData.categories
+            : [],
+        });
+      });
+      this.products = fbproducts;
+
+      if (this.user) {
+        // Ensure that this.user is defined before attempting to access userDocRef
+        const userDoc = await getDoc(this.userDocRef);
+        if (userDoc.exists()) {
+          const userType = userDoc.data().userType;
+          if (userType == "Eco-Entrepreneur") {
+            this.seller = true;
+            const sellerdocs = await getDocs(
+              collection(db, "Eco-Entrepreneur", this.user.uid, "Products")
+            );
+            const sellerproducts = [];
+            sellerdocs.forEach((doc) => {
+              const sellerData = doc.data(); // Renamed to avoid any scope confusion
+              sellerproducts.push({
+                id: doc.id,
+                title: sellerData.title,
+                description: sellerData.desc,
+                picture: sellerData.pictures,
+                cost: sellerData.cost,
+              });
             });
-          });
-          this.products = sellerproducts;
+            this.products = sellerproducts;
+          }
         }
       }
+    } catch (error) {
+      console.error("An error occurred in the mounted hook:", error);
     }
-  } catch (error) {
-    console.error("An error occurred in the mounted hook:", error);
-  }
-},
-
-
-
+  },
 };
 </script>
 
 <style>
-
 .product-link {
   text-decoration: none; /* This will remove underline from the link */
 }
@@ -168,7 +203,7 @@ export default {
 .filters {
   flex: 0 0 250px; /* Adjust the width of the sidebar as needed */
   padding: 20px;
-  border-right: 2px solid #748C70;
+  border-right: 2px solid #748c70;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -182,7 +217,7 @@ export default {
 .search-bar input {
   width: 100%;
   padding: 10px;
-  border: 2px solid #748C70;
+  border: 2px solid #748c70;
   border-radius: 5px;
   font-size: 16px;
   box-sizing: border-box; /* Ensure padding doesn't increase width */
@@ -218,14 +253,14 @@ export default {
   margin: 10px;
   background-color: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .productcard:hover {
   transform: scale(1.03);
-  box-shadow: 0 5px 15px 0 rgba(0,0,0,0.15);
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
 /* Individual product card styling */
@@ -298,7 +333,7 @@ export default {
 .product-cost {
   font-size: 20px;
   font-weight: bold;
-  color: #748C70;
+  color: #748c70;
   margin-bottom: 0px; /* Add this if you want to control the gap between cost and the bottom of the card */
 }
 
@@ -306,14 +341,14 @@ export default {
 .add-product-btn a {
   background-color: #748c70;
   color: white;
-  padding: 12px 16px;
+  padding: 0.75vh 1.5vw;
   text-align: center;
   margin-bottom: 30px;
   font-size: 16px;
   font-weight: bold;
   text-decoration: none;
   display: inline-block; /* So padding and margins apply correctly */
-  border-radius: 5px;
+  /* border-radius: 5px; */
 }
 
 /* Checkbox styles */
@@ -339,7 +374,7 @@ export default {
     overflow-x: auto;
     white-space: nowrap;
     border-right: none;
-    border-bottom: 2px solid #748C70;
+    border-bottom: 2px solid #748c70;
     justify-content: center;
   }
 
@@ -355,4 +390,3 @@ export default {
   }
 }
 </style>
-

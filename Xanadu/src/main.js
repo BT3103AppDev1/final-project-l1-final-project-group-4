@@ -1,11 +1,9 @@
 import { createApp } from "vue";
-// import vuetify from "./plugins/vuetify.js";
-// import VDatePicker from "@/plugins/vuetify.js";
 import App from "./App.vue";
 import router from "./router/index.js";
 import VueChartkick from "vue-chartkick";
 import "chartkick/chart.js";
-// import Vue from "vue";
+
 import PrimeVue from "primevue/config";
 import "primevue/resources/themes/saga-green/theme.css";
 import "primevue/resources/primevue.min.css";
@@ -36,11 +34,6 @@ import Password from "primevue/password";
 import Divider from "primevue/divider";
 import Menubar from "primevue/menubar";
 import Chart from "primevue/chart";
-// import Tailwind from "primevue/passthrough/tailwind";
-
-// createApp(App).use(router).use(VueChartkick).mount("#app");
-
-// import "@/assets/theme.css";
 
 const app = createApp(App);
 
@@ -73,7 +66,7 @@ app.directive("focustrap", FocusTrap);
 app.component("Password", Password);
 app.component("Menubar", Menubar);
 
-// createApp(App).use(router).use(VueChartkick).mount("#app");
 app.use(router);
 app.use(VueChartkick);
+
 app.mount("#app");

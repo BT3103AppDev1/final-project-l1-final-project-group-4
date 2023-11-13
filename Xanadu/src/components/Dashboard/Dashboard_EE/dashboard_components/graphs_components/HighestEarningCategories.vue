@@ -23,13 +23,6 @@ export default {
   props: {
     highestEarningCategories: Array,
   },
-  watch: {
-    highestEarningCategories(data) {
-      console.log(data);
-      // this.productInfo = Object.values(data["details"]);
-      // console.log(this.productInfo);
-    },
-  },
 };
 </script>
 
@@ -50,7 +43,7 @@ export default {
   font-size: 1.3vw;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.5vh; /* 39.063% */
+  line-height: 0.5vh;
   letter-spacing: 0.05vw;
   color: var(--neutral-gray-404040, #404040);
 }
@@ -59,18 +52,8 @@ export default {
 <style lang="scss">
 .column-text-right {
   .p-column-header-content {
-    text-align: center; // or center
+    text-align: center;
     display: block !important;
-    // color: white;
-    // background: #404e3e;
-    // margin: 0px;
   }
-  // .p-sortable-column {
-  //   text-align: center; // or center
-  //   display: block !important;
-  //   color: white;
-  //   background: #404e3e;
-  //   // margin: 0px;
-  // }
 }
 </style>

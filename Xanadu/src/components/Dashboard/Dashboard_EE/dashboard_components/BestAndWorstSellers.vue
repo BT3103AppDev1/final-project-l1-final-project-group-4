@@ -52,41 +52,18 @@ export default {
   },
   watch: {
     bestAndWorstSellersInfo(data) {
-      console.log(data);
       this.productInfo = Object.values(data["details"]);
-      // console.log(this.productInfo);
     },
   },
-  // methods: {
-  //   rowStyle(data) {
-  //     if (data.productQuantity === 2) {
-  //       return {
-  //         // fontWeight: "bold",
-  //         // fontStyle: "italic",
-  //         backgroundColor: "#738678",
-  //       };
-  //     }
-  //   },
-  // },
 };
 </script>
 
 <style lang="scss">
 .column-text-right {
   .p-column-header-content {
-    text-align: center; // or center
+    text-align: center;
     display: block !important;
-    // color: white;
-    // background: #404e3e;
-    // margin: 0px;
   }
-  // .p-sortable-column {
-  //   text-align: center; // or center
-  //   display: block !important;
-  //   color: white;
-  //   background: #404e3e;
-  //   // margin: 0px;
-  // }
 }
 </style>
 

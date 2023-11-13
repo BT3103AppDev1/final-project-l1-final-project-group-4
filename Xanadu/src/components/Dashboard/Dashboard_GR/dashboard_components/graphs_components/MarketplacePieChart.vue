@@ -21,11 +21,6 @@ export default {
       chartOptions: null,
     };
   },
-  watch: {
-    purchasesData(data) {
-      console.log(data);
-    },
-  },
   methods: {
     setChartOptions() {
       const documentStyle = getComputedStyle(document.documentElement);
