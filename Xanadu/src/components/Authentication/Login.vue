@@ -27,11 +27,14 @@
         <span @click="moveToRegister" class="switchTo_register">Register</span>
       </div>
     </form>
+    <div class="forgot-password">
+      <span @click="sendPasswordResetEmail" class="forgot-password-link">Forgot Password?</span>
+    </div>
   </div>
 </template>
 
 <script>
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import firebaseApp from "@/firebase.js";
 import { getFirestore } from "firebase/firestore";
 import { doc, getDoc, collection } from "firebase/firestore";
@@ -84,13 +87,44 @@ export default {
     moveToRegister() {
       this.$router.push("/register");
     },
+
+    async sendPasswordResetEmail() {
+      const auth = getAuth();
+      if (this.email) {
+        sendPasswordResetEmail(auth, this.email)
+          .then(() => {
+            alert("Password reset email sent!");
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(`Error: ${errorCode}\nMessage: ${errorMessage}`);
+          });
+      } else {
+        alert("Please enter your email address in the email field.");
+      }
   },
+}
 };
 </script>
 
 <style scoped>
 /* import specific font */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
+
+.forgot-password {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.forgot-password-link {
+  color: #748c70;
+  cursor: pointer;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
 
 .LoginTitle {
   font-size: 32px;
