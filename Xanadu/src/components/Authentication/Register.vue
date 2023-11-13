@@ -35,7 +35,7 @@
           <div class="image-uploader">
             <p class="upload-pic-label">Upload profile picture</p>
             <div v-if="img1" class="preview-image" :style="{ backgroundImage: 'url(' + img1 + ')' }"></div>
-            <button @click="triggerInput1" class="upload-btn">Upload Profile  Picture</button>
+            <button type="button" @click="triggerInput1" class="upload-btn">Upload Profile  Picture</button>
             <input type="file" ref="uploadPictures1" @change="uploadPictures1" accept="image/*" multiple hidden>
           </div>
 
@@ -66,7 +66,8 @@
         <!-- input: password -->
         <div class="field">
           <div class="p-float-label">
-            <Password v-model="password" id="password" required>
+            <Password v-model="password" id="password" toggleMask
+            :inputProps="{pattern : '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}'}" required>
               <template #header>
                 <h3>Pick a password</h3>
               </template>
@@ -137,13 +138,13 @@
           <div class="image-uploader">
             <p class="upload-pic-label">Upload Payment QR Code</p>
             <div v-if="img2" class="preview-image" :style="{ backgroundImage: 'url(' + img2 + ')' }"></div>
-            <button @click="triggerInput2" class="upload-btn">Upload  Picture</button>
-            <input type="file" ref="uploadPictures2" @change="uploadPictures2" accept="image/*" required multiple hidden>
+            <button type="button" @click="triggerInput2" class="upload-btn">Upload  Picture</button>
+            <input name="payment_pic" type="file" ref="uploadPictures2" @change="uploadPictures2" accept="image/*" multiple hidden>
           </div>
 
         </div>
 
-        <Button @click="register" label="Register" class="mt-2 register-button" />
+        <Button type="submit" label="Register" class="mt-2 register-button" />
       </div>
 
       <div class="alternative_option">
