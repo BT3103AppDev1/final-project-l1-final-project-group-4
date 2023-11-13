@@ -148,14 +148,14 @@ export default {
 <style>
 .navbar {
   display: flex;
-  justify-content: space-between; /* Distribute space equally between elements */
+  justify-content: space-between; 
 }
 
 .p-menubar-root-list {
   align-items: center;
-  flex-grow: 1; /* Allow the menu items to take available space */
+  flex-grow: 1; 
   display: flex;
-  justify-content: center; /* Ensure items within this container are centralized */
+  justify-content: center;
 }
 
 .shipping-note {

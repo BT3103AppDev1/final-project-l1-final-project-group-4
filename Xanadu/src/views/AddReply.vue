@@ -47,8 +47,6 @@ export default {
                 this.firstName = userSnapshot.data().firstName || "N/A";  // Added default value for debugging
                 this.lastName = userSnapshot.data().lastName || "N/A";    // Added default value for debugging
                 this.profilepic = userSnapshot.data().profilePicture || "N/A";
-
-                console.log(`Fetched user data:`, userSnapshot.data());   // Debug log
             } else {
                 console.warn(`User document for ID ${this.loggedInUserId} not found in either collection`);  // Debug warning
             }
@@ -80,7 +78,6 @@ export default {
                     profilepic: this.profilepic
                 });
 
-                console.log('Reply added successfully');
                 this.content = ''; // Clear the content after successful addition
             } catch (error) {
                 console.error(`Error adding reply:`, error);

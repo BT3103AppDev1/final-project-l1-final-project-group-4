@@ -64,9 +64,6 @@ export default {
 
         this.cartItems = fbCartItems;
       }
-      // else {
-      //   alert("You must be logged in to view your cart.");
-      // }
     });
   },
   methods: {

@@ -173,37 +173,42 @@ export default {
         const userCollectionRef = collection(this.db, group);
         const usersSnapshot = await getDocs(userCollectionRef);
 
-        const threadsPromises = usersSnapshot.docs.map(userDoc => {
+        for (const userDoc of usersSnapshot.docs) {
           const threadsCollectionRef = collection(this.db, group, userDoc.id, 'threads');
-          return getDocs(threadsCollectionRef).then(threadsSnapshot => {
-            return threadsSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
+          const threadsSnapshot = await getDocs(threadsCollectionRef);
+
+          for (const threadDoc of threadsSnapshot.docs) {
+            const threadData = {
+              id: threadDoc.id,
+              ...threadDoc.data(),
               userGroup: group,
               userId: userDoc.id,
               firstName: userDoc.data().firstName,
               lastName: userDoc.data().lastName,
               profilePicture: userDoc.data().profilePicture,
-              repliesCount: 0
-            }));
-          });
-        });
+              repliesCount: 0 // Initialize with 0
+            };
+            allThreads.push(threadData);
 
-        const groupThreads = await Promise.all(threadsPromises);
-        allThreads = allThreads.concat(groupThreads.flat());
+            const repliesRef = collection(this.db, group, userDoc.id, 'threads', threadDoc.id, 'replies');
+            onSnapshot(repliesRef, (replySnapshot) => {
+              threadData.repliesCount = replySnapshot.docs.length;
+              // To trigger reactivity, you could either:
+              // - Use Vue.set if needed (Vue 2 approach, not recommended in Vue 3)
+              // - Or, reassign the threads array to itself
+              this.threads = [...this.threads];
+            });
+          }
+        }
       }
 
+      // Sort all threads by timestamp after fetching all threads
       allThreads.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
 
-      allThreads.forEach(thread => {
-        const repliesRef = collection(this.db, thread.userGroup, thread.userId, 'threads', thread.id, 'replies');
-        onSnapshot(repliesRef, replySnapshot => {
-          thread.repliesCount = replySnapshot.docs.length;
-        });
-      });
-
+      // Now, update the reactive threads data
       this.threads = allThreads;
     },
+
   }
 }
 </script>

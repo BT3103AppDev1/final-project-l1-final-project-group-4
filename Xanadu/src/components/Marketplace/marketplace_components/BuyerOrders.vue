@@ -150,8 +150,8 @@ export default {
 .divider {
   font-size: 18px;
   font-weight: bold;
-  color: #748C70; /* Adjust the color to match your theme */
-  margin-bottom: 20px; /* Space after divider */
+  color: #748C70; 
+  margin-bottom: 20px; 
 }
 
 

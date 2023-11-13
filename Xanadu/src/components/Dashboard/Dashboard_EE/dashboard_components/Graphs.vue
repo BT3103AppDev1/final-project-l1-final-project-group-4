@@ -2,11 +2,9 @@
   <div>
     <div>
       <h1 class="dashboardHeader">Dashboard</h1>
-
       <div class="pieChart">
         <MarketplacePieChart :salesData="salesData" />
       </div>
-
       <div>
         <HighestEarningCategories
           :highestEarningCategories="highestEarningCategories"
@@ -28,14 +26,6 @@ export default {
   props: {
     salesData: Object,
     highestEarningCategories: Array,
-  },
-  watch: {
-    salesData(data) {
-      // console.log(data);
-    },
-    highestEarningCategories(data) {
-      // console.log(data);
-    },
   },
 };
 </script>

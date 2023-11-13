@@ -30,12 +30,9 @@ export default {
         aspectRatio: 1.4,
         animation: {
           onProgress: function () {
-            // console.error('this', this);
             const ctx = this.ctx;
-
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-
             let dataSum = 0;
             if (
               this._sortedMetasets.length > 0 &&
@@ -77,17 +74,7 @@ export default {
             responsive: true,
             boxHeight: 500,
             position: "right",
-
-            // title: {
-            //   display: true,
-            //   text: "Product Categories",
-            //   color: textColor,
-            //   font: {
-            //     size: 20,
-            //   },
-            // },
             labels: {
-              // display: true,
               font: {
                 size: 18,
               },
@@ -111,7 +98,7 @@ export default {
   font-size: 1.3vw;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.5vh; /* 39.063% */
+  line-height: 0.5vh;
   letter-spacing: 0.05vw;
   color: var(--neutral-gray-404040, #404040);
 }

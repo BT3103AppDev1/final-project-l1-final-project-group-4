@@ -76,11 +76,6 @@ export default {
               "Invalid Login credentials! \nYou may have keyed in the wrong email or password. \nPlease try again!"
             );
           }
-
-          // let alert_1 = document.querySelector("#alert_1");
-          // alert_1.classList.remove("d-none");
-          // alert_1.innerHTML = errorMessage;
-          // console.log(alert_1);
         });
     },
 
