@@ -96,7 +96,6 @@ export default {
   },
   
   beforeRouteEnter(to, from, next) {
-    console.log(to.params.id);
     const productRef = doc(db, 'Products', to.params.id);
     getDoc(productRef).then((productDoc) => {
       if (productDoc.exists) {
@@ -130,19 +129,11 @@ export default {
       const auth = getAuth(firebaseApp);
       const user = auth.currentUser;
       this.user = user;
-      console.log(this.user);
       const userDocRef = doc(db, 'Users', this.user.uid);
       const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists()) {
-        console.log("Document data:", userDoc.data());
-      } else {
-        console.log("No such document!")
-      }
       const userType = userDoc.data().userType;
-      console.log(userType);
       if (this.user && userType == "Eco-Entrepreneur") {
         this.seller = true;
-        console.log("a seller");
       }
     } catch(error) {
       console.log(error);
@@ -248,11 +239,6 @@ export default {
   }
 },
 
-
-
-    EditProduct(product) {
-      console.log("Edit Product: ", product);
-    }
   }
 }
 </script>

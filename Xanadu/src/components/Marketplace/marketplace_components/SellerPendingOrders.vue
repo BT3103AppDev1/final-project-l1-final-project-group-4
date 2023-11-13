@@ -30,9 +30,7 @@ export default {
       this.confirmShipAndFulfilDialog = true;
     },
     async shipAndFulfilOrders() {
-      // I need to add all these orders to the fulfilled orders collection
-      // console.log(this.selectedOrders);
-      // console.log(this.user.uid);
+
       this.$toast.add({
         severity: "info",
         summary: "Shipping Orders...",
@@ -40,7 +38,6 @@ export default {
         life: 3000,
       });
       for (var order of this.selectedOrders) {
-        console.log(order);
 
         order.status = "Fulfilled";
         // console.log(order);
@@ -97,7 +94,6 @@ export default {
         for (const orderDoc of allOrdersSnapshot.docs) {
           const productRef = doc(db, "Products", orderDoc.data().productName);
           const productSnapshot = await getDoc(productRef);
-          // console.log(productSnapshot.data().pictures);
           let pictures = [];
           if (productSnapshot.exists()) {
             pictures = productSnapshot.data().pictures || [];
@@ -115,7 +111,7 @@ export default {
           });
         }
         this.orders = orders.sort((a, b) => b.orderPlacedAt - a.orderPlacedAt);
-        console.log(this.orders);
+
       }
     });
   },

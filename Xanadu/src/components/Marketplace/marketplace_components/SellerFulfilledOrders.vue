@@ -44,7 +44,6 @@ export default {
           orders.push(orderDoc.data());
         }
         this.orders = orders.sort((a, b) => b.orderPlacedAt - a.orderPlacedAt);
-        console.log(this.orders);
       }
     });
   },
