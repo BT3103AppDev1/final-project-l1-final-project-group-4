@@ -116,7 +116,6 @@ export default {
         const auth = getAuth();
         const currentUser = auth.currentUser;
         this.check = getAuth().currentUser.uid;
-        console.log('Logged-in user ID:', this.check);
 
         // Fetch the thread data based on userType, userId, and threadId
         const threadRef = doc(db, this.userType, this.userId, 'threads', this.threadId);
@@ -136,12 +135,8 @@ export default {
             }));
 
             // Log the fetched replies to see them
-            console.log("Fetched replies:", this.replies);
         });
 
-        setTimeout(() => {
-            console.log("Direct test:", this.replies[0] ? this.replies[0].firstName : 'No userID');
-        }, 3000);
 
         const userRef = doc(db, this.userType, this.userId);
         const userDoc = await getDoc(userRef);
@@ -174,7 +169,6 @@ export default {
 
                     await deleteDoc(replyRef);
 
-                    console.log("Reply successfully deleted!");
 
                     this.$refs.toast.add({
                         severity: "success",
