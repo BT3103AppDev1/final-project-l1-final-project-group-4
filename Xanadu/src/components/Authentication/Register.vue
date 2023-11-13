@@ -32,18 +32,11 @@
 
         <!-- input: profile pic -->
         <div class="field">
-          <p class="upload-pic-label">Upload profile picture</p>
-          <div class="UploadImages">
-            <button @click="triggerInput1" id="UploadPictures">
-              Upload Picture
-            </button>
-            <input
-              type="file"
-              v-show="false"
-              ref="uploadPictures1"
-              @change="uploadPictures1"
-              accept="image/*"
-            />
+          <div class="image-uploader">
+            <p class="upload-pic-label">Upload profile picture</p>
+            <div v-if="img1" class="preview-image" :style="{ backgroundImage: 'url(' + img1 + ')' }"></div>
+            <button type="button" @click="triggerInput1" class="upload-btn">Upload Profile  Picture</button>
+            <input type="file" ref="uploadPictures1" @change="uploadPictures1" accept="image/*" multiple hidden>
           </div>
         </div>
 
@@ -72,7 +65,7 @@
         <!-- input: password -->
         <div class="field">
           <div class="p-float-label">
-            <Password v-model="password" id="password" required>
+            <Password v-model="password" id="password" toggleMask :inputProps="{pattern : '(?=.*\\d)(?=.*[a-zA-Z]).{8,}'}" required>
               <template #header>
                 <h3>Pick a password</h3>
               </template>
@@ -81,8 +74,7 @@
                 <Divider />
                 <p class="mt-2">Suggestions</p>
                 <ul>
-                  <li>At least one lowercase</li>
-                  <li>At least one uppercase</li>
+                  <li>At least one alphabet character</li>
                   <li>At least one numeric</li>
                   <li>Minimum 8 characters</li>
                 </ul>
@@ -140,23 +132,15 @@
 
         <!-- input: (for sellers) payment -->
         <div class="field" v-if="userType == 'Eco-Entrepreneur'">
-          <p class="upload-pic-label">Upload payment QR code</p>
-          <div class="UploadImages">
-            <button @click="triggerInput2" id="UploadPictures">
-              Upload Picture
-            </button>
-            <input
-              type="file"
-              ref="uploadPictures2"
-              @change="uploadPictures2"
-              accept="image/*"
-              required
-              v-show="false"
-            />
+          <div class="image-uploader">
+            <p class="upload-pic-label">Upload Payment QR Code</p>
+            <div v-if="img2" class="preview-image" :style="{ backgroundImage: 'url(' + img2 + ')' }"></div>
+            <button type="button" @click="triggerInput2" class="upload-btn">Upload  Picture</button>
+            <input name="payment_pic" type="file" ref="uploadPictures2" @change="uploadPictures2" accept="image/*" multiple hidden>
           </div>
         </div>
 
-        <Button type="register" label="Register" class="mt-2 register-button" />
+        <Button type="submit" label="Register" class="mt-2 register-button" />
       </div>
 
       <div class="alternative_option">
@@ -277,6 +261,14 @@ export default {
         alert("Please select an Account Type you would like to register as!");
         return;
       }
+      if (this.userType == "Eco-Entrepreneur" && this.address == "") {
+        alert("Please enter a valid address!");
+        return;
+      }
+      if (this.userType == "Eco-Entrepreneur" && this.img2 == null) {
+        alert("Please upload your Payment QR Code!");
+        return;
+      }
 
       const auth = getAuth();
       const db = getFirestore();
@@ -328,19 +320,7 @@ export default {
             });
           }
 
-          // setDoc(doc(db, "Users", userCredential.user.uid), {
-          //     userType: this.userType,
-          //     firstName: this.firstName,
-          //     lastName: this.lastName,
-          //     username: this.username,
-          //     email: this.email,
-          //     profilePicture: this.img1,
-          // });
-
           const user = userCredential.user;
-          //console.log(user);
-          console.log("Registration completed.");
-          //   this.clearInput();
           this.$router.push("/dashboard");
         })
         .catch((error) => {
@@ -364,11 +344,6 @@ export default {
               "Email exists! \nEmail already in use!\n Please use another email or login instead!"
             );
           }
-
-          // let alert_2 = document.querySelector("#alert_2");
-          // alert_2.classList.remove("d-none");
-          // alert_2.innerHTML = errorMessage;
-          // console.log(alert_2);
         });
     },
 
@@ -469,5 +444,28 @@ li {
 .upload-pic-label {
   margin-top: 0;
   padding-left: 10px;
+}
+
+.image-uploader {
+  margin-bottom: 2rem;
+  text-align: center;
+  display: grid;
+  justify-content: center;
+}
+.preview-image {
+  width: 200px;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 5px;
+}
+.upload-btn {
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 </style>

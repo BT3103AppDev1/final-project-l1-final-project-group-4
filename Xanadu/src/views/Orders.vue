@@ -43,7 +43,6 @@ export default {
         this.user = user;
         this.userDocRef = doc(db, "Users", this.user.uid);
         const u = await getDoc(this.userDocRef);
-        console.log(u.data());
         if (u.data().userType == "Eco-Entrepreneur") {
           this.seller = true;
         }
@@ -52,7 +51,6 @@ export default {
   },
   methods: {
     async fulfilled() {
-      console.log("fulfilled");
       this.refreshComp += 1;
     },
   },
