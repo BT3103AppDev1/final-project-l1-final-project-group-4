@@ -49,7 +49,7 @@ import {
   collection,
   getFirestore,
 } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // 1. Import required functions
+import { getAuth, onAuthStateChanged } from "firebase/auth"; 
 
 const db = getFirestore();
 
@@ -153,7 +153,7 @@ export default {
 <style>
 
 .product-link {
-  text-decoration: none; /* This will remove underline from the link */
+  text-decoration: none; 
 }
 
 .products-container {
@@ -166,7 +166,7 @@ export default {
 
 /* Sidebar filters styling */
 .filters {
-  flex: 0 0 250px; /* Adjust the width of the sidebar as needed */
+  flex: 0 0 250px; 
   padding: 20px;
   border-right: 2px solid #748C70;
   display: flex;
@@ -185,7 +185,7 @@ export default {
   border: 2px solid #748C70;
   border-radius: 5px;
   font-size: 16px;
-  box-sizing: border-box; /* Ensure padding doesn't increase width */
+  box-sizing: border-box;
 }
 
 /* Category filter styling */
@@ -235,32 +235,32 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%; /* Make sure all cards are the same height */
+  height: 100%;
 }
 
 .product-title,
 .product-description,
 .product-cost {
-  text-align: left; /* Align text to the left */
-  width: 100%; /* Ensure text spans the full width of the card */
+  text-align: left; 
+  width: 100%; 
   text-decoration: none;
 }
 
 .product-title,
 .product-description {
-  max-height: 4.5em; /* Adjust as needed to control the height */
+  max-height: 4.5em; 
   overflow: hidden;
   text-overflow: ellipsis;
-  /* rest of the properties */
+
 }
 
 .product-image-container {
-  width: 100%; /* Full width of card */
-  padding-top: 100%; /* Makes a square */
+  width: 100%; 
+  padding-top: 100%; 
   position: relative;
   border-radius: 10px;
   overflow: hidden;
-  background-color: #f5f5f5; /* Placeholder color */
+  background-color: #f5f5f5; 
   margin-bottom: 15px;
 }
 
@@ -270,18 +270,18 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures image retains aspect ratio but fills space */
+  object-fit: cover; 
 }
 
 .product-details {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align details to the start */
+  align-items: flex-start; 
 }
 
 .product-title {
   font-size: 18px;
-  margin-bottom: 0px; /* Reduced from whatever it was before */
+  margin-bottom: 0px;
   color: #333;
   font-weight: bold;
 }
@@ -290,7 +290,7 @@ export default {
   font-size: 16px;
   margin-bottom: 0px;
   color: #555;
-  height: auto; /* Changed from 3em to auto to allow text to determine height */
+  height: auto;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -299,7 +299,7 @@ export default {
   font-size: 20px;
   font-weight: bold;
   color: #748C70;
-  margin-bottom: 0px; /* Add this if you want to control the gap between cost and the bottom of the card */
+  margin-bottom: 0px;
 }
 
 /* Add product button styling */
@@ -312,7 +312,7 @@ export default {
   font-size: 16px;
   font-weight: bold;
   text-decoration: none;
-  display: inline-block; /* So padding and margins apply correctly */
+  display: inline-block;
   border-radius: 5px;
 }
 
@@ -351,7 +351,7 @@ export default {
 /* Further responsive adjustments for very small screens */
 @media (max-width: 480px) {
   .productcard {
-    flex: 0 0 100%; /* Full width cards on very small screens */
+    flex: 0 0 100%; 
   }
 }
 </style>
