@@ -47,20 +47,6 @@
             />
           </template>
         </Toolbar>
-        <!-- <template #header>
-          <div
-          class="flex flex-wrap gap-2 align-items-center justify-content-between"
-          >
-            <span class="p-input-icon-left">
-              <i class="pi pi-search" />
-              <InputText
-              v-model="filters['global'].value"
-                placeholder="Search..."
-              />
-            </span>
-          </div>
-        </template> -->
-
         <Column
           selectionMode="multiple"
           style="width: 3rem"
