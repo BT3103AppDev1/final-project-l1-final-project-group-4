@@ -167,43 +167,56 @@ export default {
     },
 
     async searchThreads() {
-      let allThreads = [];
+  let allThreads = [];
 
-      for (const group of this.userGroups) {
-        const userCollectionRef = collection(this.db, group);
-        const usersSnapshot = await getDocs(userCollectionRef);
+  for (const group of this.userGroups) {
+    const userCollectionRef = collection(this.db, group);
+    const usersSnapshot = await getDocs(userCollectionRef);
 
-        const threadsPromises = usersSnapshot.docs.map(userDoc => {
-          const threadsCollectionRef = collection(this.db, group, userDoc.id, 'threads');
-          return getDocs(threadsCollectionRef).then(threadsSnapshot => {
-            return threadsSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-              userGroup: group,
-              userId: userDoc.id,
-              firstName: userDoc.data().firstName,
-              lastName: userDoc.data().lastName,
-              profilePicture: userDoc.data().profilePicture,
-              repliesCount: 0
-            }));
-          });
-        });
-
-        const groupThreads = await Promise.all(threadsPromises);
-        allThreads = allThreads.concat(groupThreads.flat());
-      }
-
-      allThreads.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
-
-      allThreads.forEach(thread => {
-        const repliesRef = collection(this.db, thread.userGroup, thread.userId, 'threads', thread.id, 'replies');
-        onSnapshot(repliesRef, replySnapshot => {
-          thread.repliesCount = replySnapshot.docs.length;
-        });
+    const threadsPromises = usersSnapshot.docs.map(userDoc => {
+      const threadsCollectionRef = collection(this.db, group, userDoc.id, 'threads');
+      return getDocs(threadsCollectionRef).then(threadsSnapshot => {
+        return threadsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          userGroup: group,
+          userId: userDoc.id,
+          firstName: userDoc.data().firstName,
+          lastName: userDoc.data().lastName,
+          profilePicture: userDoc.data().profilePicture,
+          repliesCount: 0 // Initialize with 0
+        }));
       });
+    });
 
-      this.threads = allThreads;
-    },
+    const groupThreads = await Promise.all(threadsPromises);
+    allThreads = allThreads.concat(groupThreads.flat());
+  }
+
+  // Sort all threads by timestamp after fetching all threads
+  allThreads.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+
+  // Now, update the reactive threads data
+  this.threads = allThreads;
+
+  // Update the replies count for each thread reactively
+  this.threads.forEach((thread, index) => {
+    const repliesRef = collection(this.db, thread.userGroup, thread.userId, 'threads', thread.id, 'replies');
+    onSnapshot(repliesRef, replySnapshot => {
+      // Find the thread by ID and update its repliesCount property
+      const threadToUpdate = this.threads.find(t => t.id === thread.id);
+      if (threadToUpdate) {
+        threadToUpdate.repliesCount = replySnapshot.docs.length;
+        // Use Vue's reactivity system to update the thread
+        this.$set(this.threads, index, threadToUpdate);
+      }
+    });
+  });
+}
+
+
+    
+
   }
 }
 </script>
