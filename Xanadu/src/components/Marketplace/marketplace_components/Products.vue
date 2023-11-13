@@ -333,13 +333,8 @@ export default {
 .product-cost {
   font-size: 20px;
   font-weight: bold;
-<<<<<<< HEAD
   color: #748C70;
   margin-bottom: 0px;
-=======
-  color: #748c70;
-  margin-bottom: 0px; /* Add this if you want to control the gap between cost and the bottom of the card */
->>>>>>> 781a46f4d874d4df24bc598faba9ae9d3a7ff466
 }
 
 /* Add product button styling */
@@ -352,13 +347,8 @@ export default {
   font-size: 16px;
   font-weight: bold;
   text-decoration: none;
-<<<<<<< HEAD
   display: inline-block;
   border-radius: 5px;
-=======
-  display: inline-block; /* So padding and margins apply correctly */
-  /* border-radius: 5px; */
->>>>>>> 781a46f4d874d4df24bc598faba9ae9d3a7ff466
 }
 
 /* Checkbox styles */
