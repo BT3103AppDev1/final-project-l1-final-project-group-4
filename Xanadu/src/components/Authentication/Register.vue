@@ -67,7 +67,7 @@
         <div class="field">
           <div class="p-float-label">
             <Password v-model="password" id="password" toggleMask
-            :inputProps="{pattern : '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}'}" required>
+            :inputProps="{pattern : '(?=.*\\d)(?=.*[a-zA-Z]).{8,}'}" required>
               <template #header>
                 <h3>Pick a password</h3>
               </template>
@@ -76,8 +76,7 @@
                 <Divider />
                 <p class="mt-2">Suggestions</p>
                 <ul>
-                  <li>At least one lowercase</li>
-                  <li>At least one uppercase</li>
+                  <li>At least one alphabet character</li>
                   <li>At least one numeric</li>
                   <li>Minimum 8 characters</li>
                 </ul>
