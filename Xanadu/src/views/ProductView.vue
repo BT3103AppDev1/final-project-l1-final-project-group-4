@@ -383,7 +383,19 @@ h3 {
   color: #555;
 }
 
-.cart-btn,
+.cart-btn {
+  padding: 1.1vh 1vw 0.9vh 1vw;
+  font-size: 16px;
+  background-color: #738678;
+  color: white;
+  border-radius: 0px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
 .edit-product-btn a,
 .del-product-btn {
   padding: 15px 20px;
