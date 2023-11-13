@@ -44,7 +44,6 @@ export default {
   },
   async mounted() {
     const auth = getAuth();
-    // console.log(auth.currentUser.uid);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.userId = auth.currentUser.uid;
@@ -55,15 +54,11 @@ export default {
     async userId(userId) {
       this.sales = await this.getSalesData();
       this.bestAndWorstSellersInfo = await this.getSalesDetails();
-      console.log(this.bestAndWorstSellersInfo);
     },
     sales(sales) {
-      console.log(sales);
       var sortedSales = Object.entries(sales);
       sortedSales.sort((a, b) => b[1] - a[1]);
-      // console.log(sortedSales);
       sortedSales = sortedSales.slice(0, 3);
-
       sortedSales = sortedSales.map(function (item) {
         var obj = {};
         obj["category"] = item[0];
@@ -71,14 +66,8 @@ export default {
         return obj;
       });
       this.highestEarningCategories = sortedSales;
-      console.log(this.highestEarningCategories);
-
-      console.log(this.highestEarningCategories);
-
       this.productCategories = Object.keys(sales);
-      // console.log(this.productCategories);
       this.productCategorySpending = Object.values(sales);
-      console.log(this.productCategorySpending);
       this.salesData = {
         labels: this.productCategories,
         datasets: [
@@ -94,7 +83,6 @@ export default {
 
   methods: {
     async refresh() {
-      console.log("refreshed!");
       this.refreshComp += 1;
     },
     async getSalesDetails() {
@@ -109,7 +97,6 @@ export default {
 
       querySnapshot.forEach((productDoc) => {
         const data = productDoc.data();
-        // console.log(data);
         const productName = data.productName;
         var productPrice = data.productPrice.toString();
         const productQuantity = data.productQuantity;
@@ -119,7 +106,6 @@ export default {
           categories = categories + cat + ", ";
         }
         categories = categories.slice(0, -2);
-        console.log(categories);
         productPrice = "$" + productPrice;
         if (quantityOfProductsSold.hasOwnProperty(productName)) {
           quantityOfProductsSold[productName] += productQuantity;
@@ -127,7 +113,6 @@ export default {
           quantityOfProductsSold[productName] = productQuantity;
         }
         if (detailsOfProductsSold.hasOwnProperty(productName)) {
-          // detailOfProductsSold[productName] += productQuantity;
         } else {
           detailsOfProductsSold[productName] = {
             productName: productName,
@@ -138,25 +123,15 @@ export default {
         }
       });
       const details = Object.values(detailsOfProductsSold);
-      console.log(details);
-      // console.log(quantityOfProductsSold);
-      // console.log(detailsOfProductsSold);
-
       quantityOfProductsSold = Object.entries(quantityOfProductsSold);
       quantityOfProductsSold.sort((a, b) => b[1] - a[1]);
-      // console.log(quantityOfProductsSold);
       var bestAndWorstSellers = quantityOfProductsSold.map(
         (subArray) => subArray[0]
       );
-      // var worstSellers = bestSellers.slice(-5);
-      // bestSellers = bestSellers.slice(0, 5);
       var bestAndWorstSellersInfo = {
         bestAndWorstSellersInfo: bestAndWorstSellers,
-        // worstSellers: worstSellers,
         details: detailsOfProductsSold,
       };
-      // console.log(bestAndWorstSellers);
-
       return bestAndWorstSellersInfo;
     },
 
@@ -171,7 +146,6 @@ export default {
 
       querySnapshot.forEach((productDoc) => {
         const data = productDoc.data();
-        // console.log(data);
         const productCategory = data.productCategory;
         const productPrice = data.productPrice;
         const productQuantity = data.productQuantity;
@@ -206,7 +180,7 @@ export default {
   font-size: 2rem;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.75rem; /* 39.063% */
+  line-height: 0.75rem;
   letter-spacing: 0.1rem;
 }
 </style>

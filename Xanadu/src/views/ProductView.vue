@@ -1,57 +1,102 @@
 <template>
-  <div class="product-view">
-    <div class="product-content">
-      <div class="product-left">
-        <img :src="product.picture" alt="Product Image" class="product-view-image">
-      </div>
-      <div class="product-right">
-        <h2 class="product-title">{{ product.title }}</h2>
-        <div class="product-details">
-          <!-- Removed duplicate detail-section div -->
-          <div class="detail-section">
-            <h3>Categories:</h3>
-            <ul class="product-categories">
-              <li v-for="category in product.categories" :key="category">{{ category }}</li>
-            </ul>
-          </div>
-          <div class="detail-section">
-            <h3>Description:</h3>
-            <p class="product-description">{{ productDescription }}</p>
-          </div>
-          <div class="detail-section">
-            <h3>Short Description:</h3>
-            <p>{{ product.shortdesc }}</p>
-          </div>
-          <div class="detail-section">
-            <h3>Shipping:</h3>
-            <p>{{ product.shipping }}</p>
-          </div>
-          <div class="detail-section">
-            <h3>Dimensions:</h3>
-            <p>{{ product.dimensions }}</p>
-          </div>
-          <div class="detail-section">
-            <h3>Price:</h3>
-            <p class="product-cost">{{ product.cost ? `$${product.cost.toFixed(2)}` : 'Price not available' }}</p>
-          </div>
-          <div class="detail-section">
-            <h3>Seller:</h3>
-            <p>{{ product.seller }}</p>
-          </div>
+  <div>
+    <Button
+      label="Back to Marketplace"
+      icon="pi pi-arrow-left"
+      style="
+        background-color: #738678;
+        color: White;
+        margin-left: 1vw;
+        margin-top: 1vh;
+        padding-top: 0.5vh;
+        padding-bottom: 0.7vh;
+        border-radius: 0;
+        font-weight: bold;
+      "
+      @click="backToMarketplace"
+    />
+    <div class="product-view">
+      <div class="product-content">
+        <div class="product-left">
+          <img
+            :src="product.picture"
+            alt="Product Image"
+            class="product-view-image"
+          />
         </div>
-        <div class="actions-section">
-          <div v-if="userType !== 'Eco-Entrepreneur'" class="quantity-input">
-            <label for="quantity">Quantity:</label>
-            <input v-model="quantity" type="number" id="quantity" min="1">
-          </div>
-          <br>
-          <div class="buttons">
-            <div v-if="userType === 'Green Ranger'" class="add-cart-btn">
-              <button @click="addToCart(product, quantity)" class="cart-btn">Add to Cart</button>
+        <div class="product-right">
+          <h2 class="product-title">{{ product.title }}</h2>
+          <div class="product-details">
+            <!-- Removed duplicate detail-section div -->
+            <div class="detail-section">
+              <h3>Categories:</h3>
+              <ul class="product-categories">
+                <li v-for="category in product.categories" :key="category">
+                  {{ category }}
+                </li>
+              </ul>
             </div>
-            <div v-if="userType === 'Eco-Entrepreneur'" class="product-buttons">
-              <RouterLink :to="'/marketplace/product/' + product.id + '/edit'" class="edit-btn">Edit Product</RouterLink>
-              <Button class="del-product-btn" icon="pi pi-times" severity="danger" rounded aria-label="Cancel" @click="deleteProduct(product.title)"/>
+            <div class="detail-section">
+              <h3>Description:</h3>
+              <p class="product-description">{{ productDescription }}</p>
+            </div>
+            <div class="detail-section">
+              <h3>Short Description:</h3>
+              <p>{{ product.shortdesc }}</p>
+            </div>
+            <div class="detail-section">
+              <h3>Shipping:</h3>
+              <p>{{ product.shipping }}</p>
+            </div>
+            <div class="detail-section">
+              <h3>Dimensions:</h3>
+              <p>{{ product.dimensions }}</p>
+            </div>
+            <div class="detail-section">
+              <h3>Price:</h3>
+              <p class="product-cost">
+                {{
+                  product.cost
+                    ? `$${product.cost.toFixed(2)}`
+                    : "Price not available"
+                }}
+              </p>
+            </div>
+            <div class="detail-section">
+              <h3>Seller:</h3>
+              <p>{{ product.seller }}</p>
+            </div>
+          </div>
+          <div class="actions-section">
+            <div v-if="userType !== 'Eco-Entrepreneur'" class="quantity-input">
+              <label for="quantity">Quantity:</label>
+              <input v-model="quantity" type="number" id="quantity" min="1" />
+            </div>
+            <br />
+            <div class="buttons">
+              <div v-if="userType === 'Green Ranger'" class="add-cart-btn">
+                <button @click="addToCart(product, quantity)" class="cart-btn">
+                  Add to Cart
+                </button>
+              </div>
+              <div
+                v-if="userType === 'Eco-Entrepreneur'"
+                class="product-buttons"
+              >
+                <RouterLink
+                  :to="'/marketplace/product/' + product.id + '/edit'"
+                  class="edit-btn"
+                  >Edit Product</RouterLink
+                >
+                <Button
+                  class="del-product-btn"
+                  icon="pi pi-times"
+                  severity="danger"
+                  rounded
+                  aria-label="Cancel"
+                  @click="deleteProduct(product.title)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -62,16 +107,24 @@
 
 <script>
 import firebaseApp from "@/firebase.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";  // 1. Import required functions
-
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // 1. Import required functions
 
 const db = getFirestore();
 const auth = getAuth();
 
 export default {
   props: {
-    id: String
+    id: String,
   },
   data() {
     return {
@@ -79,67 +132,72 @@ export default {
       product: {},
       quantity: 1,
       seller: false,
-      user : false,
-      userDocRef: false
+      user: false,
+      userDocRef: false,
     };
   },
   async created() {
-      const user = auth.currentUser;
-      if (user) {
+    const user = auth.currentUser;
+    if (user) {
       this.userType = await this.determineUserType(user);
     }
   },
   computed: {
     productDescription() {
       return this.product.description || "No description";
-    }
+    },
   },
-  
+
   beforeRouteEnter(to, from, next) {
-    const productRef = doc(db, 'Products', to.params.id);
-    getDoc(productRef).then((productDoc) => {
-      if (productDoc.exists) {
-        const productData = productDoc.data();
-        next(vm => {
-          vm.product = {
-            id: productDoc.id,
-            title: productData.title,
-            shortdesc: productData.shortdesc,
-            shipping: productData.shipping,
-            dimensions: productData.dimensions,
-            description: productData.desc,
-            picture: productData.pictures,
-            cost: productData.cost,
-            seller: productData.username,
-            categories: productData.categories,
-            uid: productData.uid,
-          };
-        });
-      } else {
-        console.error("Product not found!");
+    const productRef = doc(db, "Products", to.params.id);
+    getDoc(productRef)
+      .then((productDoc) => {
+        if (productDoc.exists) {
+          const productData = productDoc.data();
+          next((vm) => {
+            vm.product = {
+              id: productDoc.id,
+              title: productData.title,
+              shortdesc: productData.shortdesc,
+              shipping: productData.shipping,
+              dimensions: productData.dimensions,
+              description: productData.desc,
+              picture: productData.pictures,
+              cost: productData.cost,
+              seller: productData.username,
+              categories: productData.categories,
+              uid: productData.uid,
+            };
+          });
+        } else {
+          console.error("Product not found!");
+          next(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching product:", error);
         next(false);
-      }
-    }).catch((error) => {
-      console.error("Error fetching product:", error);
-      next(false);
-    });
+      });
   },
   async mounted() {
     try {
       const auth = getAuth(firebaseApp);
       const user = auth.currentUser;
       this.user = user;
-      const userDocRef = doc(db, 'Users', this.user.uid);
+      const userDocRef = doc(db, "Users", this.user.uid);
       const userDoc = await getDoc(userDocRef);
       const userType = userDoc.data().userType;
       if (this.user && userType == "Eco-Entrepreneur") {
         this.seller = true;
       }
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
-    },
+  },
   methods: {
+    backToMarketplace() {
+      this.$router.push("/Marketplace");
+    },
     async determineUserType(user) {
       const ecoEntrepreneurDocRef = doc(db, "Eco-Entrepreneur", user.uid);
       const ecoEntrepreneurDocSnap = await getDoc(ecoEntrepreneurDocRef);
@@ -158,92 +216,103 @@ export default {
     },
     // need to add function to delete from user collection as well
     async deleteProduct(productId) {
-        try {
-            this.$toast.add({
-                severity: "info",
-                summary: "Deleting Product",
-                life: 6000,
-            });
+      try {
+        this.$toast.add({
+          severity: "info",
+          summary: "Deleting Product",
+          life: 6000,
+        });
 
-            // Delete from the main 'Products' collection
-            await deleteDoc(doc(db, 'Products', productId));
+        // Delete from the main 'Products' collection
+        await deleteDoc(doc(db, "Products", productId));
 
-            // Check if userType and currentUser are available
-            if (this.userType && auth.currentUser) {
-                // Delete from the seller's 'Products' sub-collection using userType and current user's UID
-                await deleteDoc(doc(db, this.userType, auth.currentUser.uid, 'Products', productId));
-            } else {
-                throw new Error("User type or current user UID not found");
-            }
-
-            this.$toast.add({
-                severity: "success",
-                summary: "Deleted Product",
-                life: 6000,
-            });
-
-            this.$router.push('/Marketplace');
-        } catch (error) {
-            console.error("Error deleting product:", error);
-            this.$toast.add({
-                severity: "error",
-                summary: "Error deleting product",
-                detail: error.message,
-                life: 6000,
-            });
+        // Check if userType and currentUser are available
+        if (this.userType && auth.currentUser) {
+          // Delete from the seller's 'Products' sub-collection using userType and current user's UID
+          await deleteDoc(
+            doc(db, this.userType, auth.currentUser.uid, "Products", productId)
+          );
+        } else {
+          throw new Error("User type or current user UID not found");
         }
+
+        this.$toast.add({
+          severity: "success",
+          summary: "Deleted Product",
+          life: 6000,
+        });
+
+        this.$router.push("/Marketplace");
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        this.$toast.add({
+          severity: "error",
+          summary: "Error deleting product",
+          detail: error.message,
+          life: 6000,
+        });
+      }
     },
 
     async addToCart(product, quantityToAdd) {
-  const currentUser = auth.currentUser;
+      const currentUser = auth.currentUser;
 
-  if (!currentUser) {
-    console.error("No current user found.");
-    alert("You must be logged in to add items to the cart.");
-    return;
-  }
+      if (!currentUser) {
+        console.error("No current user found.");
+        alert("You must be logged in to add items to the cart.");
+        return;
+      }
 
-  if (!product.seller) {
-    console.error("Seller information is missing from the product details.");
-    return;
-  }
+      if (!product.seller) {
+        console.error(
+          "Seller information is missing from the product details."
+        );
+        return;
+      }
 
-  try {
-    const cartRef = collection(db, 'Green Rangers', currentUser.uid, 'Cart');
-    const cartSnapshot = await getDocs(cartRef);
-    const productInCart = cartSnapshot.docs.find(doc => doc.data().title === product.title);
+      try {
+        const cartRef = collection(
+          db,
+          "Green Rangers",
+          currentUser.uid,
+          "Cart"
+        );
+        const cartSnapshot = await getDocs(cartRef);
+        const productInCart = cartSnapshot.docs.find(
+          (doc) => doc.data().title === product.title
+        );
 
-    if (productInCart) {
-      const updatedQuantity = productInCart.data().quantity + quantityToAdd;
-      await updateDoc(doc(cartRef, productInCart.id), { quantity: updatedQuantity });
-      alert("Updated quantity in cart!");
-    } else {
-      const productToAdd = {
-        title: product.title,
-        picture: product.picture,
-        description: product.description || "No description",
-        quantity: quantityToAdd,
-        cost: product.cost,
-        seller: product.seller,
-        categories: product.categories,
-        uid: product.uid,
-      };
-      await addDoc(cartRef, productToAdd);
-      alert("Added to cart!");
-    }
-    // Redirect to the marketplace after the product is added to the cart
-    this.$router.push('/marketplace');
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    alert("Failed to add to cart!");
-  }
-},
-
-  }
-}
+        if (productInCart) {
+          const updatedQuantity = productInCart.data().quantity + quantityToAdd;
+          await updateDoc(doc(cartRef, productInCart.id), {
+            quantity: updatedQuantity,
+          });
+          alert("Updated quantity in cart!");
+        } else {
+          const productToAdd = {
+            title: product.title,
+            picture: product.picture,
+            description: product.description || "No description",
+            quantity: quantityToAdd,
+            cost: product.cost,
+            seller: product.seller,
+            categories: product.categories,
+            uid: product.uid,
+          };
+          await addDoc(cartRef, productToAdd);
+          alert("Added to cart!");
+        }
+        // Redirect to the marketplace after the product is added to the cart
+        this.$router.push("/marketplace");
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert("Failed to add to cart!");
+      }
+    },
+  },
+};
 </script>
 
-  
 <style>
 .product-categories {
   list-style-type: none;
@@ -265,11 +334,11 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: 50px 20px;
+  padding: 20px 20px;
   min-height: 100vh;
   background-color: #f9f9f9;
   color: #333;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .product-content {
@@ -351,7 +420,7 @@ h3 {
 }
 
 .edit-btn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   text-decoration: none;
   border: none;
@@ -362,26 +431,25 @@ h3 {
   background-color: #45a049;
 }
 
-  .edit-product-btn a {
-    background-color: #748C70;
-    color: white;
-    border: none;
-    padding: 12px 24px; /* Increased padding */
-    font-size: 18px; /* Increased font size */
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-family: Montserrat;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 140%;
-    text-decoration: none;
+.edit-product-btn a {
+  background-color: #748c70;
+  color: white;
+  border: none;
+  padding: 12px 24px; /* Increased padding */
+  font-size: 18px; /* Increased font size */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: Montserrat;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 140%;
+  text-decoration: none;
+}
 
-  }
-
-  .del-product-btn {
-    margin: 20px;
-  }
+.del-product-btn {
+  margin: 20px;
+}
 .del-product-btn {
   background-color: #f44336;
   color: white;
@@ -404,7 +472,4 @@ h3 {
     width: 100%;
   }
 }
-
 </style>
-
-  

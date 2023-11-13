@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <h1 class="ecoFriendlyActivityHeader">Eco-Friendly Activities</h1> -->
     <Toast> </Toast>
     <div class="card">
       <DataTable
@@ -482,11 +481,7 @@ export default {
     activityData: Array,
   },
   watch: {
-    activityData(data) {
-      console.log(data);
-    },
     activityType(type) {
-      // console.log(type);
       this.activity.activityType = type;
       if (type == "Water Conservation") {
         this.activityTypeWaterConservation = true;
@@ -573,10 +568,8 @@ export default {
         this.$toast.add({
           severity: "info",
           summary: "Adding Activity...",
-          // detail: "Activity Deleted",
           life: 3000,
         });
-        console.log(this.activity);
         var date = this.activity.date;
         const dateObject = new Date(date);
         const year = dateObject.getFullYear();
@@ -586,7 +579,6 @@ export default {
         let sustainabilityPoints = (this.activity.amount / 10).toFixed(3);
 
         try {
-          console.log(this.userId);
           const docRef = await addDoc(
             collection(
               db,
@@ -601,10 +593,6 @@ export default {
               date: date,
             }
           );
-          console.log(
-            "Eco-friendly activity Document added with ID: ",
-            docRef.id
-          );
         } catch (error) {
           console.error("Error adding document: ", error);
         }
@@ -612,25 +600,19 @@ export default {
         this.$toast.add({
           severity: "success",
           summary: "Activity Added!",
-          // detail: "Activity Deleted",
           life: 3000,
         });
-        console.log("Input box resetted, 'added' was emitted");
-
-        this.submitted = true; // dont touch
-        this.activityDialog = false; // dont touch
+        this.submitted = true;
+        this.activityDialog = false;
         this.activity = {};
       }
     },
     editActivity(activity) {
       this.activityType = activity.activityType;
-      console.log(activity.activityType);
       this.activity = { ...activity };
-      // this.activityType = activity.activityType;
       this.editActivityDialog = true;
     },
     async updateActivity() {
-      //   console.log(this.activity);
       if (
         this.activity.name == "" ||
         this.activity.activityType == null ||
@@ -638,8 +620,6 @@ export default {
         this.activity.amount == null ||
         this.activity.date == null
       ) {
-        // console.log(this.activity.name == null);
-        // console.log(this.activity.amount == null);
         this.$toast.add({
           severity: "info",
           summary: "Please fill in all fields!",
@@ -649,7 +629,6 @@ export default {
         this.$toast.add({
           severity: "info",
           summary: "Updating Activity...",
-          // detail: "Activity Deleted",
           life: 3000,
         });
         var data = this.activity;
@@ -679,13 +658,11 @@ export default {
         this.$toast.add({
           severity: "success",
           summary: "Activity Updated!",
-          // detail: "Activity Deleted",
           life: 3000,
         });
-        console.log("activityEdited");
 
-        this.submitted = true; // dont touch
-        this.editActivityDialog = false; // dont touch
+        this.submitted = true;
+        this.editActivityDialog = false;
         this.activity = {};
       }
     },
@@ -698,7 +675,6 @@ export default {
       this.$toast.add({
         severity: "error",
         summary: "Deleting Activity...",
-        // detail: "Activity Deleted",
         life: 3000,
       });
       await deleteDoc(
@@ -715,7 +691,6 @@ export default {
       this.$toast.add({
         severity: "success",
         summary: "Activity Deleted!",
-        // detail: "Activity Deleted",
         life: 3000,
       });
       this.$emit("deletedActivity");
@@ -728,7 +703,6 @@ export default {
       this.$toast.add({
         severity: "error",
         summary: "Deleting Activities...",
-        // detail: "Activity Deleted",
         life: 3000,
       });
       this.selectedActivities.forEach(async (activity) => {
@@ -748,7 +722,6 @@ export default {
       this.$toast.add({
         severity: "success",
         summary: "Activities Deleted!",
-        // detail: "Activity Deleted",
         life: 3000,
       });
       this.$emit("deletedActivity");
@@ -768,7 +741,7 @@ export default {
   font-size: 2rem;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.75rem; /* 39.063% */
+  line-height: 0.75rem;
   letter-spacing: 0.1rem;
 }
 
@@ -785,18 +758,8 @@ export default {
 <style lang="scss">
 .column-text-right {
   .p-column-header-content {
-    text-align: center; // or center
+    text-align: center;
     display: block !important;
-    // color: white;
-    // background: #404e3e;
-    // margin: 0px;
   }
-  // .p-sortable-column {
-  //   text-align: center; // or center
-  //   display: block !important;
-  //   color: white;
-  //   background: #404e3e;
-  //   // margin: 0px;
-  // }
 }
 </style>

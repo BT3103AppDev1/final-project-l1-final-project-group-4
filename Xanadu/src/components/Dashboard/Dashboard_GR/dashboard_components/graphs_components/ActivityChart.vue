@@ -17,7 +17,6 @@ export default {
   },
   watch: {
     activityChartData(activityChartData) {
-      console.log(activityChartData); // --> this is ok
       const documentStyle = getComputedStyle(document.documentElement);
       this.chartOptions = this.setChartOptions();
     },
