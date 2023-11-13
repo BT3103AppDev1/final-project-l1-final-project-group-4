@@ -86,6 +86,7 @@
                 <RouterLink
                   :to="'/marketplace/product/' + product.id + '/edit'"
                   class="edit-btn"
+                  style="background-color: #738678"
                   >Edit Product</RouterLink
                 >
                 <Button
@@ -384,11 +385,21 @@ h3 {
 
 .cart-btn,
 .edit-product-btn a,
-.edit-btn,
 .del-product-btn {
   padding: 15px 20px;
   font-size: 16px;
   border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.edit-btn {
+  padding: 1.1vh 1vw 0.9vh 1vw;
+  font-size: 16px;
+  border-radius: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
@@ -448,14 +459,12 @@ h3 {
 }
 
 .del-product-btn {
-  margin: 20px;
-}
-.del-product-btn {
   background-color: #f44336;
   color: white;
   text-decoration: none;
   border: none;
   cursor: pointer;
+  border-radius: 0px;
 }
 
 .del-product-btn:hover {
