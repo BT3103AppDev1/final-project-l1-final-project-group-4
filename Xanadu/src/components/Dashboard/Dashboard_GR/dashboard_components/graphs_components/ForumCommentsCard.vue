@@ -28,11 +28,9 @@ export default {
 .cardTitle {
   color: var(--White, #fff);
   text-align: center;
-
   font-size: 1.5vw;
   font-style: normal;
   font-weight: 400;
-
   text-transform: capitalize;
 }
 
@@ -46,12 +44,11 @@ export default {
   color: var(--White, #fff);
   text-align: center;
   leading-trim: both;
-
   text-edge: cap;
   font-size: 3vw;
   font-style: normal;
   font-weight: 700;
-  line-height: 40%; /* 39.063% */
+  line-height: 40%;
   letter-spacing: 0.1vw;
 }
 </style>

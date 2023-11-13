@@ -55,7 +55,6 @@ export default {
   },
   async mounted() {
     const auth = getAuth();
-    // console.log(auth.currentUser.uid);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.userId = auth.currentUser.uid;
@@ -64,32 +63,16 @@ export default {
   },
   watch: {
     async userId(userId) {
-      // console.log(this.userId);
       this.activityChartData = await this.getActivityChartData(this.userId);
-      // console.log(this.activityChartData);
-      // let activityData =
       this.activityData = await this.getActivityData(this.userId);
-
-      // For debugging
-      // this.activityData.forEach((doc) => {
-      //   console.log(doc);
-      // });
-      // console.log(this.activityData);
-      console.log(
-        "activityData and activityChartData has loaded in Dashboard.vue."
-      );
       this.purchases = await this.getPurchasesData();
       const forum = await this.getThreadsData();
       this.threadsStarted = forum[0];
       this.noOfComments = forum[1];
-      // console.log(forum);
     },
     purchases(purchases) {
-      // console.log(purchases);
       this.productCategories = Object.keys(purchases);
-      // console.log(this.productCategories);
       this.productCategorySpending = Object.values(purchases);
-      // console.log(this.productCategorySpending);
       this.purchasesData = {
         labels: this.productCategories,
         datasets: [
@@ -114,13 +97,11 @@ export default {
         i++;
       }
       this.highestSpendingProductCategory = this.productCategories[index];
-      // console.log(this.highestSpendingProductCategory);
     },
   },
 
   methods: {
     async refresh() {
-      console.log("refreshed!");
       this.refreshComp += 1;
       this.activityData = await this.getActivityData();
       this.activityChartData = await this.getActivityChartData();
@@ -137,11 +118,8 @@ export default {
         var activity = docs.data();
         activity.id = docs.id;
         activities.push(activity);
-        // console.log(docs.data());
-        //console.log(activity);
       });
       return activities;
-      // console.log(activities);
     },
     async getActivityChartData() {
       let allDocuments = await getDocs(
@@ -164,13 +142,10 @@ export default {
         }
       });
 
-      console.log(activityChartData);
-      // console.log(activityChartData);
       var chartData = {};
       var labels = Object.keys(activityChartData);
       var data = Object.values(activityChartData);
       var colors = ["#738678", "#C86368", "#E4D5A3"];
-      // // console.log(data); // --> this is ok
       var datasets = [
         {
           backgroundColor: colors,
@@ -182,8 +157,6 @@ export default {
         labels: labels,
         datasets: datasets,
       };
-      console.log(chartData);
-
       return chartData;
     },
 
@@ -262,7 +235,7 @@ export default {
   font-size: 2rem;
   font-style: normal;
   font-weight: 700;
-  line-height: 0.75rem; /* 39.063% */
+  line-height: 0.75rem;
   letter-spacing: 0.1rem;
 }
 </style>

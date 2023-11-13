@@ -43,14 +43,6 @@ export default {
     noOfComments: Number,
     highestSpendingProductCategory: String,
   },
-  watch: {
-    activityChartData(data) {
-      // console.log(data);
-    },
-    purchasesData(data) {
-      // console.log(data);
-    },
-  },
 };
 </script>
 
