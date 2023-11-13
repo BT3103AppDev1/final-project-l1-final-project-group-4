@@ -7,7 +7,7 @@
       <div class="search-bar">
         <input v-model="searchTerm" type="text" placeholder="Search for products...">
       </div>
-      <div class="category-filter">
+      <div v-if="!seller" class="category-filter">
         <h3>Categories</h3>
         <div v-for="category in categories" :key="category" class="category-checkbox">
           <input type="checkbox" :id="category" :value="category" v-model="selectedCategories">

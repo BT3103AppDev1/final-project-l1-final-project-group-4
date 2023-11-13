@@ -2,7 +2,7 @@
 import firebaseApp from "@/firebase.js";
 import { getFirestore, setDoc, getDoc, doc, collection, deleteDoc, getDocs } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getAuth, onAuthStateChanged } from "firebase/auth";  // Import these functions only once
+import { getAuth, onAuthStateChanged } from "firebase/auth"; 
 
 
 const db = getFirestore(firebaseApp);
