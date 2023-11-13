@@ -62,10 +62,11 @@ export default {
       sortedSales = sortedSales.map(function (item) {
         var obj = {};
         obj["category"] = item[0];
-        obj["amountEarned"] = "$" + item[1].toString();
+        obj["amountEarned"] = "$" + item[1].toFixed(2).toString();
         return obj;
       });
       this.highestEarningCategories = sortedSales;
+      console.log(sortedSales);
       this.productCategories = Object.keys(sales);
       this.productCategorySpending = Object.values(sales);
       this.salesData = {
