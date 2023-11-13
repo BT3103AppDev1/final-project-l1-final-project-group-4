@@ -17,6 +17,7 @@ import AddThread from "../views/AddThread.vue"; // Added this import
 import AddReply from "../views/AddReply.vue"; // Added this import
 import Orders from "../views/Orders.vue";
 import Profile from "../views/ProfileView.vue";
+import NotFound from "../views/NotFound.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -106,6 +107,11 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: Profile,
+    },
+    {
+      path: "/:catchAll(.*)",
+      name: "notFound",
+      component: NotFound,
     },
   ],
 });
