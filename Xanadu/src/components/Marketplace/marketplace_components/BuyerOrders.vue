@@ -63,7 +63,7 @@ export default {
                 });
 
                 const products = await Promise.all(productsPromises);
-                const totalCost = products.reduce((acc, product) => acc + product.totalCost, 0);
+                const totalCost = products.reduce((acc, product) => acc + product.totalCost, 0).toFixed(2);
 
                 orders.push({
                 order: orderDoc.id,
