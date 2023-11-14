@@ -30,7 +30,6 @@ export default {
       this.confirmShipAndFulfilDialog = true;
     },
     async shipAndFulfilOrders() {
-
       this.$toast.add({
         severity: "info",
         summary: "Shipping Orders...",
@@ -38,7 +37,7 @@ export default {
         life: 3000,
       });
       for (var order of this.selectedOrders) {
-
+        console.log(this.selectedOrders);
         order.status = "Fulfilled";
         // console.log(order);
 
@@ -98,20 +97,22 @@ export default {
           if (productSnapshot.exists()) {
             pictures = productSnapshot.data().pictures || [];
           }
+
           orders.push({
             order: orderDoc.id,
+            categories: orderDoc.data().productCategory,
             address: orderDoc.data().shippingAddress,
             product: orderDoc.data().productName,
             orderPlacedAt: orderDoc.data().orderPlacedAt.toDate(),
             orderDate: orderDoc.data().orderPlacedAt.toDate().toDateString(),
             productPicture: pictures,
+            price: orderDoc.data().productPrice,
             buyer: orderDoc.data().buyerUsername,
             quantity: orderDoc.data().productQuantity,
             status: "pending",
           });
         }
         this.orders = orders.sort((a, b) => b.orderPlacedAt - a.orderPlacedAt);
-
       }
     });
   },

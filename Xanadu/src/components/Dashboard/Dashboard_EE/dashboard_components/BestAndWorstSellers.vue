@@ -52,7 +52,7 @@ export default {
   },
   watch: {
     bestAndWorstSellersInfo(data) {
-      this.productInfo = Object.values(data["details"]);
+      this.productInfo = Object.values(data);
     },
   },
 };

@@ -66,7 +66,7 @@ export default {
         return obj;
       });
       this.highestEarningCategories = sortedSales;
-      console.log(sortedSales);
+      // console.log(sortedSales);
       this.productCategories = Object.keys(sales);
       this.productCategorySpending = Object.values(sales);
       this.salesData = {
@@ -92,28 +92,30 @@ export default {
       const db = getFirestore();
       const usersRef = collection(db, "Eco-Entrepreneur");
       const customerRef = doc(usersRef, this.userId);
-      const pastOrdersRef = collection(customerRef, "Orders");
+      const pastOrdersRef = collection(customerRef, "Fulfilled Orders");
 
       const querySnapshot = await getDocs(pastOrdersRef);
 
       querySnapshot.forEach((productDoc) => {
         const data = productDoc.data();
-        const productName = data.productName;
-        var productPrice = data.productPrice.toString();
-        const productQuantity = data.productQuantity;
-        const productCategory = data.productCategory;
+        // console.log(productDoc.data());
+        const productName = data.product;
+        var productPrice = data.price.toString();
+        const productQuantity = data.quantity;
+        const productCategory = data.categories;
         var categories = "";
         for (const cat of productCategory) {
           categories = categories + cat + ", ";
         }
         categories = categories.slice(0, -2);
         productPrice = "$" + productPrice;
-        if (quantityOfProductsSold.hasOwnProperty(productName)) {
-          quantityOfProductsSold[productName] += productQuantity;
-        } else {
-          quantityOfProductsSold[productName] = productQuantity;
-        }
+        // if (quantityOfProductsSold.hasOwnProperty(productName)) {
+        //   quantityOfProductsSold[productName] += productQuantity;
+        // } else {
+        //   quantityOfProductsSold[productName] = productQuantity;
+        // }
         if (detailsOfProductsSold.hasOwnProperty(productName)) {
+          detailsOfProductsSold[productName].productQuantity += productQuantity;
         } else {
           detailsOfProductsSold[productName] = {
             productName: productName,
@@ -123,16 +125,18 @@ export default {
           };
         }
       });
-      const details = Object.values(detailsOfProductsSold);
-      quantityOfProductsSold = Object.entries(quantityOfProductsSold);
-      quantityOfProductsSold.sort((a, b) => b[1] - a[1]);
-      var bestAndWorstSellers = quantityOfProductsSold.map(
-        (subArray) => subArray[0]
-      );
-      var bestAndWorstSellersInfo = {
-        bestAndWorstSellersInfo: bestAndWorstSellers,
-        details: detailsOfProductsSold,
-      };
+      // const details = Object.values(detailsOfProductsSold);
+      // quantityOfProductsSold = Object.entries(quantityOfProductsSold);
+      // quantityOfProductsSold.sort((a, b) => b[1] - a[1]);
+      // var bestAndWorstSellers = quantityOfProductsSold.map(
+      //   (subArray) => subArray[0]
+      // );
+      // var bestAndWorstSellersInfo = {
+      //   bestAndWorstSellersInfo: bestAndWorstSellers,
+      //   details: detailsOfProductsSold,
+      // };
+      var bestAndWorstSellersInfo = detailsOfProductsSold;
+      // console.log(bestAndWorstSellersInfo);
       return bestAndWorstSellersInfo;
     },
 
@@ -141,15 +145,16 @@ export default {
       const db = getFirestore();
       const usersRef = collection(db, "Eco-Entrepreneur");
       const customerRef = doc(usersRef, this.userId);
-      const pastOrdersRef = collection(customerRef, "Orders");
+      const pastOrdersRef = collection(customerRef, "Fulfilled Orders");
 
       const querySnapshot = await getDocs(pastOrdersRef);
 
       querySnapshot.forEach((productDoc) => {
+        // console.log(productDoc.data());
         const data = productDoc.data();
-        const productCategory = data.productCategory;
-        const productPrice = data.productPrice;
-        const productQuantity = data.productQuantity;
+        const productCategory = data.categories;
+        const productPrice = data.price;
+        const productQuantity = data.quantity;
         const amountEarned = productPrice * productQuantity;
         for (const cat of productCategory) {
           if (sales.hasOwnProperty(cat)) {
